@@ -141,7 +141,7 @@ public class ModuleExtractor {
 		OWLOntology two = OntologyLoader.loadOntology("/users/loco/wgatens/Ontologies/interp/diff2.krss");
 		
 		
-		//OWLOntology nci1 = OntologyLoader.loadOntology("/users/loco/wgatens/Ontologies/NCI/nci-09.03d.owl");
+		OWLOntology nci1 = OntologyLoader.loadOntology("/users/loco/wgatens/Ontologies/NCI/nci-09.03d.owl");
 		//OWLOntology nci2 = OntologyLoader.loadOntology("/users/loco/wgatens/Ontologies/NCI/nci-10.02d.owl");
 
 		ModuleExtractor mod = null;
@@ -153,8 +153,8 @@ public class ModuleExtractor {
 		int percentOfAxioms = (int) Math.max(1, Math.round(((double) ont.getLogicalAxiomCount()/100)*10));
 		
 		
-		OWLOntology chosenOnt = ont;
-		Set<OWLClass> randomSignature = mod.generateRandomClassSignature(chosenOnt,300);
+		OWLOntology chosenOnt = nci1;
+		Set<OWLClass> randomSignature = mod.generateRandomClassSignature(chosenOnt,50);
 //		System.out.println("Signature: " + randomSignature);
 		System.out.println("Signaure Size: " + randomSignature);
 		System.out.println("Ontology Size: " + chosenOnt.getLogicalAxiomCount());

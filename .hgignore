@@ -1,0 +1,6 @@
+s is .hgignore
+syntax: glob
+*.class
+*.log
+bin/**
+# end of file
