@@ -13,22 +13,27 @@ import qbf.QBFSolverException;
 import replacers.InverseRolePropertyReplacer;
 
 public class InseperableChecker {
-	public boolean isInseperableFromEmptySet(HashSet<OWLLogicalAxiom> w, Set<OWLClass> sig) throws IOException, QBFSolverException{
+	public boolean isSeperableFromEmptySet(HashSet<OWLLogicalAxiom> w, Set<OWLClass> sig) throws IOException, QBFSolverException{
 		QBFConvertor convertor = new QBFConvertor();
 		QBFSolver solver =  new QBFSolver();
-//
-//		System.out.println(w);
-//		System.out.println(sig);
-		//Remove inverse roles from the QBF problem
-		InverseRolePropertyReplacer replacer = new InverseRolePropertyReplacer();
-		File qbfProblem = convertor.generateQBFProblem(replacer.convert(w), sig);
-		boolean result = solver.isSatisfiable(qbfProblem);
 
-		if(!result){
-			System.out.println("Separable from ∅?: " + !result);
+
+		boolean isInseperable = true;
+		
+		//If W is empty of course it IS the empty set so is not inseperable from itself
+		if(!w.isEmpty()){
+			//Remove inverse roles from the QBF problem
+			InverseRolePropertyReplacer replacer = new InverseRolePropertyReplacer();
+			File qbfProblem = convertor.generateQBFProblem(replacer.convert(w), sig);
+			isInseperable = solver.isSatisfiable(qbfProblem);
+
+			if(!isInseperable){
+				System.out.println("Separable from ∅?: " + !isInseperable);
+			}
 		}
 
-		return !result;
+		//We test for inseperablity and return the negation
+		return !isInseperable;
 	}
 
 }

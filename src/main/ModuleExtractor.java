@@ -16,7 +16,10 @@ import qbf.QBFSolver;
 import qbf.QBFSolverException;
 import replacers.ModuleUtils;
 
+import checkers.ALCAxiomChecker;
+import checkers.ELChecker;
 import checkers.InseperableChecker;
+import checkers.LHSSigExtractor;
 import checkers.SyntacticDependencyChecker;
 
 import temp.ontologyloader.OntologyLoader;
@@ -27,14 +30,15 @@ public class ModuleExtractor {
 	SyntacticDependencyChecker syntaxDepChecker = new SyntacticDependencyChecker();
 	InseperableChecker insepChecker = new InseperableChecker();
 	QBFSolver qbfSolver = new QBFSolver();
+	LHSSigExtractor lhsExtractor = new LHSSigExtractor();
 	int maxPercentageComplete = 0;
 
 	public ModuleExtractor() throws OWLOntologyCreationException {
 	
 	}
 	
-	public HashSet<OWLLogicalAxiom> extractModule(OWLOntology ontology, Set<OWLClass> signature) throws 
-	OWLOntologyCreationException, IOException, QBFSolverException{		
+	public HashSet<OWLLogicalAxiom> extractModule(OWLOntology ontology, Set<OWLClass> signature) throws IOException, QBFSolverException{
+		
 		HashSet<OWLLogicalAxiom> module = new HashSet<OWLLogicalAxiom>();
 		HashSet<OWLLogicalAxiom> W = new HashSet<OWLLogicalAxiom>();
 		HashSet<OWLLogicalAxiom> terminology = (HashSet<OWLLogicalAxiom>) ontology.getLogicalAxioms();
@@ -52,11 +56,12 @@ public class ModuleExtractor {
 			signatureAndM.addAll(signature);
 			signatureAndM.addAll(ModuleUtils.getClassesInSet(module));
 			printPercentageComplete(W, terminology, module);
-
+			
+			HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(W, signatureAndM);
+			
 			if(syntaxDepChecker.hasSyntacticSigDependency(W, signatureAndM) 
-					|| insepChecker.isInseperableFromEmptySet(W, signatureAndM)){
-				
-				//System.out.println("Adding " + a + " to module");
+					|| insepChecker.isSeperableFromEmptySet(lhsSigT, signatureAndM)){
+
 				module.add(a);
 				W.clear();
 			}
@@ -140,7 +145,6 @@ public class ModuleExtractor {
 		OWLOntology one = OntologyLoader.loadOntology("/users/loco/wgatens/Ontologies/interp/diff.krss");
 		OWLOntology two = OntologyLoader.loadOntology("/users/loco/wgatens/Ontologies/interp/diff2.krss");
 		
-		
 		OWLOntology nci1 = OntologyLoader.loadOntology("/users/loco/wgatens/Ontologies/NCI/nci-09.03d.owl");
 		//OWLOntology nci2 = OntologyLoader.loadOntology("/users/loco/wgatens/Ontologies/NCI/nci-10.02d.owl");
 
@@ -154,21 +158,30 @@ public class ModuleExtractor {
 		
 		
 		OWLOntology chosenOnt = nci1;
-		Set<OWLClass> randomSignature = mod.generateRandomClassSignature(chosenOnt,50);
+		
+		HashSet<OWLLogicalAxiom> alcAxioms = new HashSet<OWLLogicalAxiom>();
+		for(OWLLogicalAxiom axiom : chosenOnt.getLogicalAxioms()){
+			if(new ALCAxiomChecker().isALCAxiom(axiom) && !(new ELChecker().isELAxiom(axiom))){
+				alcAxioms.add(axiom);
+			}
+		}
+		
+		Set<OWLClass> randomSignature = mod.generateRandomClassSignature(chosenOnt,1000);
 //		System.out.println("Signature: " + randomSignature);
 		System.out.println("Signaure Size: " + randomSignature);
 		System.out.println("Ontology Size: " + chosenOnt.getLogicalAxiomCount());
 		
 		HashSet<OWLLogicalAxiom> module = null;
 		try {
-			module = mod.extractModule(chosenOnt, randomSignature);
-		} catch (OWLOntologyCreationException e) {
-			e.printStackTrace();
+			System.out.println("Signature size " + ModuleUtils.getClassesInSet(alcAxioms).size());
+			module = mod.extractModule(chosenOnt, ModuleUtils.getClassesInSet(alcAxioms));
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (QBFSolverException e) {
 			e.printStackTrace();
 		}
+		
 
 		System.out.println("\nExtracted Module (" + module.size() + ") :");
 		for(OWLLogicalAxiom ax: module){
