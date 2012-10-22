@@ -21,10 +21,10 @@ import org.semanticweb.owlapi.model.OWLOntology;
 
 import formula.CNFFormula;
 
-import replacers.ModuleUtils;
 import sat.CNFtoSATConvertor;
 import sat.OntologytoCNFConvertor;
 import temp.ontologyloader.OntologyLoader;
+import util.ModuleUtils;
 
 public class QBFConvertor {
 
@@ -66,7 +66,7 @@ public class QBFConvertor {
 			HashSet<OWLEntity> classesNotInSignature, 
 			CNFFormula cnfOntology) throws IOException{
 
-		File file = new File("/users/loco/wgatens/QBF/Files/temper" + Math.random() +".qdimacs");
+		File file = new File("/users/loco/wgatens/QBF/Files/temper.qdimacs");
 		if (!file.exists()) {
 			file.createNewFile();
 		}

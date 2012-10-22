@@ -11,8 +11,8 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import replacers.ModuleUtils;
 import temp.ontologyloader.OntologyLoader;
+import util.ModuleUtils;
 
 public class Dependencies {
 
