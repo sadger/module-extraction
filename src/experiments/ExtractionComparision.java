@@ -22,6 +22,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import qbf.QBFSolverException;
 
+import temp.ontologyloader.OntologyLoader;
 import uk.ac.manchester.cs.owlapi.dlsyntax.DLSyntaxObjectRenderer;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
@@ -32,6 +33,8 @@ public class ExtractionComparision {
 	
 	public static void main(String[] args) {
 		ExtractionComparision compare = new ExtractionComparision();
+		
+		///OWLOntology ontology = compare.loadOntology("/users/loco/wgatens/Ontologies/module/pathway.obo");
 		OWLOntology ontology = compare.loadOntology("/users/loco/wgatens/Ontologies/NCI/nci-09.03d.owl");
 		//"/users/loco/wgatens/Ontologies/NCI/nci-09.03d.owl"
 		//"/users/loco/wgatens/Ontologies/NCI/nci-10.02d.owl";
@@ -41,22 +44,27 @@ public class ExtractionComparision {
 		
 		
 		SyntacticLocalityModuleExtractor syntaxModExtractor = 
-				new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.STAR);
+				new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.BOT);
 		ModuleExtractor moduleExtractor = new ModuleExtractor();
+		
+	
 		
 		/* The tests use the same signature (just OWLClass) but one must be converted to OWLEntities as expected 
 		 * by the OWLAPI*/
-		Set<OWLClass> randomClassSignature = ModuleUtils.generateRandomClassSignature(ontology, 1000);
+		Set<OWLClass> randomClassSignature = ModuleUtils.generateRandomClassSignature(ontology, 100);
 		Set<OWLEntity> randomSignature = 
 				new HashSet<OWLEntity>(randomClassSignature);
 		
+		System.out.println(randomClassSignature);
+		
+
 		HashSet<OWLLogicalAxiom> syntacticModule = (HashSet<OWLLogicalAxiom>) compare.getLogicalAxioms(syntaxModExtractor.extract(randomSignature));
 		@SuppressWarnings("unchecked")
 		HashSet<OWLLogicalAxiom> syntacticCopy = (HashSet<OWLLogicalAxiom>) syntacticModule.clone();
 		System.out.println("DONE size=" + syntacticCopy.size());
-		Set<OWLLogicalAxiom> semanticModule = null;
+		Set<OWLLogicalAxiom> syntThenSemanticModule = null;
 		try {
-			semanticModule = moduleExtractor.extractModule(syntacticCopy, randomClassSignature);
+			syntThenSemanticModule = moduleExtractor.extractModule(syntacticCopy, randomClassSignature);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (QBFSolverException e) {
@@ -64,7 +72,9 @@ public class ExtractionComparision {
 		}
 		
 		System.out.println("Syntatic Size: " + syntacticModule.size());
-		System.out.println("Semantic Size: " + semanticModule.size());
+		System.out.println("Synt->Semantic Size: " + syntThenSemanticModule.size());
+		
+		System.out.println(syntThenSemanticModule);
 
 	}
 
