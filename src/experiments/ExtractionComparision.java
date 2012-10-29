@@ -42,7 +42,6 @@ public class ExtractionComparision {
 		
 		
 		
-		
 		SyntacticLocalityModuleExtractor syntaxModExtractor = 
 				new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.BOT);
 		ModuleExtractor moduleExtractor = new ModuleExtractor();
