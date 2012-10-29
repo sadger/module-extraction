@@ -1,12 +1,16 @@
 package checkers;
 
+
+
 import java.util.HashSet;
 import java.util.Set;
 
-import interpretation.util.AxiomSplitter;
+import ontologyutils.AxiomSplitter;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+
+
 
 
 public class LHSSigExtractor {

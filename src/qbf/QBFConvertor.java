@@ -10,6 +10,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import ontologyutils.OntologyLoader;
+
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.IteratorInt;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -24,7 +26,6 @@ import formula.CNFFormula;
 
 import sat.CNFtoSATConvertor;
 import sat.OntologytoCNFConvertor;
-import temp.ontologyloader.OntologyLoader;
 import util.ModuleUtils;
 
 public class QBFConvertor {

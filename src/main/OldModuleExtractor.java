@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import ontologyutils.OntologyLoader;
+
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -22,7 +25,6 @@ import checkers.InseperableChecker;
 import checkers.LHSSigExtractor;
 import checkers.SyntacticDependencyChecker;
 
-import temp.ontologyloader.OntologyLoader;
 import util.ModuleUtils;
 
 public class OldModuleExtractor {

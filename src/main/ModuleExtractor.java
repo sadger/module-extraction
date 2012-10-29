@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
+import ontologyutils.OntologyLoader;
+
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -25,7 +27,6 @@ import checkers.SyntacticDependencyChecker;
 
 import qbf.QBFSolver;
 import qbf.QBFSolverException;
-import temp.ontologyloader.OntologyLoader;
 import util.ModuleUtils;
 
 public class ModuleExtractor {

@@ -1,17 +1,20 @@
 package checkers;
 
-import interpretation.util.AxiomSplitter;
+
+
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+
+import ontologyutils.AxiomSplitter;
+import ontologyutils.OntologyLoader;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import temp.ontologyloader.OntologyLoader;
 import util.ModuleUtils;
 
 public class Dependencies {
@@ -31,16 +34,27 @@ public class Dependencies {
 		return dependencies.get(name);
 	}
 	
+	public boolean isEmpty(){
+		return dependencies.isEmpty();
+	}
+	
 	private void initialiseMappings(){
 		for(OWLClass c : ModuleUtils.getClassesInSet(ontology)){
 			dependencies.put(c, new HashSet<OWLClass>());
 		}
 	}
 	
-	public boolean isEmpty(){
-		return dependencies.isEmpty();
+	private void populateFromOwnDefinitions(){
+		for(OWLLogicalAxiom axiom : ontology){
+			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
+			OWLClassExpression definition = AxiomSplitter.getDefinitionofAxiom(axiom);
+
+			//Add class names in immediate definition to that classes dependencies
+			dependencies.get(name).addAll(definition.getClassesInSignature());
+		}
 	}
 	
+
 	private void buildMappings() {
 		for(OWLClass cls : ModuleUtils.getClassesInSet(ontology)){
 			addImmediateDepsTo(cls, dependencies.get(cls));
@@ -65,16 +79,7 @@ public class Dependencies {
 		
 	}
 
-	private void populateFromOwnDefinitions(){
-		for(OWLLogicalAxiom axiom : ontology){
-			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
-			OWLClassExpression definition = AxiomSplitter.getDefinitionofAxiom(axiom);
 
-			//Add class names in immediate definition to that classes dependencies
-			dependencies.get(name).addAll(definition.getClassesInSignature());
-		}
-	}
-	
 	public void clearMappings(){
 		dependencies.clear();
 	}

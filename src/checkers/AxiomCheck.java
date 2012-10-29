@@ -1,9 +1,11 @@
 package checkers;
 
+import ontologyutils.OntologyLoader;
+
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import temp.ontologyloader.OntologyLoader;
+
 
 
 public class AxiomCheck {

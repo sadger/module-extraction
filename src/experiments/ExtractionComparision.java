@@ -1,6 +1,5 @@
 package experiments;
 
-import interpretation.util.AxiomExtractor;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,6 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import main.ModuleExtractor;
+
+import ontologyutils.AxiomExtractor;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.ToStringRenderer;
@@ -22,7 +23,6 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import qbf.QBFSolverException;
 
-import temp.ontologyloader.OntologyLoader;
 import uk.ac.manchester.cs.owlapi.dlsyntax.DLSyntaxObjectRenderer;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
@@ -46,11 +46,9 @@ public class ExtractionComparision {
 				new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.BOT);
 		ModuleExtractor moduleExtractor = new ModuleExtractor();
 		
-	
-		
 		/* The tests use the same signature (just OWLClass) but one must be converted to OWLEntities as expected 
 		 * by the OWLAPI*/
-		Set<OWLClass> randomClassSignature = ModuleUtils.generateRandomClassSignature(ontology, 100);
+		Set<OWLClass> randomClassSignature = ModuleUtils.generateRandomClassSignature(ontology, 200);
 		Set<OWLEntity> randomSignature = 
 				new HashSet<OWLEntity>(randomClassSignature);
 		
@@ -86,9 +84,11 @@ public class ExtractionComparision {
 		}
 		return result;
 	}
+	
 	public OWLOntologyManager getManager() {
 		return manager;
 	}
+	
 	private OWLOntology loadOntology(String pathName) {
 		ToStringRenderer stringRender = ToStringRenderer.getInstance();
 		DLSyntaxObjectRenderer renderer;
