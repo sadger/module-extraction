@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import ontologyutils.AxiomExtractor;
 import ontologyutils.AxiomSplitter;
 import ontologyutils.OntologyLoader;
 
@@ -21,9 +22,11 @@ public class Dependencies {
 
 	private HashMap<OWLClass, HashSet<OWLClass>> dependencies = new HashMap<OWLClass, HashSet<OWLClass>>();
 	private Set<OWLLogicalAxiom> ontology;
+	AxiomExtractor extractor = new AxiomExtractor();
 
 	public Dependencies(Set<OWLLogicalAxiom> ont) {
-		this.ontology = ont;
+		/* We can only generate dependencies for inclusions or equalities */
+		this.ontology = extractor.extractInclusionsAndEqualities(ont);
 		initialiseMappings();
 		populateFromOwnDefinitions();
 		buildMappings();

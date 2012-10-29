@@ -92,22 +92,17 @@ public class ModuleExtractor {
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 	
-		OWLOntology ont = OntologyLoader.loadOntology("/users/loco/wgatens/Ontologies/module/pathway.obo");
+		//OWLOntology ont = OntologyLoader.loadOntology("/home/william/Phd/Ontologies");
 		
-		OWLOntology ont2 = OntologyLoader.loadOntology("/users/loco/wgatens/Ontologies/module/material.owl");
-
-		OWLOntology one = OntologyLoader.loadOntology("/users/loco/wgatens/Ontologies/interp/diff.krss");
-		OWLOntology two = OntologyLoader.loadOntology("/users/loco/wgatens/Ontologies/interp/diff2.krss");
-		
-		//OWLOntology nci1 = OntologyLoader.loadOntology("/users/loco/wgatens/Ontologies/NCI/nci-09.03d.owl");
-		//OWLOntology nci2 = OntologyLoader.loadOntology("/users/loco/wgatens/Ontologies/NCI/nci-10.02d.owl");
+		OWLOntology nci1 = OntologyLoader.loadOntology("/home/william/PhD/Ontologies/NCI/nci-09.03d.owl");
+		//OWLOntology nci2 = OntologyLoader.loadOntology("/home/william/Phd/Ontologies/NCI/nci-10.02d.owl");
 
 		ModuleExtractor mod = null;
 		mod = new ModuleExtractor();
-		int percentOfAxioms = (int) Math.max(1, Math.round(((double) ont.getLogicalAxiomCount()/100)*10));
+		//int percentOfAxioms = (int) Math.max(1, Math.round(((double) ont.getLogicalAxiomCount()/100)*10));
 		
 		
-		OWLOntology chosenOnt = ont;
+		OWLOntology chosenOnt = nci1;
 
 		
 		Set<OWLClass> randomSignature = ModuleUtils.generateRandomClassSignature(chosenOnt,100);

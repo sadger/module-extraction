@@ -40,6 +40,8 @@ public class QBFConvertor {
 	private Set<OWLLogicalAxiom> ontology;
 	ArrayList<String> toWrite;
 
+	/* Must have .qdimacs extention or skizzo complains */
+	final static String FILE_TO_WRITE = "/home/william/Programs/skizzo/temp.qdimacs";
 
 	public QBFConvertor(Set<OWLLogicalAxiom> ontology, Set<OWLClass> signature) {
 		this.ontology = ontology;
@@ -132,7 +134,7 @@ public class QBFConvertor {
 	}
 
 	private File createQBFFile(List<String> list){
-		File file = new File("/users/loco/wgatens/QBF/Files/temper.qdimacs");
+		File file = new File(FILE_TO_WRITE);
 		if (!file.exists()) {
 			try {
 				file.createNewFile();
@@ -169,6 +171,7 @@ public class QBFConvertor {
 		return file;
 	}
 
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
