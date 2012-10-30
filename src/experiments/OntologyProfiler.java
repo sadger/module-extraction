@@ -133,7 +133,7 @@ public class OntologyProfiler {
 	
 
 	public static void main(String[] args) {
-		OWLOntology nci1 = OntologyLoader.loadOntologyAllAxioms("/home/william/PhD/Ontologies/NCI/nci-10.02d.owl");
+		OWLOntology nci1 = OntologyLoader.loadOntologyAllAxioms("/users/loco/wgatens/Ontologies/NCI/nci-10.02d.owl");
 		OntologyProfiler profiler = new OntologyProfiler(nci1);
 		profiler.showProfile();
 	}
