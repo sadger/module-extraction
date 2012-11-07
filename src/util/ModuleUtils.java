@@ -62,6 +62,20 @@ public class ModuleUtils {
 		return result;
 	}
 	
+	public static Set<OWLLogicalAxiom> generateRandomAxioms(Set<OWLLogicalAxiom> originalOntology, int desiredSize){
+		Set<OWLLogicalAxiom> result = null;
+		
+		if(desiredSize >= originalOntology.size())
+			result = originalOntology;
+		else{
+			ArrayList<OWLLogicalAxiom> listOfAxioms = new ArrayList<OWLLogicalAxiom>(originalOntology);
+			Collections.shuffle(listOfAxioms);
+			result = new HashSet<OWLLogicalAxiom>(listOfAxioms.subList(0, desiredSize));
+		}
+		
+		return result;
+	}
+	
 	
 	public static void remapIRIs(HashSet<OWLOntology> ontologies, String prefix) {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
