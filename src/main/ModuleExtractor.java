@@ -39,14 +39,21 @@ public class ModuleExtractor {
 	LHSSigExtractor lhsExtractor = new LHSSigExtractor();
 	
 	public HashSet<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> terminology, Set<OWLClass> signature) throws IOException, QBFSolverException{
+
+		ELChecker checker = new ELChecker();
+		
 		HashSet<OWLLogicalAxiom> module = new HashSet<OWLLogicalAxiom>();
 		HashSet<OWLLogicalAxiom> W  = new HashSet<OWLLogicalAxiom>();
 		Iterator<OWLLogicalAxiom> axiomIterator = terminology.iterator();
 		
+		boolean isEL = true;
 		
 		//Terminology is the value of T\M as we remove items as we add them to the module
 		while(!terminology.equals(W)){
 			OWLLogicalAxiom chosenAxiom = axiomIterator.next();
+			
+			isEL = isEL && checker.isELAxiom(chosenAxiom);
+			
 			W.add(chosenAxiom);
 			
 			printPercentageComplete(W, terminology, module);
@@ -57,13 +64,14 @@ public class ModuleExtractor {
 			
 			HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(W, signatureAndM);
 			
-			if(syntaxDepChecker.hasSyntacticSigDependency(W, signatureAndM) 
+			if(syntaxDepChecker.hasSyntacticSigDependency(W, signatureAndM)
 					|| insepChecker.isSeperableFromEmptySet(lhsSigT, signatureAndM)){
 
 				terminology.remove(chosenAxiom);
 				module.add(chosenAxiom);
 				W.clear();
 				//reset the iterator
+				
 				axiomIterator = terminology.iterator();
 			}
 			
