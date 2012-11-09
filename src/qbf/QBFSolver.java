@@ -6,11 +6,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import util.ModulePaths;
+
 public class QBFSolver {
 
 	public boolean isSatisfiable (File dimacsLocation) throws QBFSolverException{
 		ProcessBuilder pb = new ProcessBuilder("./sKizzo", dimacsLocation.getAbsolutePath());
-		pb.directory(new File("/users/loco/wgatens/QBF/Skizzo"));
+		pb.directory(new File(ModulePaths.getQBFSolverLocation()));
 		Process proc = null;
 
 		try {

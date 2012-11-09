@@ -8,8 +8,8 @@ import ontologyutils.AxiomSplitter;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import util.DefinitorialDepth;
 import util.ModuleUtils;
+import util.NewDefinitorialDepth;
 
 
 public class DefinitorialDependencies {
@@ -44,7 +44,7 @@ public class DefinitorialDependencies {
 	}
 	
 	private void calculateDependencies(){
-		DefinitorialDepth definitorialDepth = new DefinitorialDepth(logicalAxioms);
+		NewDefinitorialDepth definitorialDepth = new NewDefinitorialDepth(logicalAxioms);
 		for(OWLLogicalAxiom axiom : definitorialDepth.getDefinitorialSortedList())
 			addFromTop(axiom);
 	}

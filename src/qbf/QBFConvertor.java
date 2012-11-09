@@ -26,6 +26,7 @@ import formula.CNFFormula;
 
 import sat.CNFtoSATConvertor;
 import sat.OntologytoCNFConvertor;
+import util.ModulePaths;
 import util.ModuleUtils;
 
 public class QBFConvertor {
@@ -41,9 +42,7 @@ public class QBFConvertor {
 	ArrayList<String> toWrite;
 
 	/* Must have .qdimacs extention or skizzo complains */
-
-	
-	final static String FILE_TO_WRITE = "/users/loco/wgatens/QBF/Files/temp.qdimacs";
+	final static String FILE_TO_WRITE = ModulePaths.getQBFSolverLocation() + "Files/temp.qdimacs";
 
 	public QBFConvertor(Set<OWLLogicalAxiom> ontology, Set<OWLClass> signature) {
 		this.ontology = ontology;

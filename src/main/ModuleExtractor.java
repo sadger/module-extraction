@@ -1,12 +1,8 @@
 package main;
 
 import java.io.IOException;
-import java.security.Signature;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.Set;
 
 import ontologyutils.OntologyLoader;
@@ -16,17 +12,15 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-import checkers.ALCAxiomChecker;
-import checkers.ELChecker;
 import checkers.InseperableChecker;
 import checkers.LHSSigExtractor;
 import checkers.SyntacticDependencyChecker;
 
 import qbf.QBFSolver;
 import qbf.QBFSolverException;
+import util.ModulePaths;
 import util.ModuleUtils;
 
 public class ModuleExtractor {
@@ -78,7 +72,6 @@ public class ModuleExtractor {
 		
 	}
 
-	
 	@SuppressWarnings("unused")
 	private void printPercentageComplete(Set<OWLLogicalAxiom> W, Set<OWLLogicalAxiom> terminology, Set<OWLLogicalAxiom> module) {
 		int terminologySize = terminology.size();
@@ -97,7 +90,7 @@ public class ModuleExtractor {
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 	
-		OWLOntology ont = OntologyLoader.loadOntology("/users/loco/wgatens/Ontologies/interp/semanticdep.krss");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"interp/diff.krss");
 		
 		//OWLOntology nci1 = OntologyLoader.loadOntology("/home/william/PhD/Ontologies/NCI/nci-09.03d.owl");
 		//OWLOntology nci2 = OntologyLoader.loadOntology("/home/william/Phd/Ontologies/NCI/nci-10.02d.owl");
