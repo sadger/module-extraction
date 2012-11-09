@@ -10,7 +10,7 @@ public class QBFSolver {
 
 	public boolean isSatisfiable (File dimacsLocation) throws QBFSolverException{
 		ProcessBuilder pb = new ProcessBuilder("./sKizzo", dimacsLocation.getAbsolutePath());
-		pb.directory(new File("/home/william/Programs/skizzo"));
+		pb.directory(new File("/users/loco/wgatens/QBF/Skizzo"));
 		Process proc = null;
 
 		try {

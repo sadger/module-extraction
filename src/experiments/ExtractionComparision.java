@@ -35,7 +35,8 @@ public class ExtractionComparision {
 		ExtractionComparision compare = new ExtractionComparision();
 		
 		///OWLOntology ontology = compare.loadOntology("/users/loco/wgatens/Ontologies/module/pathway.obo");
-		OWLOntology ontology = compare.loadOntology("/home/william/PhD/Ontologies/NCI/nci-09.03d.owl");
+		OWLOntology ontology = compare.loadOntology("/media/2E33-E265/NCI/Thesaurus_04.03n.OWL");
+		//OWLOntology ontology = compare.loadOntology("/home/william/PhD/Ontologies/NCI/nci-09.03d.owl");
 		//"/users/loco/wgatens/Ontologies/NCI/nci-09.03d.owl"
 		//"/users/loco/wgatens/Ontologies/NCI/nci-10.02d.owl";
 		OWLOntologyManager manager = compare.getManager();

@@ -40,19 +40,15 @@ public class ModuleExtractor {
 	
 	public HashSet<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> terminology, Set<OWLClass> signature) throws IOException, QBFSolverException{
 
-		ELChecker checker = new ELChecker();
 		
 		HashSet<OWLLogicalAxiom> module = new HashSet<OWLLogicalAxiom>();
 		HashSet<OWLLogicalAxiom> W  = new HashSet<OWLLogicalAxiom>();
 		Iterator<OWLLogicalAxiom> axiomIterator = terminology.iterator();
 		
-		boolean isEL = true;
 		
 		//Terminology is the value of T\M as we remove items as we add them to the module
 		while(!terminology.equals(W)){
 			OWLLogicalAxiom chosenAxiom = axiomIterator.next();
-			
-			isEL = isEL && checker.isELAxiom(chosenAxiom);
 			
 			W.add(chosenAxiom);
 			
@@ -68,6 +64,7 @@ public class ModuleExtractor {
 					|| insepChecker.isSeperableFromEmptySet(lhsSigT, signatureAndM)){
 
 				terminology.remove(chosenAxiom);
+				System.out.println("Adding " + chosenAxiom);
 				module.add(chosenAxiom);
 				W.clear();
 				//reset the iterator
@@ -100,9 +97,9 @@ public class ModuleExtractor {
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 	
-		//OWLOntology ont = OntologyLoader.loadOntology("/home/william/Phd/Ontologies");
+		OWLOntology ont = OntologyLoader.loadOntology("/users/loco/wgatens/Ontologies/interp/semanticdep.krss");
 		
-		OWLOntology nci1 = OntologyLoader.loadOntology("/home/william/PhD/Ontologies/NCI/nci-09.03d.owl");
+		//OWLOntology nci1 = OntologyLoader.loadOntology("/home/william/PhD/Ontologies/NCI/nci-09.03d.owl");
 		//OWLOntology nci2 = OntologyLoader.loadOntology("/home/william/Phd/Ontologies/NCI/nci-10.02d.owl");
 
 		ModuleExtractor mod = null;
@@ -110,10 +107,10 @@ public class ModuleExtractor {
 		//int percentOfAxioms = (int) Math.max(1, Math.round(((double) ont.getLogicalAxiomCount()/100)*10));
 		
 		
-		OWLOntology chosenOnt = nci1;
+		OWLOntology chosenOnt = ont;
 
 		
-		Set<OWLClass> randomSignature = ModuleUtils.generateRandomClassSignature(chosenOnt,100);
+		Set<OWLClass> randomSignature = ModuleUtils.generateRandomClassSignature(chosenOnt,3);
 //		System.out.println("Signature: " + randomSignature);
 		System.out.println("Signaure Size: " + randomSignature);
 		System.out.println("Ontology Size: " + chosenOnt.getLogicalAxiomCount());

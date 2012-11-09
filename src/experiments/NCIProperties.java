@@ -18,7 +18,7 @@ public class NCIProperties {
 		equivChecker = new EquivalentToTerminologyChecker();
 	}
 	public void getProperties(){
-		File directory = new File("/media/transformer/NCI/");
+		File directory = new File("/media/2E33-E265/NCI/");
 		for (final File file : directory.listFiles()) {
 	        if (file.isFile()) {
 	        	System.out.println(file.getName());
