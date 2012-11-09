@@ -4,12 +4,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import ontologyutils.AxiomSplitter;
-import ontologyutils.OntologyLoader;
+import loader.OntologyLoader;
+
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+
+import axioms.AxiomSplitter;
 
 import util.ModuleUtils;
 

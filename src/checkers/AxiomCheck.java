@@ -1,6 +1,6 @@
 package checkers;
 
-import ontologyutils.OntologyLoader;
+import loader.OntologyLoader;
 
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;

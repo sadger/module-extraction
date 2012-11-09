@@ -3,11 +3,18 @@ package checkers;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import ontologyutils.AxiomExtractor;
-import ontologyutils.AxiomSplitter;
+
+import loader.OntologyLoader;
+
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
+
+import axioms.AxiomExtractor;
+import axioms.AxiomSplitter;
+
+import util.ModulePaths;
 import util.ModuleUtils;
 import util.NewDefinitorialDepth;
 
@@ -61,5 +68,15 @@ public class DefinitorialDependencies {
 		}
 	}
 	
-
+	public static void main(String[] args) {
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-03.10j.owl");
+		System.out.println("Ontology Loaded");
+		DefinitorialDependencies def = new DefinitorialDependencies(ont.getLogicalAxioms());
+//		for(OWLLogicalAxiom ax : ont.getLogicalAxioms())
+//			System.out.println(ax);
+		for(OWLClass cls : ont.getClassesInSignature()){
+			System.out.println(cls + ":" + def.getDependenciesFor(cls));
+		}
+	}
+	
 }

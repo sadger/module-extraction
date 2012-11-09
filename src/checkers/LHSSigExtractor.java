@@ -5,10 +5,11 @@ package checkers;
 import java.util.HashSet;
 import java.util.Set;
 
-import ontologyutils.AxiomSplitter;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+
+import axioms.AxiomSplitter;
 
 
 

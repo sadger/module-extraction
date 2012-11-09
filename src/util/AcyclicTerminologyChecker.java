@@ -1,9 +1,10 @@
 package util;
 
-import ontologyutils.OntologyLoader;
-import ontologyutils.TerminologyChecker;
+import loader.OntologyLoader;
 
 import org.semanticweb.owlapi.model.OWLOntology;
+
+import terminology.TerminologyChecker;
 
 
 public class AcyclicTerminologyChecker {

@@ -2,7 +2,6 @@ package checkers;
 
 
 
-import ontologyutils.AxiomSplitter;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -25,6 +24,8 @@ import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
 import org.semanticweb.owlapi.model.OWLObjectOneOf;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLObjectUnionOf;
+
+import axioms.AxiomSplitter;
 
 
 public class ELChecker implements OWLClassExpressionVisitorEx<Boolean>{

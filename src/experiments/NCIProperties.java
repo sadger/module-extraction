@@ -2,11 +2,12 @@ package experiments;
 
 import java.io.File;
 
+import loader.OntologyLoader;
+
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import ontologyutils.EquivalentToTerminologyChecker;
-import ontologyutils.OntologyLoader;
-import ontologyutils.TerminologyChecker;
+import terminology.EquivalentToTerminologyChecker;
+import terminology.TerminologyChecker;
 
 public class NCIProperties {
 

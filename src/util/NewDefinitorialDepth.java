@@ -8,13 +8,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import ontologyutils.AxiomSplitter;
-import ontologyutils.OntologyLoader;
+import loader.OntologyLoader;
+
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+
+import axioms.AxiomSplitter;
 
 
 public class NewDefinitorialDepth {
@@ -109,7 +111,7 @@ public class NewDefinitorialDepth {
 	}
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "interp/diff.krss");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-03.10j.owl");
 		System.out.println("Ontology Loaded");
 		NewDefinitorialDepth d = new NewDefinitorialDepth(ont);
 		for(OWLLogicalAxiom ax : d.getDefinitorialSortedList()){

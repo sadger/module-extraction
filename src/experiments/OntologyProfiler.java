@@ -4,13 +4,15 @@ import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Set;
 
-import ontologyutils.AxiomExtractor;
-import ontologyutils.OntologyLoader;
+import loader.OntologyLoader;
+
 
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
+
+import axioms.AxiomExtractor;
 
 import checkers.Dependencies;
 

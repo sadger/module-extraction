@@ -4,7 +4,6 @@ package replacers;
 import java.util.HashSet;
 import java.util.Set;
 
-import ontologyutils.AxiomSplitter;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
@@ -35,6 +34,8 @@ import org.semanticweb.owlapi.model.OWLObjectUnionOf;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+
+import axioms.AxiomSplitter;
 
 
 public class InverseRolePropertyReplacer implements OWLClassExpressionVisitorEx<OWLClassExpression>{

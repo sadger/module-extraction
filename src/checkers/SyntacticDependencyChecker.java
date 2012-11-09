@@ -12,7 +12,7 @@ public class SyntacticDependencyChecker {
 	}
 
 	public boolean hasSyntacticSigDependency(Set<OWLLogicalAxiom> ontology, Set<OWLClass> signature){
-		boolean result = false;
+		boolean result = false;	
 		DefinitorialDependencies dependencies = new DefinitorialDependencies(ontology);
 		//Dependencies deps = new Dependencies(ontology);
 		

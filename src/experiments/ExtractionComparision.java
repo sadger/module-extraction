@@ -8,7 +8,6 @@ import java.util.Set;
 
 import main.ModuleExtractor;
 
-import ontologyutils.AxiomExtractor;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.ToStringRenderer;
@@ -20,6 +19,8 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+
+import axioms.AxiomExtractor;
 
 import qbf.QBFSolverException;
 
