@@ -1,45 +1,37 @@
 package experiments;
 
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import loader.OntologyLoader;
 import main.ModuleExtractor;
 
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.ToStringRenderer;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-
-import axioms.AxiomExtractor;
 
 import qbf.QBFSolverException;
 
-import uk.ac.manchester.cs.owlapi.dlsyntax.DLSyntaxObjectRenderer;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
+import util.ModulePaths;
 import util.ModuleUtils;
 
 public class ExtractionComparision {
+	private static final int SIGNATURE_SIZE = 100\;
 	OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 	
 	public static void main(String[] args) {
-		ExtractionComparision compare = new ExtractionComparision();
 		
-		///OWLOntology ontology = compare.loadOntology("/users/loco/wgatens/Ontologies/module/pathway.obo");
-		OWLOntology ontology = compare.loadOntology("/media/2E33-E265/NCI/Thesaurus_04.03n.OWL");
-		//OWLOntology ontology = compare.loadOntology("/home/william/PhD/Ontologies/NCI/nci-09.03d.owl");
-		//"/users/loco/wgatens/Ontologies/NCI/nci-09.03d.owl"
-		//"/users/loco/wgatens/Ontologies/NCI/nci-10.02d.owl";
+		ExtractionComparision compare = new ExtractionComparision();
+		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/Thesaurus_08.11d-terminology.owl");
 		OWLOntologyManager manager = compare.getManager();
 		
 		
@@ -50,7 +42,7 @@ public class ExtractionComparision {
 		
 		/* The tests use the same signature (just OWLClass) but one must be converted to OWLEntities as expected 
 		 * by the OWLAPI*/
-		Set<OWLClass> randomClassSignature = ModuleUtils.generateRandomClassSignature(ontology, 200);
+		Set<OWLClass> randomClassSignature = ModuleUtils.generateRandomClassSignature(ontology, SIGNATURE_SIZE);
 		Set<OWLEntity> randomSignature = 
 				new HashSet<OWLEntity>(randomClassSignature);
 		
@@ -70,6 +62,7 @@ public class ExtractionComparision {
 			e.printStackTrace();
 		}
 		
+		System.out.println("Signature Size: " + SIGNATURE_SIZE);
 		System.out.println("Syntatic Size: " + syntacticModule.size());
 		System.out.println("Synt->Semantic Size: " + syntThenSemanticModule.size());
 		
@@ -89,30 +82,6 @@ public class ExtractionComparision {
 	
 	public OWLOntologyManager getManager() {
 		return manager;
-	}
-	
-	private OWLOntology loadOntology(String pathName) {
-		ToStringRenderer stringRender = ToStringRenderer.getInstance();
-		DLSyntaxObjectRenderer renderer;
-		renderer =  new DLSyntaxObjectRenderer();
-		stringRender.setRenderer(renderer);
-
-		OWLOntology ontology = null;
-		
-		try {
-			ontology =  
-					manager.loadOntologyFromOntologyDocument
-					(new File(pathName));
-			
-		} catch (OWLOntologyCreationException e) {
-			e.printStackTrace();
-		}
-		
-		AxiomExtractor extract = new AxiomExtractor();
-		ontology = extract.extractInclusionsAndEqualities(ontology);
-		
-		return ontology;
-
 	}
 	
 

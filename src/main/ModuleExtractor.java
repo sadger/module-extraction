@@ -62,8 +62,7 @@ public class ModuleExtractor {
 				System.out.println("Adding " + chosenAxiom);
 				module.add(chosenAxiom);
 				W.clear();
-				//reset the iterator
-				
+				/* reset the iterator */
 				axiomIterator = terminology.iterator();
 			}
 			
@@ -91,7 +90,7 @@ public class ModuleExtractor {
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 	
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"interp/diff.krss");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/Thesaurus_08.11d-terminology.owl");
 		
 		//OWLOntology nci1 = OntologyLoader.loadOntology("/home/william/PhD/Ontologies/NCI/nci-09.03d.owl");
 		//OWLOntology nci2 = OntologyLoader.loadOntology("/home/william/Phd/Ontologies/NCI/nci-10.02d.owl");
