@@ -14,19 +14,20 @@ import org.semanticweb.owlapi.model.OWLOntology;
 
 import axioms.AxiomExtractor;
 
-import checkers.Dependencies;
+import checkers.DefinitorialDependencies;
 
 public class OntologyProfiler {
 
 	HashMap<OWLClass, Integer> depSizes =  new HashMap<OWLClass, Integer>();
 	OWLOntology ontology;
-	Dependencies dependencies;
+	DefinitorialDependencies dependencies;
 	AxiomExtractor extractor = new AxiomExtractor();
 	NumberFormat nf = NumberFormat.getInstance();
 
 	public OntologyProfiler(OWLOntology ont) {
 		this.ontology = ont;
-		this.dependencies = new Dependencies
+		
+		this.dependencies = new DefinitorialDependencies
 				(extractor.extractInclusionsAndEqualities(ontology.getLogicalAxioms()));
 	}
 	

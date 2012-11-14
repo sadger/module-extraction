@@ -25,13 +25,13 @@ import util.ModulePaths;
 import util.ModuleUtils;
 
 public class ExtractionComparision {
-	private static final int SIGNATURE_SIZE = 100\;
+	private static final int SIGNATURE_SIZE = 100;
 	OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 	
 	public static void main(String[] args) {
 		
 		ExtractionComparision compare = new ExtractionComparision();
-		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/Thesaurus_08.11d-terminology.owl");
+		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/nci_08_09d-terminology.owl");
 		OWLOntologyManager manager = compare.getManager();
 		
 		

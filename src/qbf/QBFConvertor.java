@@ -45,6 +45,7 @@ public class QBFConvertor {
 	/* Must have .qdimacs extention or skizzo complains */
 	final static String FILE_TO_WRITE = ModulePaths.getQBFSolverLocation() + "Files/temp.qdimacs";
 
+
 	public QBFConvertor(Set<OWLLogicalAxiom> ontology, Set<OWLClass> signature) {
 		this.ontology = ontology;
 		this.signature = signature;
