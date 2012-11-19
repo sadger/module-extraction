@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import javax.tools.DiagnosticCollector;
 
 import loader.OntologyLoader;
 
@@ -21,6 +26,7 @@ import checkers.SyntacticDependencyChecker;
 
 import qbf.QBFSolver;
 import qbf.QBFSolverException;
+import timers.DumpExtractionToDisk;
 import util.ModulePaths;
 import util.ModuleUtils;
 
@@ -33,13 +39,21 @@ public class ModuleExtractor {
 	QBFSolver qbfSolver = new QBFSolver();
 	LHSSigExtractor lhsExtractor = new LHSSigExtractor();
 	
-	public HashSet<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> terminology, Set<OWLClass> signature) throws IOException, QBFSolverException{
-
+	private final ScheduledExecutorService scheduler =
+			Executors.newScheduledThreadPool(1);
+	
+	public HashSet<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> terminology, HashSet<OWLLogicalAxiom> existingModule, Set<OWLClass> signature) throws IOException, QBFSolverException{
 		
-		HashSet<OWLLogicalAxiom> module = new HashSet<OWLLogicalAxiom>();
+		HashSet<OWLLogicalAxiom> module = null;
+		if(existingModule == null)
+		 module = new HashSet<OWLLogicalAxiom>();
+		else
+		 module = existingModule;
+		
 		HashSet<OWLLogicalAxiom> W  = new HashSet<OWLLogicalAxiom>();
 		Iterator<OWLLogicalAxiom> axiomIterator = terminology.iterator();
 		
+		scheduler.scheduleAtFixedRate(new DumpExtractionToDisk("test",terminology, module, signature), 0, 5, TimeUnit.MINUTES);
 		
 		//Terminology is the value of T\M as we remove items as we add them to the module
 		while(!terminology.equals(W)){
@@ -47,7 +61,7 @@ public class ModuleExtractor {
 			
 			W.add(chosenAxiom);
 			
-			printPercentageComplete(W, terminology, module);
+		printPercentageComplete(W, terminology, module);
 			
 			Set<OWLClass> signatureAndM = new HashSet<OWLClass>();
 			signatureAndM.addAll(signature);
@@ -69,7 +83,10 @@ public class ModuleExtractor {
 		}
 		
 		return module;
-		
+	}
+	
+	public HashSet<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> terminology, Set<OWLClass> signature) throws IOException, QBFSolverException{
+		return extractModule(terminology,null,signature);
 	}
 
 	@SuppressWarnings("unused")
@@ -103,7 +120,7 @@ public class ModuleExtractor {
 		OWLOntology chosenOnt = ont;
 
 		
-		Set<OWLClass> randomSignature = ModuleUtils.generateRandomClassSignature(chosenOnt,3);
+		Set<OWLClass> randomSignature = ModuleUtils.generateRandomClassSignature(chosenOnt,200);
 //		System.out.println("Signature: " + randomSignature);
 		System.out.println("Signaure Size: " + randomSignature);
 		System.out.println("Ontology Size: " + chosenOnt.getLogicalAxiomCount());

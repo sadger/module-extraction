@@ -10,7 +10,11 @@ import util.ModulePaths;
 
 public class QBFSolver {
 
+	String solverText;
+	
 	public boolean isSatisfiable (File dimacsLocation) throws QBFSolverException{
+		solverText = "";
+		
 		ProcessBuilder pb = new ProcessBuilder("./sKizzo", dimacsLocation.getAbsolutePath());
 		pb.directory(new File(ModulePaths.getQBFSolverLocation()));
 		Process proc = null;
@@ -30,7 +34,7 @@ public class QBFSolver {
 
 		try {
 			while ((line = br.readLine()) != null) {
-		//		System.out.println(line);
+				solverText += line + "\n";
 			}
 
 		} catch (IOException e) {
@@ -65,6 +69,7 @@ public class QBFSolver {
 		}
 		else{
 			System.err.println("There was an error with the QBF solver, EXIT CODE " + exitValue);
+			System.out.println(solverText);
 			throw new QBFSolverException();
 		}
 
