@@ -3,8 +3,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Propositional"/>
-	<classpathentry kind="lib" path="/home/william/Documents/Jars/owlapi-bin.jar"/>
+	<classpathentry kind="lib" path="/home/loco8/wgatens/interpretations/owlapi-bin.jar"/>
 	<classpathentry kind="src" path="/OntologyUtils"/>
-	<classpathentry kind="lib" path="/home/william/Documents/Jars/org.sat4j.core.jar"/>
+	<classpathentry kind="lib" path="/home/loco8/wgatens/QBF/sat4j/org.sat4j.core.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
@@ -74,6 +75,14 @@ public class ModuleUtils {
 		}
 		
 		return result;
+	}
+	
+	public static String getTimeAsHMS(long timeInMilliseconds){
+		long hours = TimeUnit.MILLISECONDS.toHours(timeInMilliseconds);
+		long minutes = TimeUnit.MILLISECONDS.toMinutes(timeInMilliseconds) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(timeInMilliseconds));
+		long seconds = TimeUnit.MILLISECONDS.toSeconds(timeInMilliseconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeInMilliseconds));
+		
+		return hours + "hrs " + minutes + "mins " + seconds + "s";
 	}
 	
 	
