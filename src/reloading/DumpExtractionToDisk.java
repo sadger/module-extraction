@@ -1,4 +1,4 @@
-package timers;
+package reloading;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -38,11 +38,11 @@ public class DumpExtractionToDisk implements Runnable {
 	private static final String TERM_FILE = "/terminology.owl";
 	private static final String MOD_FILE = "/module.owl";
 
-	public DumpExtractionToDisk(String ontologyName, Set<OWLLogicalAxiom> term,Set<OWLLogicalAxiom> mod, Set<OWLClass> sig) {
+	public DumpExtractionToDisk(String folderName, Set<OWLLogicalAxiom> term,Set<OWLLogicalAxiom> mod, Set<OWLClass> sig) {
 		this.terminology = term;
 		this.module = mod;
 		this.signature = sig;
-		this.name = ontologyName;
+		this.name = folderName;
 		this.timeStarted = new Date();
 		
 		this.ontologyManager = OWLManager.createOWLOntologyManager();
@@ -50,12 +50,11 @@ public class DumpExtractionToDisk implements Runnable {
 
 	@Override
 	public void run() {
-		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yy_HH:mm");
-		System.out.println("Terminology Size: " + terminology.size());
-		System.out.println("Module Size: " + module.size());
-		System.out.println("Signature Size: " + signature.size());
+//		System.out.println("Terminology Size: " + terminology.size());
+//		System.out.println("Module Size: " + module.size());
+//		System.out.println("Signature Size: " + signature.size());
 
-		directory = new File(ModulePaths.getOntologyLocation() + "/Results/" + name + "_" + signature.size() + "_" + dateFormat.format(timeStarted));
+		directory = new File(ModulePaths.getOntologyLocation() + "/Results/" + name);
 
 		if(!directory.exists())
 			directory.mkdir();
@@ -67,7 +66,10 @@ public class DumpExtractionToDisk implements Runnable {
 		writeSetToOntology(terminology, TERM_FILE);
 		writeSetToOntology(module, MOD_FILE);
 		
+		System.out.println("Dumped to: " + directory.getAbsolutePath());
+		
 	}
+	
 	
 	private void writeSetToOntology(Set<OWLLogicalAxiom> ontology, String file){
 		OWLXMLOntologyFormat owlFormat = new OWLXMLOntologyFormat();
@@ -78,10 +80,12 @@ public class DumpExtractionToDisk implements Runnable {
 			e.printStackTrace();
 		}
 		
-		String saveLocation = directory.getAbsolutePath()+file;
+		File saveLocation = new File(directory.getAbsolutePath()+file);
+//		if(saveLocation.exists())
+//			saveLocation.delete();
+		
 		try {
-			ontologyManager.saveOntology(ontologyToWrite,owlFormat,IRI.create(new File(saveLocation)));
-			System.out.println("Writen " + saveLocation);
+			ontologyManager.saveOntology(ontologyToWrite,owlFormat,IRI.create(saveLocation));
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		}
