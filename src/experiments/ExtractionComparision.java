@@ -1,7 +1,9 @@
 package experiments;
 
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -79,6 +81,8 @@ public class ExtractionComparision {
 		 * but one must be converted to OWLEntities as expected 
 		 * by the OWLAPI*/
 
+		long startTime = System.currentTimeMillis();
+		
 		Set<OWLClass> classSignature = signature;
 
 
@@ -113,17 +117,26 @@ public class ExtractionComparision {
 				moduleExtractor.getModule(), signature);
 
 		this.dumpHandle = scheduler.scheduleAtFixedRate(dump,
-				0, 10, TimeUnit.SECONDS);
+				30, 30, TimeUnit.MINUTES);
 
 		Set<OWLLogicalAxiom> semanticModule = moduleExtractor.extractModule();
 		writeResults(semanticModule);
+		
+		System.out.println(ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
 
 	}
 
-	public void writeResults(Set<OWLLogicalAxiom> semanticModule){
-		System.out.println("Signature Size: " + SIGNATURE_SIZE);
-		System.out.println("Syntatic Size: " + syntaticSize);
-		System.out.println("Synt->Semantic Size: " + semanticModule.size());
+	public void writeResults(Set<OWLLogicalAxiom> semanticModule) throws IOException{
+	
+		
+		BufferedWriter writer = new BufferedWriter(new FileWriter(ModulePaths.getOntologyLocation() + "/Results/" + experimentName  + "/" + "experiment-results", false));
+		writer.write("Signature Size: " + SIGNATURE_SIZE);
+		writer.write("Syntatic Size: " + syntaticSize);
+		writer.write("Synt->Semantic Size: " + semanticModule.size());
+		
+		writer.flush();
+		writer.close();
+		
 
 		/* Dump the results one last time before finishing */
 		new Thread(dump).run();
@@ -145,17 +158,15 @@ public class ExtractionComparision {
 
 
 	public static void main(String[] args) {
-		//OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/expr/nci-08.09d-terminology.owl");
-		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/pathway.obo");
+		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/expr/nci-08.09d-terminology.owl");
+		//OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/pathway.obo");
 		ExtractionComparision compare = null;
+		
 		try {
-			compare = new ExtractionComparision("/home/william/PhD/Ontologies/Results/pathway-random-100/");
-			//compare =  new ExtractionComparision(ontology, ModuleUtils.generateRandomClassSignature(ontology, SIGNATURE_SIZE), "pathway-random-100");
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		try {
+			/* Restart experiment */
+			compare = new ExtractionComparision(ModulePaths.getOntologyLocation() + "/Results/nci-08.09d-random-100/");
+			/* Start new experiment */
+			//compare =  new ExtractionComparision(ontology, ModuleUtils.generateRandomClassSignature(ontology, SIGNATURE_SIZE), "nci-0s11238.09d-random-100");
 			compare.compareExtractionApproaches();
 		} catch (IOException e) {
 			e.printStackTrace();

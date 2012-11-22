@@ -50,9 +50,9 @@ public class DumpExtractionToDisk implements Runnable {
 
 	@Override
 	public void run() {
-//		System.out.println("Terminology Size: " + terminology.size());
-//		System.out.println("Module Size: " + module.size());
-//		System.out.println("Signature Size: " + signature.size());
+		System.out.println("Terminology Size: " + terminology.size());
+		System.out.println("Module Size: " + module.size());
+		System.out.println("Signature Size: " + signature.size());
 
 		directory = new File(ModulePaths.getOntologyLocation() + "/Results/" + name);
 
@@ -94,7 +94,7 @@ public class DumpExtractionToDisk implements Runnable {
 	private void writeSignature(){
 		FileWriter fileWriter = null;
 		try {
-			fileWriter = new FileWriter(directory.getAbsolutePath()+"/sig",false);
+			fileWriter = new FileWriter(directory.getAbsolutePath()+ SIGNATURE_FILE,false);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

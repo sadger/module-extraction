@@ -18,6 +18,7 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import qbf.QBFSolverException;
+import util.ModulePaths;
 
 public class ReloadExperimentFromDisk {
 
@@ -38,6 +39,8 @@ public class ReloadExperimentFromDisk {
 		this.signature = populateSignature();
 		this.terminology = restoreOntology(TERM_FILE);
 		this.module = restoreOntology(MOD_FILE);
+		System.out.println("Reloaded: " + location);
+		System.out.format("T:%d, M:%d, S:%d", terminology.size(), module.size(), signature.size());
 	}
 
 	private Set<OWLLogicalAxiom> restoreOntology(String ontLocation){
@@ -85,8 +88,9 @@ public class ReloadExperimentFromDisk {
 
 	public static void main(String[] args) {
 		try {
-			ReloadExperimentFromDisk reload = new ReloadExperimentFromDisk("/home/william/PhD/Ontologies/Results/pathway-random-100/");
-			System.out.println(reload.getModule().size());
+			ReloadExperimentFromDisk reload = new ReloadExperimentFromDisk(ModulePaths.getOntologyLocation() + "/Results/pathway-random-100/");
+			System.out.println("Terminology Size: " + reload.getTerminology().size());
+			System.out.println("Module Size: " + reload.getModule().size());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
