@@ -40,7 +40,7 @@ public class ReloadExperimentFromDisk {
 		this.terminology = restoreOntology(TERM_FILE);
 		this.module = restoreOntology(MOD_FILE);
 		System.out.println("Reloaded: " + location);
-		System.out.format("T:%d, M:%d, S:%d", terminology.size(), module.size(), signature.size());
+		System.out.format("T:%d, M:%d, S:%d\n", terminology.size(), module.size(), signature.size());
 	}
 
 	private Set<OWLLogicalAxiom> restoreOntology(String ontLocation){

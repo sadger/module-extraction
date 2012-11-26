@@ -58,7 +58,7 @@ public class QBFConvertor {
 	private void populateSignatures() {
 		classesNotInSignature.addAll(ModuleUtils.getEntitiesInSet(ontology));
 		classesNotInSignature.removeAll(signature);
-		
+
 		/* Remove Top and Bottom classes */
 		classesNotInSignature.remove(factory.getOWLThing());
 		classesNotInSignature.remove(factory.getOWLNothing());
@@ -174,43 +174,4 @@ public class QBFConvertor {
 		return file;
 	}
 
-	@SuppressWarnings("unused")
-	public static void main(String[] args) {
-
-		OWLDataFactory f = OWLManager.getOWLDataFactory();
-		OWLOntology ont = OntologyLoader.loadOntology();
-		System.out.println(ont);
-		OWLClass a = f.getOWLClass(IRI.create(ont.getOntologyID().toString() + "#A"));
-		OWLClass b = f.getOWLClass(IRI.create(ont.getOntologyID().toString() + "#B"));
-		OWLClass c = f.getOWLClass(IRI.create(ont.getOntologyID().toString() + "#C"));
-		OWLClass d = f.getOWLClass(IRI.create(ont.getOntologyID().toString() + "#Z"));
-
-		HashSet<OWLClass> signature = new HashSet<OWLClass>();
-		signature.add(a);
-		signature.add(b);
-		signature.add(c);
-		//		signature.add(d);
-
-		System.out.println(signature);
-
-		File qbfproblem = null;
-
-		QBFConvertor qbf = new QBFConvertor(ont.getLogicalAxioms(), signature);
-		try {
-			qbfproblem = qbf.generateQBFProblem();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		QBFSolver solver = new QBFSolver();
-		try {
-			System.out.println(!solver.isSatisfiable(qbfproblem));
-		} catch (QBFSolverException e) {
-			e.printStackTrace();
-		}
-
-
-
-
-	}
 }

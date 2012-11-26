@@ -130,9 +130,9 @@ public class ExtractionComparision {
 	
 		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(ModulePaths.getOntologyLocation() + "/Results/" + experimentName  + "/" + "experiment-results", false));
-		writer.write("Signature Size: " + SIGNATURE_SIZE);
-		writer.write("Syntatic Size: " + syntaticSize);
-		writer.write("Synt->Semantic Size: " + semanticModule.size());
+		writer.write("Signature Size: " + SIGNATURE_SIZE + "\n");
+		writer.write("Syntatic Size: " + syntaticSize + "\n");
+		writer.write("Synt->Semantic Size: " + semanticModule.size() + "\n");
 		
 		writer.flush();
 		writer.close();
@@ -163,7 +163,7 @@ public class ExtractionComparision {
 		ExtractionComparision compare = null;
 		
 		try {
-			/* Restart experiment */
+			/* Reload experiment */
 			compare = new ExtractionComparision(ModulePaths.getOntologyLocation() + "/Results/nci-08.09d-random-100/");
 			/* Start new experiment */
 			//compare =  new ExtractionComparision(ontology, ModuleUtils.generateRandomClassSignature(ontology, SIGNATURE_SIZE), "nci-0s11238.09d-random-100");
