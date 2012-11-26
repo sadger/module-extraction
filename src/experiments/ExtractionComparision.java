@@ -39,6 +39,7 @@ import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 import util.ModulePaths;
 import util.ModuleUtils;
+import util.SignatureGenerator;
 
 public class ExtractionComparision {
 
@@ -161,12 +162,13 @@ public class ExtractionComparision {
 		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/expr/nci-08.09d-terminology.owl");
 		//OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/pathway.obo");
 		ExtractionComparision compare = null;
+		SignatureGenerator generator = new SignatureGenerator(ontology.getLogicalAxioms());
 		
 		try {
 			/* Reload experiment */
 			compare = new ExtractionComparision(ModulePaths.getOntologyLocation() + "/Results/nci-08.09d-random-100/");
 			/* Start new experiment */
-			//compare =  new ExtractionComparision(ontology, ModuleUtils.generateRandomClassSignature(ontology, SIGNATURE_SIZE), "nci-0s11238.09d-random-100");
+			//compare =  new ExtractionComparision(ontology, generator.generateRandomClassSignature(SIGNATURE_SIZE), "nci-0s11238.09d-random-100");
 			compare.compareExtractionApproaches();
 		} catch (IOException e) {
 			e.printStackTrace();

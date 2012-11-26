@@ -12,6 +12,8 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLOntology;
 
+import util.ModulePaths;
+
 import axioms.AxiomExtractor;
 
 import checkers.DefinitorialDependencies;
@@ -136,8 +138,8 @@ public class OntologyProfiler {
 	
 
 	public static void main(String[] args) {
-		OWLOntology nci1 = OntologyLoader.loadOntologyAllAxioms("/users/loco/wgatens/Ontologies/NCI/nci-10.02d.owl");
-		OntologyProfiler profiler = new OntologyProfiler(nci1);
+		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/nci-08.09d-terminology.owl");
+		OntologyProfiler profiler = new OntologyProfiler(ontology);
 		profiler.showProfile();
 	}
 

@@ -27,6 +27,7 @@ import checkers.LHSSigExtractor;
 import checkers.SyntacticDependencyChecker;
 
 import util.ModuleUtils;
+import util.SignatureGenerator;
 
 public class OldModuleExtractor {
 
@@ -147,7 +148,8 @@ public class OldModuleExtractor {
 			}
 		}
 		
-		Set<OWLClass> randomSignature = ModuleUtils.generateRandomClassSignature(chosenOnt,1000);
+		SignatureGenerator generator = new SignatureGenerator(chosenOnt.getLogicalAxioms());
+		Set<OWLClass> randomSignature = generator.generateRandomClassSignature(1000);
 //		System.out.println("Signature: " + randomSignature);
 		System.out.println("Signaure Size: " + randomSignature);
 		System.out.println("Ontology Size: " + chosenOnt.getLogicalAxiomCount());

@@ -40,28 +40,7 @@ public class ModuleUtils {
 		return entities;
 	}
 	
-	/**
-	 * Gets a random signature consisting only of class names
-	 * @param ontology - Ontology to extract signature from
-	 * @param desiredSize - Desired size of signatureA simple SMS text message costs literally nothing to send. Whether you are charged per text, or pay for unlimited text messages, it is all profit for your wireless carrier.
 
-	 * @return Subset of ontology class names representing the random signature
-	 */
-	public static Set<OWLClass> generateRandomClassSignature(OWLOntology ontology, int desiredSize){
-		Set<OWLClass> result = null;
-		Set<OWLClass> signature = ontology.getClassesInSignature();
-	
-		if(desiredSize >= signature.size()){
-			result = signature;
-		}
-		else{
-			ArrayList<OWLClass> listOfNames = new ArrayList<OWLClass>(signature);
-			Collections.shuffle(listOfNames);
-			result = new HashSet<OWLClass>(listOfNames.subList(0, desiredSize));
-		}
-		
-		return result;
-	}
 	
 	public static Set<OWLLogicalAxiom> generateRandomAxioms(Set<OWLLogicalAxiom> originalOntology, int desiredSize){
 		Set<OWLLogicalAxiom> result = null;
