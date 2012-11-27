@@ -40,8 +40,12 @@ public class ModuleUtils {
 		return entities;
 	}
 	
-
-	
+	public static OWLClass getRandomClass(Set<OWLClass> classes){
+		ArrayList<OWLClass> listOfClasses = new ArrayList<OWLClass>(classes);
+		Collections.shuffle(listOfClasses);
+		return listOfClasses.get(0);
+	}
+		
 	public static Set<OWLLogicalAxiom> generateRandomAxioms(Set<OWLLogicalAxiom> originalOntology, int desiredSize){
 		Set<OWLLogicalAxiom> result = null;
 		

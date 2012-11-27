@@ -2,6 +2,7 @@ package checkers;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import loader.OntologyLoader;
@@ -33,8 +34,23 @@ public class DefinitorialDependencies {
 		calculateDependencies();
 	}
 	
-	public HashMap<OWLClass, Set<OWLClass>> getDependencies() {
+	public HashMap<OWLClass, Set<OWLClass>> getDependencyMap() {
 		return dependencies;
+	}
+	
+	public HashMap<Integer, Set<OWLClass>> getDependenciesByNumber(){
+		HashMap<Integer, Set<OWLClass>> 
+		numberMap = new HashMap<Integer, Set<OWLClass>>();
+
+		for(OWLClass cls : dependencies.keySet()){
+			int depSize = getDependenciesFor(cls).size();
+
+			if(numberMap.get(depSize) == null)
+				numberMap.put(depSize, new HashSet<OWLClass>());
+
+			numberMap.get(depSize).add(cls);
+		}
+		return numberMap;
 	}
 	
 	public void clearMappings(){
@@ -68,15 +84,7 @@ public class DefinitorialDependencies {
 		}
 	}
 	
-	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-03.10j.owl");
-		System.out.println("Ontology Loaded");
-		DefinitorialDependencies def = new DefinitorialDependencies(ont.getLogicalAxioms());
-//		for(OWLLogicalAxiom ax : ont.getLogicalAxioms())
-//			System.out.println(ax);
-		for(OWLClass cls : ont.getClassesInSignature()){
-			System.out.println(cls + ":" + def.getDependenciesFor(cls));
-		}
-	}
+	
+	
 	
 }
