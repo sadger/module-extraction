@@ -10,9 +10,12 @@ import util.ModulePaths;
 
 public class QBFSolver {
 
-	String solverText;
+	private String solverText;
+	private File qbfFile;
 	
 	public boolean isSatisfiable (File dimacsLocation) throws QBFSolverException{
+		
+		this.qbfFile = dimacsLocation;
 		solverText = "";
 		
 		ProcessBuilder pb = new ProcessBuilder("./sKizzo", dimacsLocation.getAbsolutePath());
@@ -29,7 +32,7 @@ public class QBFSolver {
 		InputStreamReader isr = new InputStreamReader(is);
 		BufferedReader br = new BufferedReader(isr);
 
-		@SuppressWarnings("unused")
+	
 		String line;
 
 		try {
@@ -59,6 +62,10 @@ public class QBFSolver {
 		}
 		catch(IllegalThreadStateException t){
 			t.printStackTrace();
+		}
+		finally{
+			/* Delete the qbf file */
+			qbfFile.delete();
 		}
 
 		if(exitValue == 10){

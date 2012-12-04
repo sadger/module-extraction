@@ -16,6 +16,8 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
+import checkers.DefinitorialDependencies;
+
 import axioms.AxiomSplitter;
 
 
@@ -46,6 +48,7 @@ public class NewDefinitorialDepth {
 		generateDefinitorialDepths();
 	}
 	
+	
 	public Integer lookup(OWLClass cls){
 		return definitorialDepth.get(cls);
 	}
@@ -58,6 +61,21 @@ public class NewDefinitorialDepth {
 			sortedAxiomsByDefinitorialDepth = sortedAxioms;
 		}
 		return sortedAxiomsByDefinitorialDepth;
+	}
+	
+	public HashMap<Integer, Set<OWLClass>> getDefinitorialDepthByNumber(){
+		HashMap<Integer, Set<OWLClass>> 
+		numberMap = new HashMap<Integer, Set<OWLClass>>();
+
+		for(OWLClass cls : definitorialDepth.keySet()){
+			int depSize = lookup(cls);
+
+			if(numberMap.get(depSize) == null)
+				numberMap.put(depSize, new HashSet<OWLClass>());
+
+			numberMap.get(depSize).add(cls);
+		}
+		return numberMap;
 	}
 	
 
@@ -111,11 +129,8 @@ public class NewDefinitorialDepth {
 	}
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-03.10j.owl");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/expr/nci-08.09d-terminology.owl");
 		System.out.println("Ontology Loaded");
-		NewDefinitorialDepth d = new NewDefinitorialDepth(ont);
-		for(OWLLogicalAxiom ax : d.getDefinitorialSortedList()){
-			System.out.println(d.lookup((OWLClass) AxiomSplitter.getNameofAxiom(ax)) + ":" + ax);
-		}
+	
 	}
 }

@@ -19,6 +19,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import qbf.QBFSolver;
 import qbf.QBFSolverException;
+import signature.SignatureGenerator;
 
 import checkers.ALCAxiomChecker;
 import checkers.ELChecker;
@@ -27,7 +28,6 @@ import checkers.LHSSigExtractor;
 import checkers.SyntacticDependencyChecker;
 
 import util.ModuleUtils;
-import util.SignatureGenerator;
 
 public class OldModuleExtractor {
 

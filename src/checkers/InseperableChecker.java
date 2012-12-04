@@ -16,6 +16,7 @@ public class InseperableChecker {
 	public boolean isSeperableFromEmptySet(HashSet<OWLLogicalAxiom> w, Set<OWLClass> sig) throws IOException, QBFSolverException{
 		
 		InverseRolePropertyReplacer replacer = new InverseRolePropertyReplacer();
+		//Remove inverse roles from the QBF problem
 		QBFConvertor convertor = new QBFConvertor(replacer.convert(w),sig);
 		QBFSolver solver =  new QBFSolver();
 
@@ -24,7 +25,6 @@ public class InseperableChecker {
 		
 		//If W is empty of course it IS the empty set so is not inseperable from itself
 		if(!w.isEmpty()){
-			//Remove inverse roles from the QBF problem
 			File qbfProblem = convertor.generateQBFProblem();
 			isInseperable = solver.isSatisfiable(qbfProblem);
 

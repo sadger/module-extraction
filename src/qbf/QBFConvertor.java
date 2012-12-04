@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -41,12 +43,15 @@ public class QBFConvertor {
 	private CNFFormula cnfOntology;
 	private Set<OWLLogicalAxiom> ontology;
 	ArrayList<String> toWrite;
+	
+	SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmms");
+
 
 	/* Must have .qdimacs extention or skizzo complains */
-	final static String FILE_TO_WRITE = ModulePaths.getQBFSolverLocation() + "Files/temp.qdimacs";
-
+	static String FILE_TO_WRITE;
 
 	public QBFConvertor(Set<OWLLogicalAxiom> ontology, Set<OWLClass> signature) {
+		FILE_TO_WRITE =  ModulePaths.getQBFSolverLocation() + "Files/qbf" + System.currentTimeMillis() + ".qdimacs";
 		this.ontology = ontology;
 		this.signature = signature;
 		this.cnfOntology = convertor.convertOntologyToCNFClauses(ontology);

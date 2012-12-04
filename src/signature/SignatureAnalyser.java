@@ -1,4 +1,4 @@
-package util;
+package signature;
 
 
 import java.util.Set;
@@ -8,6 +8,9 @@ import loader.OntologyLoader;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+
+import util.ModulePaths;
+import util.NewDefinitorialDepth;
 
 import checkers.DefinitorialDependencies;
 

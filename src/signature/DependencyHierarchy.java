@@ -1,4 +1,4 @@
-package util;
+package signature;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,6 +13,9 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+
+import util.ModulePaths;
+import util.ModuleUtils;
 
 import checkers.DefinitorialDependencies;
 
@@ -43,7 +46,7 @@ public class DependencyHierarchy {
 		else
 			return Collections.max(hierarchy.keySet());
 	}
-
+	
 	private void populateImmediateDependencies() {
 		for(OWLClass cls : ModuleUtils.getClassesInSet(logicalAxioms))
 			immediateDependencies.put(cls, new HashSet<OWLClass>());
@@ -102,7 +105,7 @@ public class DependencyHierarchy {
 
 	public static void main(String[] args) {
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
-		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/nci-08.09d-terminology.owl");
+		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/expr/nci-08.09d-terminology.owl");
 
 		Set<OWLLogicalAxiom> logicalAxioms = ontology.getLogicalAxioms();
 		DependencyHierarchy hier = new DependencyHierarchy(logicalAxioms);
@@ -110,7 +113,7 @@ public class DependencyHierarchy {
 
 		for(OWLClass cls : ModuleUtils.getClassesInSet(logicalAxioms)){
 			int depSize = deps.getDependenciesFor(cls).size();
-			if(depSize > 90 && depSize < 110){
+			if(depSize > 45 && depSize < 55){
 				int maxHier = hier.getMaxHierarchyDepth(cls);
 				System.out.println(cls + ":" + depSize);
 

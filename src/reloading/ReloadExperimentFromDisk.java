@@ -88,6 +88,7 @@ public class ReloadExperimentFromDisk {
 
 	public static void main(String[] args) {
 		try {
+			
 			ReloadExperimentFromDisk reload = new ReloadExperimentFromDisk(ModulePaths.getOntologyLocation() + "/Results/pathway-random-100/");
 			System.out.println("Terminology Size: " + reload.getTerminology().size());
 			System.out.println("Module Size: " + reload.getModule().size());

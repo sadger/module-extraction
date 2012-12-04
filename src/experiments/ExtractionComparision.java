@@ -34,12 +34,12 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import qbf.QBFSolverException;
 import reloading.DumpExtractionToDisk;
 import reloading.ReloadExperimentFromDisk;
+import signature.SignatureGenerator;
 
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 import util.ModulePaths;
 import util.ModuleUtils;
-import util.SignatureGenerator;
 
 public class ExtractionComparision {
 
@@ -50,7 +50,6 @@ public class ExtractionComparision {
 	private final ScheduledExecutorService scheduler =
 			Executors.newScheduledThreadPool(1);
 
-	private static final int SIGNATURE_SIZE = 100;
 	private String experimentName = "temp";
 
 	private Set<OWLClass> signature;
@@ -85,7 +84,6 @@ public class ExtractionComparision {
 		long startTime = System.currentTimeMillis();
 		
 		Set<OWLClass> classSignature = signature;
-
 
 		Set<OWLLogicalAxiom> syntacticModule = null;
 		if(!resumingExperiments){
@@ -131,7 +129,7 @@ public class ExtractionComparision {
 	
 		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(ModulePaths.getOntologyLocation() + "/Results/" + experimentName  + "/" + "experiment-results", false));
-		writer.write("Signature Size: " + SIGNATURE_SIZE + "\n");
+		writer.write("Signature Size: " + signature.size() + "\n");
 		writer.write("Syntatic Size: " + syntaticSize + "\n");
 		writer.write("Synt->Semantic Size: " + semanticModule.size() + "\n");
 		
@@ -166,9 +164,9 @@ public class ExtractionComparision {
 		
 		try {
 			/* Reload experiment */
-			compare = new ExtractionComparision(ModulePaths.getOntologyLocation() + "/Results/nci-08.09d-random-100/");
+			//compare = new ExtractionComparision(ModulePaths.getOntologyLocation() + "/Results/nci-08.09d-random-100/");
 			/* Start new experiment */
-			//compare =  new ExtractionComparision(ontology, generator.generateRandomClassSignature(SIGNATURE_SIZE), "nci-0s11238.09d-random-100");
+			compare =  new ExtractionComparision(ontology, generator.generateRandomClassSignature(100), "profiling");
 			compare.compareExtractionApproaches();
 		} catch (IOException e) {
 			e.printStackTrace();

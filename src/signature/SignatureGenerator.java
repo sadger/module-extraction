@@ -1,4 +1,4 @@
-package util;
+package signature;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +13,9 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+
+import util.ModulePaths;
+import util.ModuleUtils;
 
 public class SignatureGenerator {
 
