@@ -81,8 +81,15 @@ public class ExtractionComparision {
 		 * but one must be converted to OWLEntities as expected 
 		 * by the OWLAPI*/
 
+		File experimentLocation = new File(ModulePaths.getOntologyLocation() + "/Results/" + experimentName  + "/" + "experiment-results");
+		if(experimentLocation.exists()){
+			System.out.println("Already complete");
+			return;
+		}
+
+
 		long startTime = System.currentTimeMillis();
-		
+
 		Set<OWLClass> classSignature = signature;
 
 		Set<OWLLogicalAxiom> syntacticModule = null;
@@ -120,26 +127,26 @@ public class ExtractionComparision {
 
 		Set<OWLLogicalAxiom> semanticModule = moduleExtractor.extractModule();
 		writeResults(semanticModule);
-		
+
 		System.out.println(ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
 
 	}
 
 	public void writeResults(Set<OWLLogicalAxiom> semanticModule) throws IOException{
-	
-		
+
+
 		BufferedWriter writer = new BufferedWriter(new FileWriter(ModulePaths.getOntologyLocation() + "/Results/" + experimentName  + "/" + "experiment-results", false));
 		writer.write("Signature Size: " + signature.size() + "\n");
 		writer.write("Syntatic Size: " + syntaticSize + "\n");
 		writer.write("Synt->Semantic Size: " + semanticModule.size() + "\n");
-		
+
 		writer.flush();
 		writer.close();
-		
+
 
 		/* Dump the results one last time before finishing */
 		new Thread(dump).run();
-		
+
 		/* Finish the scheduling of ontology dumps */
 		dumpHandle.cancel(true);
 		scheduler.shutdownNow();
@@ -161,7 +168,7 @@ public class ExtractionComparision {
 		//OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/pathway.obo");
 		ExtractionComparision compare = null;
 		SignatureGenerator generator = new SignatureGenerator(ontology.getLogicalAxioms());
-		
+
 		try {
 			/* Reload experiment */
 			//compare = new ExtractionComparision(ModulePaths.getOntologyLocation() + "/Results/nci-08.09d-random-100/");
