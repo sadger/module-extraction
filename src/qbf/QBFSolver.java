@@ -39,9 +39,17 @@ public class QBFSolver {
 			while ((line = br.readLine()) != null) {
 				solverText += line + "\n";
 			}
-
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		finally{
+			try{
+				isr.close();
+				br.close();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		try {
@@ -65,6 +73,7 @@ public class QBFSolver {
 		catch(IllegalThreadStateException t){
 			t.printStackTrace();
 		}
+	
 
 
 		if(exitValue == 10){
