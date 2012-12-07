@@ -23,7 +23,7 @@ public class LHSSigExtractor {
 		
 		for(OWLLogicalAxiom axiom : ontology){
 			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
-			if(signature.contains(name) || isInSigDependencies(name));
+			if(signature.contains(name) || isInDependencies(name,signature));
 				lhsSigT.add(axiom);
 		}
 		return lhsSigT;
@@ -35,6 +35,15 @@ public class LHSSigExtractor {
 			if(sigDeps != null)
 				signatureDependencies.addAll(sigDeps);
 		}
+	}
+	
+	private boolean isInDependencies(OWLClass name, Set<OWLClass> signature){
+		for(OWLClass sigElem : signature){
+			Set<OWLClass> sigDeps = deps.getDependenciesFor(sigElem);
+			if(!(sigDeps == null) && sigDeps.contains(name))
+				return true;
+		}
+		return false;
 	}
 	
 	private boolean isInSigDependencies(OWLClass name){
