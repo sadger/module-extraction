@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.Set;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+
+import checkers.DefinitorialDependencies;
 import checkers.InseperableChecker;
 import checkers.LHSSigExtractor;
 import checkers.SyntacticDependencyChecker;
@@ -49,14 +51,17 @@ public class ModuleExtractor {
 
 			printPercentageComplete(W, terminology, module);
 
-			Set<OWLClass> signatureAndM = new HashSet<OWLClass>();
-			signatureAndM.addAll(signature);
-			signatureAndM.addAll(ModuleUtils.getClassesInSet(module));
+			Set<OWLClass> signatureAndSigM = new HashSet<OWLClass>();
+			signatureAndSigM.addAll(signature);
+			signatureAndSigM.addAll(ModuleUtils.getClassesInSet(module));
+			
+			/* We can reuse this in the LHS check and syntatic check so do it only once */
+			DefinitorialDependencies dependW = new DefinitorialDependencies(W);
 
-			HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(W, signatureAndM);
+			HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(dependW, W, signatureAndSigM);
 
-			if(syntaxDepChecker.hasSyntacticSigDependency(W, signatureAndM)
-					|| insepChecker.isSeperableFromEmptySet(lhsSigT, signatureAndM)){
+			if(syntaxDepChecker.hasSyntacticSigDependency(dependW, signatureAndSigM)
+					|| insepChecker.isSeperableFromEmptySet(lhsSigT, signatureAndSigM)){
 
 				terminology.remove(chosenAxiom);
 				System.out.println("Adding " + chosenAxiom);
@@ -65,7 +70,7 @@ public class ModuleExtractor {
 				/* reset the iterator */
 				axiomIterator = terminology.iterator();
 			}
-
+			dependW.clearMappings();
 		}
 		return module;
 	}

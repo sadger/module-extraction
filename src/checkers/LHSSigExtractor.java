@@ -12,13 +12,13 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import axioms.AxiomSplitter;
 
 public class LHSSigExtractor {
-	private DefinitorialDependencies deps;
+	private DefinitorialDependencies dependencies;
 	private Set<OWLClass> signatureDependencies = new HashSet<OWLClass>();
 
 
-	public HashSet<OWLLogicalAxiom> getLHSSigAxioms(Set<OWLLogicalAxiom> ontology, Set<OWLClass> signature){
+	public HashSet<OWLLogicalAxiom> getLHSSigAxioms(DefinitorialDependencies deps, Set<OWLLogicalAxiom> ontology, Set<OWLClass> signature){
+		this.dependencies = deps;
 		HashSet<OWLLogicalAxiom> lhsSigT = new HashSet<OWLLogicalAxiom>();
-		deps = new DefinitorialDependencies(ontology);
 		generateSignatureDependencies(signature);
 		for(OWLLogicalAxiom axiom : ontology){
 			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
@@ -30,7 +30,7 @@ public class LHSSigExtractor {
 
 	private void generateSignatureDependencies(Set<OWLClass> signature) {
 		for(OWLClass sigConcept : signature){
-			Set<OWLClass> sigDeps = deps.getDependenciesFor(sigConcept);
+			Set<OWLClass> sigDeps = dependencies.getDependenciesFor(sigConcept);
 			if(sigDeps != null)
 				signatureDependencies.addAll(sigDeps);
 		}

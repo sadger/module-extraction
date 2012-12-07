@@ -11,10 +11,9 @@ public class SyntacticDependencyChecker {
 		//Do Nuffin'
 	}
 
-	public boolean hasSyntacticSigDependency(Set<OWLLogicalAxiom> ontology, Set<OWLClass> signature){
+	public boolean hasSyntacticSigDependency(DefinitorialDependencies dependencies, Set<OWLClass> signature){
 		boolean result = false;	
-		DefinitorialDependencies dependencies = new DefinitorialDependencies(ontology);
-		
+	
 		for(OWLClass cls : signature){
 			Set<OWLClass> classDeps = dependencies.getDependenciesFor(cls);
 			if(!(classDeps == null)){

@@ -87,7 +87,7 @@ public class QBFConvertor {
 
 	private List<String> createStringsToWrite(){
 		toWrite.add("c " + cnfOntology.getNumberMap() + "\n");
-		System.out.printf("V:%d C:%d\n", cnfOntology.variableCount(), cnfOntology.clauseCount());
+		//System.out.printf("V:%d C:%d\n", cnfOntology.variableCount(), cnfOntology.clauseCount());
 		toWrite.add("p cnf " + cnfOntology.variableCount() + " " + cnfOntology.clauseCount() + "\n");
 
 		writeUniversalQuantifiers();
