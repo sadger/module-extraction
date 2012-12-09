@@ -82,10 +82,10 @@ public class ExtractionComparision {
 		 * by the OWLAPI*/
 
 		File experimentLocation = new File(ModulePaths.getOntologyLocation() + "/Results/" + experimentName  + "/" + "experiment-results");
-		if(experimentLocation.exists()){
-			System.out.println("Already complete");
-			return;
-		}
+//		if(experimentLocation.exists()){
+//			System.out.println("Already complete");
+//			return;
+//		}
 
 
 		long startTime = System.currentTimeMillis();
@@ -171,9 +171,9 @@ public class ExtractionComparision {
 
 		try {
 			/* Reload experiment */
-			//compare = new ExtractionComparision(ModulePaths.getOntologyLocation() + "/Results/nci-08.09d-random-100/");
+			compare = new ExtractionComparision(ModulePaths.getOntologyLocation() + "/Results/nci-08.09d-avgdeps340/");
 			/* Start new experiment */
-			compare =  new ExtractionComparision(ontology, generator.generateRandomClassSignature(100), "profiling");
+			//compare =  new ExtractionComparision(ontology, generator.generateRandomClassSignature(100), "profiling");
 			compare.compareExtractionApproaches();
 		} catch (IOException e) {
 			e.printStackTrace();

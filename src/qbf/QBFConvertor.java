@@ -25,6 +25,8 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
+import alc.ALCtoPropositionalConvertor;
+
 import formula.CNFFormula;
 
 import sat.CNFtoSATConvertor;
@@ -46,7 +48,6 @@ public class QBFConvertor {
 	
 	SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmms");
 
-
 	/* Must have .qdimacs extention or skizzo complains */
 	static String FILE_TO_WRITE;
 
@@ -54,6 +55,8 @@ public class QBFConvertor {
 		FILE_TO_WRITE =  ModulePaths.getQBFSolverLocation() + "Files/qbf" + System.currentTimeMillis() + ".qdimacs";
 		this.ontology = ontology;
 		this.signature = signature;
+		
+		
 		this.cnfOntology = convertor.convertOntologyToCNFClauses(ontology);
 		cnftosat = new CNFtoSATConvertor(cnfOntology);
 		populateSignatures();
@@ -112,18 +115,15 @@ public class QBFConvertor {
 		}
 	}
 
-	
 	private void writeExistentialQuantifiers() {
 		if(!classesNotInSignature.isEmpty()){
 			toWrite.add("e ");
 			for(OWLEntity cls : classesNotInSignature){
-				if(!cls.isOWLClass()){
+				if(!cls.isOWLClass())
 					//TODO fix this it's horrible
-					toWrite.add(cnfOntology.getNumberMap().get("r_"+cls.toString()) + " ");
-				}
-				else{
+					toWrite.add(cnfOntology.getNumberMap().get(ALCtoPropositionalConvertor.ROLE_PREFIX + cls.toString()) + " ");
+				else
 					toWrite.add(cnfOntology.getNumberMap().get(cls.toString()) + " ");
-				}
 			}
 			toWrite.add("0\n");
 		}

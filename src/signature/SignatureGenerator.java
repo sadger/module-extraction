@@ -21,6 +21,7 @@ public class SignatureGenerator {
 
 	private Set<OWLLogicalAxiom> logicalAxioms;
 	private DependencyHierarchy hierarchy;
+	private OWLDataFactory factory = OWLManager.getOWLDataFactory();
 
 	public SignatureGenerator(Set<OWLLogicalAxiom> axioms) {
 		this.logicalAxioms = axioms;
@@ -47,6 +48,8 @@ public class SignatureGenerator {
 	public Set<OWLClass> generateRandomClassSignature(int desiredSize){
 		Set<OWLClass> result = null;
 		Set<OWLClass> signature = ModuleUtils.getClassesInSet(logicalAxioms);
+		signature.remove(factory.getOWLThing());
+		signature.remove(factory.getOWLNothing());
 	
 		if(desiredSize >= signature.size())
 			result = signature;
