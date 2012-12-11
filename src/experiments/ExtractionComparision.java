@@ -82,10 +82,10 @@ public class ExtractionComparision {
 		 * by the OWLAPI*/
 
 		File experimentLocation = new File(ModulePaths.getOntologyLocation() + "/Results/" + experimentName  + "/" + "experiment-results");
-//		if(experimentLocation.exists()){
-//			System.out.println("Already complete");
-//			return;
-//		}
+		if(experimentLocation.exists()){
+			System.out.println("Already complete");
+			return;
+		}
 
 
 		long startTime = System.currentTimeMillis();
@@ -95,7 +95,7 @@ public class ExtractionComparision {
 		Set<OWLLogicalAxiom> syntacticModule = null;
 		if(!resumingExperiments){
 			manager = OWLManager.createOWLOntologyManager();
-			syntaxModExtractor = new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.BOT);
+			syntaxModExtractor = new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.STAR);
 			Set<OWLEntity> entitySignature = 
 					new HashSet<OWLEntity>(classSignature);
 
@@ -115,7 +115,9 @@ public class ExtractionComparision {
 			syntacticModule = reloader.getSyntacticModule();
 		}
 
+
 		syntaticSize = syntacticModule.size();
+		System.out.println("Syntsize: " + syntaticSize);
 
 
 		this.dump = new DumpExtractionToDisk(
@@ -123,7 +125,7 @@ public class ExtractionComparision {
 				moduleExtractor.getModule(), signature);
 
 		this.dumpHandle = scheduler.scheduleAtFixedRate(dump,
-				30, 30, TimeUnit.MINUTES);
+				0, 30, TimeUnit.MINUTES);
 
 		Set<OWLLogicalAxiom> semanticModule = moduleExtractor.extractModule();
 		writeResults(semanticModule);

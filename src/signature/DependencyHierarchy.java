@@ -105,7 +105,7 @@ public class DependencyHierarchy {
 
 	public static void main(String[] args) {
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
-		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/expr/nci-08.09d-terminology.owl");
+		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"/nci-08.09d-terminology.owl");
 
 		Set<OWLLogicalAxiom> logicalAxioms = ontology.getLogicalAxioms();
 		DependencyHierarchy hier = new DependencyHierarchy(logicalAxioms);

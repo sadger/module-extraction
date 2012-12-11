@@ -49,7 +49,7 @@ public class ModuleExtractor {
 
 			W.add(chosenAxiom);
 
-			printPercentageComplete(W, terminology, module);
+			//printPercentageComplete(W, terminology, module);
 
 			Set<OWLClass> signatureAndSigM = new HashSet<OWLClass>();
 			signatureAndSigM.addAll(signature);

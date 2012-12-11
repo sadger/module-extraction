@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import qbf.QBFConvertor;
 import qbf.QBFFileWriter;
 import qbf.QBFSolver;
 import qbf.QBFSolverException;

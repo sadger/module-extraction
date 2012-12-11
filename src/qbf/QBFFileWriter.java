@@ -13,10 +13,6 @@ import java.util.Set;
 
 import loader.OntologyLoader;
 
-import newcnf.ClauseSet;
-import newcnf.ClauseSettoSATClauses;
-import newcnf.NumberMap;
-import newcnf.OWLOntologyToClauseSet;
 
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
@@ -29,10 +25,16 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
+
+import convertors.ALCtoPropositionalConvertor;
+import convertors.ClauseSettoSATClauses;
+import convertors.OWLOntologyToClauseSet;
+
 import formula.PropositionalFormula;
 
-import alc.ALCtoPropositionalConvertor;
 
+import satclauses.ClauseSet;
+import satclauses.NumberMap;
 import signature.SignatureGenerator;
 import util.ModulePaths;
 import util.ModuleUtils;
