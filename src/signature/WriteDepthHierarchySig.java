@@ -31,6 +31,8 @@ public class WriteDepthHierarchySig {
 		/* If there is more than one with the maximum size set of
 		   dependencies, only write the first */
 		Set<OWLClass> sigToWrite = new HashSet<OWLClass>();
+		//Add the class itself
+		sigToWrite.add(cls);
 
 		boolean maxWritten = false;
 		int lastSeenSize = 0;
@@ -56,8 +58,8 @@ public class WriteDepthHierarchySig {
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
 		DependencyHierarchy hier = new DependencyHierarchy(ont.getLogicalAxioms());
-		OWLClass cls = factory.getOWLClass(IRI.create("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#Intermediate_Fibrocytic_Neoplasm"));
-		new WriteDepthHierarchySig("fib", hier, cls).writeSignatures();
+		OWLClass cls = factory.getOWLClass(IRI.create("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#Nuclear_Receptor_Coactivator-6"));
+		new WriteDepthHierarchySig("nuke", hier, cls).writeSignatures();
 	}
 
 }

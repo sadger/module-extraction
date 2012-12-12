@@ -1,11 +1,18 @@
 package main;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import loader.OntologyLoader;
+
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
 
 import checkers.DefinitorialDependencies;
 import checkers.InseperableChecker;
@@ -14,6 +21,9 @@ import checkers.SyntacticDependencyChecker;
 
 import qbf.QBFSolver;
 import qbf.QBFSolverException;
+import signature.SignatureGenerator;
+import testing.DependencyCalculator;
+import util.ModulePaths;
 import util.ModuleUtils;
 
 public class ModuleExtractor {
@@ -24,6 +34,7 @@ public class ModuleExtractor {
 	InseperableChecker insepChecker = new InseperableChecker();
 	QBFSolver qbfSolver = new QBFSolver();
 	LHSSigExtractor lhsExtractor = new LHSSigExtractor();
+	DependencyCalculator dependencyCalculator;
 
 	private Set<OWLLogicalAxiom> terminology;
 	private Set<OWLLogicalAxiom> module;
@@ -33,6 +44,7 @@ public class ModuleExtractor {
 		this.terminology = term;
 		this.signature = sig;
 		this.module = (existingModule == null) ? new HashSet<OWLLogicalAxiom>() : existingModule;
+		this.dependencyCalculator = new DependencyCalculator(term);
 	}
 	
 	public ModuleExtractor(Set<OWLLogicalAxiom> terminology, Set<OWLClass> signature) {
@@ -56,7 +68,7 @@ public class ModuleExtractor {
 			signatureAndSigM.addAll(ModuleUtils.getClassesInSet(module));
 			
 			/* We can reuse this in the LHS check and syntatic check so do it only once */
-			DefinitorialDependencies dependW = new DefinitorialDependencies(W);
+			HashMap<OWLClass, Set<OWLClass>> dependW = dependencyCalculator.getDependenciesFor(W);
 
 			HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(dependW, W, signatureAndSigM);
 
@@ -70,7 +82,7 @@ public class ModuleExtractor {
 				/* reset the iterator */
 				axiomIterator = terminology.iterator();
 			}
-			dependW.clearMappings();
+			dependW.clear();
 		}
 		return module;
 	}
@@ -99,5 +111,18 @@ public class ModuleExtractor {
 		System.out.println(wSize + ":" + module.size());
 	}
 
-
+	public static void main(String[] args) {
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
+		
+		for(OWLLogicalAxiom ax :ont.getLogicalAxioms()){
+			if(ax.getAxiomType() == AxiomType.EQUIVALENT_CLASSES){
+				System.out.println(((OWLEquivalentClassesAxiom) ax).getClassExpressions());
+				
+			}
+		}
+		
+		//SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+		//	ModuleExtractor mod = new ModuleExtractor(ont.getLogicalAxioms(), gen.generateRandomClassSignature(500));
+	
+	}
 }

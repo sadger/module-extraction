@@ -10,19 +10,19 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import util.ModulePaths;
-import util.NewDefinitorialDepth;
+import util.DefinitorialDepth;
 
 import checkers.DefinitorialDependencies;
 
 public class SignatureAnalyser {
 
 	private Set<OWLLogicalAxiom> logicalAxioms;
-	private NewDefinitorialDepth definitorialDepth;
+	private DefinitorialDepth definitorialDepth;
 	private DefinitorialDependencies dependencies;
 
 	public SignatureAnalyser(Set<OWLLogicalAxiom> axioms) {
 		this.logicalAxioms = axioms;
-		this.definitorialDepth = new NewDefinitorialDepth(logicalAxioms);
+		this.definitorialDepth = new DefinitorialDepth(logicalAxioms);
 		this.dependencies = new DefinitorialDependencies(logicalAxioms);
 	}
 

@@ -21,27 +21,27 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import util.ModulePaths;
 
 public class SigManager {
-	
+
 	private File directory;
-	
+
 	public SigManager(File directory) {
 		if(!directory.exists()){
 			directory.mkdir();
 		}
 		this.directory = directory;
 	}
-	
+
 	public void writeFile(Set<OWLClass> signature, String name) throws IOException{
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(directory.getAbsolutePath() + "/" + name)));
-	
+
 		for(OWLClass cls : signature){
 			writer.write(cls.getIRI().toString() + "\n");
 		}
-		
+
 		writer.flush();
 		writer.close();
 	}
-	
+
 	public Set<OWLClass> readFile(String location) throws IOException{
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		File signatureFile = new File(location);
@@ -56,18 +56,24 @@ public class SigManager {
 		}
 		else
 			System.err.println("No signature file found");
-		
+
 		return signature;
 	}
 
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "interp/diff.krss");
-		SigManager writer = new SigManager(new File(ModulePaths.getOntologyLocation() + "sigwriter"));
-		try {
-			writer.writeFile(ont.getClassesInSignature(), "test");
-		} catch (IOException e) {
-			e.printStackTrace();
+		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"/nci-08.09d-terminology.owl");
+		SigManager writer = new SigManager(new File(ModulePaths.getOntologyLocation() + "random"));
+		SignatureGenerator gen = new SignatureGenerator(ontology.getLogicalAxioms());
+
+		for(int i=0; i<=10; i++){
+			Set<OWLClass> randomSig = gen.generateRandomClassSignature(50);
+			try {
+				writer.writeFile(randomSig, "random50-" + i);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		
+
+
 	}
 }

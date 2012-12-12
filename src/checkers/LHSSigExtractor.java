@@ -2,6 +2,7 @@ package checkers;
 
 
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,12 +13,12 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import axioms.AxiomSplitter;
 
 public class LHSSigExtractor {
-	private DefinitorialDependencies dependencies;
+	private HashMap<OWLClass, Set<OWLClass>> dependencies;
 	private Set<OWLClass> signatureDependencies = new HashSet<OWLClass>();
 
 
-	public HashSet<OWLLogicalAxiom> getLHSSigAxioms(DefinitorialDependencies deps, Set<OWLLogicalAxiom> ontology, Set<OWLClass> signature){
-		this.dependencies = deps;
+	public HashSet<OWLLogicalAxiom> getLHSSigAxioms(HashMap<OWLClass, Set<OWLClass>> dependW, Set<OWLLogicalAxiom> ontology, Set<OWLClass> signature){
+		this.dependencies = dependW;
 		HashSet<OWLLogicalAxiom> lhsSigT = new HashSet<OWLLogicalAxiom>();
 		generateSignatureDependencies(signature);
 		for(OWLLogicalAxiom axiom : ontology){
@@ -30,7 +31,7 @@ public class LHSSigExtractor {
 
 	private void generateSignatureDependencies(Set<OWLClass> signature) {
 		for(OWLClass sigConcept : signature){
-			Set<OWLClass> sigDeps = dependencies.getDependenciesFor(sigConcept);
+			Set<OWLClass> sigDeps = dependencies.get(sigConcept);
 			if(sigDeps != null)
 				signatureDependencies.addAll(sigDeps);
 		}

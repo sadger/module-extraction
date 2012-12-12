@@ -17,7 +17,7 @@ import axioms.AxiomSplitter;
 
 import util.ModulePaths;
 import util.ModuleUtils;
-import util.NewDefinitorialDepth;
+import util.DefinitorialDepth;
 
 
 public class DefinitorialDependencies {
@@ -67,7 +67,7 @@ public class DefinitorialDependencies {
 	}
 	
 	private void calculateDependencies(){
-		NewDefinitorialDepth definitorialDepth = new NewDefinitorialDepth(logicalAxioms);
+		DefinitorialDepth definitorialDepth = new DefinitorialDepth(logicalAxioms);
 		for(OWLLogicalAxiom axiom : definitorialDepth.getDefinitorialSortedList())
 			addFromTop(axiom);
 	}

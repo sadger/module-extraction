@@ -149,7 +149,7 @@ public class ExtractionComparision {
 		/* Dump the results one last time before finishing */
 		new Thread(dump).run();
 
-		/* Finish the scheduling of ontology dumps */
+		/* Finish the scheduling diff.krssof ontology dumps */
 		dumpHandle.cancel(true);
 		scheduler.shutdownNow();
 	}

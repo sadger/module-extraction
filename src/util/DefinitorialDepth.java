@@ -21,7 +21,7 @@ import checkers.DefinitorialDependencies;
 import axioms.AxiomSplitter;
 
 
-public class NewDefinitorialDepth {
+public class DefinitorialDepth {
 
 	private Set<OWLLogicalAxiom> logicalAxioms;
 	private HashMap<OWLClass, Set<OWLClass>> dependencies = new HashMap<OWLClass, Set<OWLClass>>();
@@ -33,7 +33,7 @@ public class NewDefinitorialDepth {
 	 * do NOT run if not an acyclic terminology
 	 * @param ontology
 	 */
-	public NewDefinitorialDepth(OWLOntology ontology) {
+	public DefinitorialDepth(OWLOntology ontology) {
 		this(ontology.getLogicalAxioms());
 	}
 
@@ -42,7 +42,7 @@ public class NewDefinitorialDepth {
 	 * do NOT run if set of axioms are not an acyclic terminology
 	 * @param axioms
 	 */
-	public NewDefinitorialDepth(Set<OWLLogicalAxiom> axioms){
+	public DefinitorialDepth(Set<OWLLogicalAxiom> axioms){
 		this.logicalAxioms = axioms;
 		populateImmediateDependencies();
 		generateDefinitorialDepths();
@@ -78,6 +78,10 @@ public class NewDefinitorialDepth {
 		return numberMap;
 	}
 	
+	
+	public HashMap<OWLClass, Integer> getDefinitorialMap(){
+		return definitorialDepth;
+	}
 
 	private void populateImmediateDependencies() {
 		for(OWLLogicalAxiom axiom : logicalAxioms){
@@ -108,25 +112,7 @@ public class NewDefinitorialDepth {
 	}
 	
 
-	private static class AxiomComparator implements Comparator<OWLLogicalAxiom>{
-		private Map<OWLClass, Integer> base;
 
-		public AxiomComparator(Map<OWLClass, Integer> base) {
-			this.base = base;
-		}
-		@Override
-		public int compare(OWLLogicalAxiom axiom1, OWLLogicalAxiom axiom2) {
-			OWLClass name1 = (OWLClass) AxiomSplitter.getNameofAxiom(axiom1);
-			OWLClass name2 = (OWLClass) AxiomSplitter.getNameofAxiom(axiom2);
-			if(base.get(name1) < base.get(name2)) 
-				return -1;
-			else if(name1 == name2) 
-				return 0;
-			else 
-				return 1;
-		}
-
-	}
 	
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/expr/nci-08.09d-terminology.owl");

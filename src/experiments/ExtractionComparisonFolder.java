@@ -26,7 +26,6 @@ public class ExtractionComparisonFolder {
 				File experimentLocation = new File(ModulePaths.getOntologyLocation() + "/Results/" + f.getName());
 				if(experimentLocation.exists())
 					compare = new ExtractionComparision(experimentLocation.getAbsolutePath());
-
 				else
 					compare = new ExtractionComparision(ontology, manager.readFile(f.getAbsolutePath()), f.getName());
 
@@ -40,7 +39,7 @@ public class ExtractionComparisonFolder {
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
 		try {
-			new ExtractionComparisonFolder(ont, new File(ModulePaths.getOntologyLocation() + "fib"));
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getOntologyLocation() + "child"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (OWLOntologyStorageException e) {
