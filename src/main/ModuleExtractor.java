@@ -10,9 +10,13 @@ import loader.OntologyLoader;
 
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+
+import axioms.AxiomSplitter;
 
 import checkers.DefinitorialDependencies;
 import checkers.InseperableChecker;
@@ -112,17 +116,24 @@ public class ModuleExtractor {
 	}
 
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/NCI/expr/nci-08.09d-terminology.owl");
 		
-		for(OWLLogicalAxiom ax :ont.getLogicalAxioms()){
-			if(ax.getAxiomType() == AxiomType.EQUIVALENT_CLASSES){
-				System.out.println(((OWLEquivalentClassesAxiom) ax).getClassExpressions());
-				
-			}
+//		for(OWLLogicalAxiom ax :ont.getLogicalAxioms()){
+//			System.out.println(ax);
+//			System.out.println(AxiomSplitter.getDefinitionofAxiom(ax));
+//		}
+		
+		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+		ModuleExtractor mod = new ModuleExtractor(ont.getLogicalAxioms(), gen.generateRandomClassSignature(500));
+		try {
+			mod.extractModule();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (QBFSolverException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
-		//SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		//	ModuleExtractor mod = new ModuleExtractor(ont.getLogicalAxioms(), gen.generateRandomClassSignature(500));
 	
 	}
 }

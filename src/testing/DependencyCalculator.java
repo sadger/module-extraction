@@ -41,9 +41,9 @@ public class DependencyCalculator {
 		for(OWLClass cls : ModuleUtils.getClassesInSet(subsetOfAxioms))
 			dependencies.put(cls, new HashSet<OWLClass>());
 
-		for(OWLLogicalAxiom axiom : sortedAxioms){
+		for(OWLLogicalAxiom axiom : sortedAxioms)
 			addFromTop(axiom, dependencies);
-		}
+		
 
 		return dependencies;
 	}
