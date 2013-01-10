@@ -10,11 +10,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.text.html.parser.Entity;
+
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -29,7 +32,7 @@ public class DumpExtractionToDisk implements Runnable {
 	
 	private Set<OWLLogicalAxiom> terminology;
 	Set<OWLLogicalAxiom> module;
-	Set<OWLClass> signature;
+	Set<OWLEntity> signature;
 	String name;
 	Date timeStarted;
 	File directory;
@@ -38,10 +41,10 @@ public class DumpExtractionToDisk implements Runnable {
 	private static final String TERM_FILE = "/terminology.owl";
 	private static final String MOD_FILE = "/module.owl";
 
-	public DumpExtractionToDisk(String folderName, Set<OWLLogicalAxiom> term,Set<OWLLogicalAxiom> mod, Set<OWLClass> sig) {
+	public DumpExtractionToDisk(String folderName, Set<OWLLogicalAxiom> term,Set<OWLLogicalAxiom> mod, Set<OWLEntity> signature) {
 		this.terminology = term;
 		this.module = mod;
-		this.signature = sig;
+		this.signature = signature;
 		this.name = folderName;
 		this.timeStarted = new Date();
 		
@@ -100,8 +103,8 @@ public class DumpExtractionToDisk implements Runnable {
 		}
 		BufferedWriter writer = new BufferedWriter(fileWriter);
 		try{
-			for(OWLClass cls : signature){
-				writer.write(cls.getIRI().toString() + "\n");
+			for(OWLEntity ent: signature){
+				writer.write(ent.getIRI().toString() + "\n");
 			}
 		}
 		catch (IOException e) {

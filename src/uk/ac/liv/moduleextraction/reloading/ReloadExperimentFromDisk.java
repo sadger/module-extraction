@@ -9,9 +9,11 @@ import java.util.Set;
 
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.EntityType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
@@ -30,7 +32,7 @@ public class ReloadExperimentFromDisk {
 
 	private final String EXPERIMENT_LOCATION;
 	
-	private Set<OWLClass> signature;
+	private Set<OWLEntity> signature;
 	private Set<OWLLogicalAxiom> terminology;
 	private Set<OWLLogicalAxiom> module;
 
@@ -51,11 +53,12 @@ public class ReloadExperimentFromDisk {
 		return ontology.getLogicalAxioms();
 	}
 	
-	private Set<OWLClass> populateSignature() throws IOException{
+	private Set<OWLEntity> populateSignature() throws IOException{
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		File signatureFile = new File(EXPERIMENT_LOCATION + SIGNATURE_FILE);
-		Set<OWLClass> signature = new HashSet<OWLClass>();
+		Set<OWLEntity> signature = new HashSet<OWLEntity>();
 		
+		//TODO save/load class names AND role names maybe use a config file with headers [Classes] [Roles]
 		if(signatureFile.exists()){
 			BufferedReader br = new BufferedReader(new FileReader(signatureFile));
 			String line;
@@ -82,7 +85,7 @@ public class ReloadExperimentFromDisk {
 		return module;
 	}
 	
-	public Set<OWLClass> getSignature() {
+	public Set<OWLEntity> getSignature() {
 		return signature;
 	}
 

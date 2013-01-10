@@ -15,6 +15,7 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.liv.moduleextraction.util.ModulePaths;
@@ -42,10 +43,10 @@ public class SigManager {
 		writer.close();
 	}
 
-	public Set<OWLClass> readFile(String location) throws IOException{
+	public Set<OWLEntity> readFile(String location) throws IOException{
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		File signatureFile = new File(location);
-		Set<OWLClass> signature = new HashSet<OWLClass>();
+		Set<OWLEntity> signature = new HashSet<OWLEntity>();
 		if(signatureFile.exists()){
 			BufferedReader br = new BufferedReader(new FileReader(signatureFile));
 			String line;
