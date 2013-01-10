@@ -37,6 +37,7 @@ import uk.ac.liv.moduleextraction.reloading.ReloadExperimentFromDisk;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
+import uk.ac.liv.ontologyutils.axioms.AxiomExtractor;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
@@ -63,9 +64,11 @@ public class ExtractionComparision {
 	private boolean resumingExperiments = false;
 
 	public ExtractionComparision(OWLOntology ontology, Set<OWLClass> sig, String name) {
+		AxiomExtractor extractor = new AxiomExtractor();
 		this.experimentName = name;
 		this.signature = sig;
-		this.ontology = ontology;
+		this.ontology = extractor.extractInclusionsAndEqualities(ontology);
+		System.out.println("Extracted inclusions and equalities only");
 	}
 
 	public ExtractionComparision(String experimentLocation) throws IOException{
@@ -135,21 +138,17 @@ public class ExtractionComparision {
 	}
 
 	public void writeResults(Set<OWLLogicalAxiom> semanticModule) throws IOException{
-
-
 		BufferedWriter writer = new BufferedWriter(new FileWriter(ModulePaths.getOntologyLocation() + "/Results/" + experimentName  + "/" + "experiment-results", false));
-		writer.write("Signature Size: " + signature.size() + "\n");
-		writer.write("Syntatic Size: " + syntaticSize + "\n");
-		writer.write("Synt->Semantic Size: " + semanticModule.size() + "\n");
-
+		
+		writer.write("#Signature Size\t Syntactic Size\t Synt->Semantic Size\n");
+		writer.write(signature.size() + ":" + syntaticSize + ":" +semanticModule.size() + "\n");
 		writer.flush();
 		writer.close();
-
 
 		/* Dump the results one last time before finishing */
 		new Thread(dump).run();
 
-		/* Finish the scheduling diff.krssof ontology dumps */
+		/* Finish the scheduling dumps */
 		dumpHandle.cancel(true);
 		scheduler.shutdownNow();
 	}
@@ -164,29 +163,6 @@ public class ExtractionComparision {
 		return result;
 	}
 
-
-	public static void main(String[] args) {
-		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/expr/nci-08.09d-terminology.owl");
-		//OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"NCI/pathway.obo");
-		ExtractionComparision compare = null;
-		SignatureGenerator generator = new SignatureGenerator(ontology.getLogicalAxioms());
-
-		try {
-			/* Reload experiment */
-			compare = new ExtractionComparision(ModulePaths.getOntologyLocation() + "/Results/nci-08.09d-avgdeps340/");
-			/* Start new experiment */
-			//compare =  new ExtractionComparision(ontology, generator.generateRandomClassSignature(100), "profiling");
-			compare.compareExtractionApproaches();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (QBFSolverException e) {
-			e.printStackTrace();
-		} catch (OWLOntologyStorageException e) {
-			e.printStackTrace();
-		} catch (OWLOntologyCreationException e) {
-			e.printStackTrace();
-		}
-	}
 
 
 }

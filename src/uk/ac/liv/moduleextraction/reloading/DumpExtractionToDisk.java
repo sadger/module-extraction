@@ -66,7 +66,7 @@ public class DumpExtractionToDisk implements Runnable {
 		writeSetToOntology(terminology, TERM_FILE);
 		writeSetToOntology(module, MOD_FILE);
 		
-		System.out.println("Dumped to: " + directory.getAbsolutePath() + "at " + new Date());
+		System.out.println("Dumped to: " + directory.getAbsolutePath() + " at " + new Date());
 		
 	}
 	

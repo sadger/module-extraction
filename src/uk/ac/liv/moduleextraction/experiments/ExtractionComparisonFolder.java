@@ -32,14 +32,12 @@ public class ExtractionComparisonFolder {
 				compare.compareExtractionApproaches();
 			}
 		}
-		
 	}
 	
-
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-08.09d-terminology.owl");
 		try {
-			new ExtractionComparisonFolder(ont, new File(ModulePaths.getOntologyLocation() + "child"));
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getOntologyLocation() + "sigs/random"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (OWLOntologyStorageException e) {

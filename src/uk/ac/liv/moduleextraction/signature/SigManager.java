@@ -61,11 +61,11 @@ public class SigManager {
 	}
 
 	public static void main(String[] args) {
-		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"/nci-08.09d-terminology.owl");
-		SigManager writer = new SigManager(new File(ModulePaths.getOntologyLocation() + "random"));
+		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"/NCI/nci-08.09d-terminology.owl");
+		SigManager writer = new SigManager(new File(ModulePaths.getOntologyLocation() + "sigs/random"));
 		SignatureGenerator gen = new SignatureGenerator(ontology.getLogicalAxioms());
 
-		for(int i=0; i<=10; i++){
+		for(int i=1; i<=50; i++){
 			Set<OWLClass> randomSig = gen.generateRandomClassSignature(50);
 			try {
 				writer.writeFile(randomSig, "random50-" + i);
