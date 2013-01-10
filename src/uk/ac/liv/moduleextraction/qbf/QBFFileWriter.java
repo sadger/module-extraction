@@ -54,7 +54,7 @@ public class QBFFileWriter {
 	/*OWL Structures*/
 	private Set<OWLLogicalAxiom> ontology;
 	private HashSet<OWLEntity> classesNotInSignature;
-	private Set<OWLClass> signature;
+	private Set<OWLEntity> signature;
 
 	/*QBF Structures */
 	private ClauseSet ontologyAsClauseSet;
@@ -62,11 +62,11 @@ public class QBFFileWriter {
 	private NumberMap numberMap;
 	private IVec<IVecInt> clauses;
 
-	public QBFFileWriter(Set<OWLLogicalAxiom> ontology, Set<OWLClass> signature) {
+	public QBFFileWriter(Set<OWLLogicalAxiom> ontology, Set<OWLEntity> signatureAndSigM) {
 		FILE_TO_WRITE =  ModulePaths.getQBFSolverLocation() + "Files/qbf" + System.currentTimeMillis() + ".qdimacs";
 		this.toWrite = new ArrayList<String>();
 		this.ontology = ontology;
-		this.signature = signature;
+		this.signature = signatureAndSigM;
 		this.classesNotInSignature = new HashSet<OWLEntity>();
 
 		convertOntologyToQBFClauses();
@@ -153,8 +153,8 @@ public class QBFFileWriter {
 	private void writeUniversalQuantifiers() {
 		if(!signature.isEmpty()){
 			toWrite.add("a ");
-			for(OWLClass cls : signature){
-				PropositionalFormula clsAsVar = convertor.visit(cls);
+			for(OWLEntity ent : signature){
+				PropositionalFormula clsAsVar = convertor.convert(ent);
 				toWrite.add(numberMap.get(clsAsVar) + " ");
 			}
 			toWrite.add("0\n");

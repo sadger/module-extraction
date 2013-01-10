@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
 import uk.ac.liv.moduleextraction.qbf.QBFFileWriter;
@@ -15,10 +16,10 @@ import uk.ac.liv.moduleextraction.replacers.InverseRolePropertyReplacer;
 
 public class InseperableChecker {
 	
-	public boolean isSeperableFromEmptySet(HashSet<OWLLogicalAxiom> w, Set<OWLClass> sig) throws IOException, QBFSolverException{
+	public boolean isSeperableFromEmptySet(HashSet<OWLLogicalAxiom> w, Set<OWLEntity> signatureAndSigM) throws IOException, QBFSolverException{
 		InverseRolePropertyReplacer replacer = new InverseRolePropertyReplacer();
 		//Remove inverse roles from the QBF problem
-		QBFFileWriter writer = new QBFFileWriter(replacer.convert(w),sig);
+		QBFFileWriter writer = new QBFFileWriter(replacer.convert(w),signatureAndSigM);
 		QBFSolver solver =  new QBFSolver();
 
 

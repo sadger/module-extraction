@@ -10,6 +10,7 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -42,16 +43,16 @@ public class ModuleExtractor {
 
 	private Set<OWLLogicalAxiom> terminology;
 	private Set<OWLLogicalAxiom> module;
-	private Set<OWLClass> signature;
+	private Set<OWLEntity> signature;
 	
-	public ModuleExtractor(Set<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> existingModule, Set<OWLClass> sig) {
+	public ModuleExtractor(Set<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature) {
 		this.terminology = term;
-		this.signature = sig;
+		this.signature = signature;
 		this.module = (existingModule == null) ? new HashSet<OWLLogicalAxiom>() : existingModule;
 		this.dependencyCalculator = new DependencyCalculator(term);
 	}
 	
-	public ModuleExtractor(Set<OWLLogicalAxiom> terminology, Set<OWLClass> signature) {
+	public ModuleExtractor(Set<OWLLogicalAxiom> terminology, Set<OWLEntity> signature) {
 		this(terminology,null,signature);
 	}
 	
@@ -67,12 +68,13 @@ public class ModuleExtractor {
 
 			//printPercentageComplete(W, terminology, module);
 
-			Set<OWLClass> signatureAndSigM = new HashSet<OWLClass>();
+			Set<OWLEntity> signatureAndSigM = new HashSet<OWLEntity>();
 			signatureAndSigM.addAll(signature);
-			signatureAndSigM.addAll(ModuleUtils.getClassesInSet(module));
+			System.out.println(ModuleUtils.getEntitiesInSet(module));
+			signatureAndSigM.addAll(ModuleUtils.getEntitiesInSet(module));
 			
 			/* We can reuse this in the LHS check and syntatic check so do it only once */
-			HashMap<OWLClass, Set<OWLClass>> dependW = dependencyCalculator.getDependenciesFor(W);
+			HashMap<OWLClass, Set<OWLEntity>> dependW = dependencyCalculator.getDependenciesFor(W);
 
 			HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(dependW, W, signatureAndSigM);
 
@@ -95,7 +97,7 @@ public class ModuleExtractor {
 		return module;
 	}
 
-	public Set<OWLClass> getSignature() {
+	public Set<OWLEntity> getSignature() {
 		return signature;
 	}
 	public Set<OWLLogicalAxiom> getTerminology() {
@@ -115,25 +117,25 @@ public class ModuleExtractor {
 		System.out.println(wSize + ":" + module.size());
 	}
 
-	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/NCI/expr/nci-08.09d-terminology.owl");
-		
+//	public static void main(String[] args) {
+//		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/NCI/expr/nci-08.09d-terminology.owl");
+//		
 //		for(OWLLogicalAxiom ax :ont.getLogicalAxioms()){
 //			System.out.println(ax);
 //			System.out.println(AxiomSplitter.getDefinitionofAxiom(ax));
 //		}
 		
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		ModuleExtractor mod = new ModuleExtractor(ont.getLogicalAxioms(), gen.generateRandomClassSignature(500));
-		try {
-			mod.extractModule();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (QBFSolverException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+//		ModuleExtractor mod = new ModuleExtractor(ont.getLogicalAxioms(), gen.generateRandomClassSignature(500));
+//		try {
+//			mod.extractModule();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (QBFSolverException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	
-	}
+//	}
 }

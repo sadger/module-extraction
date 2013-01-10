@@ -10,6 +10,7 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
@@ -68,6 +69,23 @@ public class SignatureGenerator {
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
 		OWLClass cls = f.getOWLClass(IRI.create(ont.getOntologyID() + "#A"));
 		System.out.println(gen.dependenciesUpToHierarchyDepth(cls, 2));
+	}
+
+	public Set<OWLEntity> generateRandomSignature(int desiredSize) {
+		Set<OWLEntity> result = null;
+		Set<OWLEntity> signature = ModuleUtils.getEntitiesInSet(logicalAxioms);
+		signature.remove(factory.getOWLThing());
+		signature.remove(factory.getOWLNothing());
+	
+		if(desiredSize >= signature.size())
+			result = signature;
+		else{
+			ArrayList<OWLEntity> listOfNames = new ArrayList<OWLEntity>(signature);
+			Collections.shuffle(listOfNames);
+			result = new HashSet<OWLEntity>(listOfNames.subList(0, desiredSize));
+		}
+		
+		return result;
 	}
 
 }

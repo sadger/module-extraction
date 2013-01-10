@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
@@ -23,7 +24,7 @@ import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 public class DefinitorialDependencies {
 	
 	private AxiomExtractor extractor; 
-	private HashMap<OWLClass, Set<OWLClass>> dependencies = new HashMap<OWLClass, Set<OWLClass>>();
+	private HashMap<OWLClass, Set<OWLEntity>> dependencies = new HashMap<OWLClass, Set<OWLEntity>>();
 	private Set<OWLLogicalAxiom> logicalAxioms;
 	
 	public DefinitorialDependencies(Set<OWLLogicalAxiom> axioms) {
@@ -34,7 +35,7 @@ public class DefinitorialDependencies {
 		calculateDependencies();
 	}
 	
-	public HashMap<OWLClass, Set<OWLClass>> getDependencyMap() {
+	public HashMap<OWLClass, Set<OWLEntity>> getDependencyMap() {
 		return dependencies;
 	}
 	
@@ -57,13 +58,13 @@ public class DefinitorialDependencies {
 		dependencies.clear();
 	}
 	
-	public Set<OWLClass> getDependenciesFor(OWLClass cls) {
+	public Set<OWLEntity> getDependenciesFor(OWLClass cls) {
 		return dependencies.get(cls);
 	}
 	
 	private void initialseMappings() {
 		for(OWLClass cls : ModuleUtils.getClassesInSet(logicalAxioms))
-			dependencies.put(cls, new HashSet<OWLClass>());
+			dependencies.put(cls, new HashSet<OWLEntity>());
 	}
 	
 	private void calculateDependencies(){
@@ -75,12 +76,20 @@ public class DefinitorialDependencies {
 	private void addFromTop(OWLLogicalAxiom axiom) {
 		OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
 		OWLClassExpression definition = AxiomSplitter.getDefinitionofAxiom(axiom);
-		dependencies.put(name, definition.getClassesInSignature());
+		dependencies.put(name, definition.getSignature());
 		
 		for(OWLClass cls : definition.getClassesInSignature()){
-			Set<OWLClass> clsDependencies = dependencies.get(cls);
+			Set<OWLEntity> clsDependencies = dependencies.get(cls);
 			if(clsDependencies != null)
 				dependencies.get(name).addAll(clsDependencies);
+		}
+	}
+	
+	public static void main(String[] args) {
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "interp/diff.krss");
+		DefinitorialDependencies d = new DefinitorialDependencies(ont.getLogicalAxioms());
+		for(OWLClass c : ont.getClassesInSignature()){
+			System.out.println(c + ":" + d.getDependenciesFor(c));
 		}
 	}
 	

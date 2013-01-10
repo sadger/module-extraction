@@ -1,9 +1,14 @@
 package uk.ac.liv.moduleextraction.main;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
@@ -28,12 +33,24 @@ public class CommandLineInterface {
 
 			SignatureGenerator sigGen = new SignatureGenerator(ontology.getLogicalAxioms());
 
-			Set<OWLClass> signature = sigGen.generateRandomClassSignature(sigSize);
+			Set<OWLEntity> signature = sigGen.generateRandomSignature(sigSize);
 
-			System.out.println("Random signature size " + signature.size() + " generated:");
-			System.out.println(signature);
+//			System.out.println("Random signature size " + signature.size() + " generated:");
+//			System.out.println(signature);
+			
+			OWLDataFactory f = OWLManager.getOWLDataFactory();
+			OWLClass a = f.getOWLClass(IRI.create(ontology.getOntologyID() + "#A"));
+			OWLClass b = f.getOWLClass(IRI.create(ontology.getOntologyID() + "#B"));
+			OWLClass c = f.getOWLClass(IRI.create(ontology.getOntologyID() + "#C"));
+			
+			Set<OWLEntity> ents = new HashSet<OWLEntity>();
+			ents.add(a);
+			ents.add(b);
+			ents.add(c);
 
-			ModuleExtractor extractor = new ModuleExtractor(ontology.getLogicalAxioms(), signature);
+			System.out.println("Signature: " + ents);
+			
+			ModuleExtractor extractor = new ModuleExtractor(ontology.getLogicalAxioms(), ents);
 
 			Set<OWLLogicalAxiom> module = null;
 			try {
