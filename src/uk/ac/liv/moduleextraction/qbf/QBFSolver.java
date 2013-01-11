@@ -14,7 +14,7 @@ public class QBFSolver {
 	private File qbfFile;
 	
 	public boolean isSatisfiable (File dimacsLocation) throws QBFSolverException{
-		
+
 		this.qbfFile = dimacsLocation;
 		solverText = "";
 		
@@ -74,7 +74,6 @@ public class QBFSolver {
 			t.printStackTrace();
 		}
 	
-
 
 		if(exitValue == 10){
 			return true;
