@@ -62,15 +62,7 @@ public class SignatureGenerator {
 		
 		return result;
 	}
-
-	public static void main(String[] args) {
-		OWLDataFactory f = OWLManager.getOWLDataFactory();
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "interp/diff.krss");
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		OWLClass cls = f.getOWLClass(IRI.create(ont.getOntologyID() + "#A"));
-		System.out.println(gen.dependenciesUpToHierarchyDepth(cls, 2));
-	}
-
+	
 	public Set<OWLEntity> generateRandomSignature(int desiredSize) {
 		Set<OWLEntity> result = null;
 		Set<OWLEntity> signature = ModuleUtils.getEntitiesInSet(logicalAxioms);
@@ -87,5 +79,16 @@ public class SignatureGenerator {
 		
 		return result;
 	}
+
+
+	public static void main(String[] args) {
+		OWLDataFactory f = OWLManager.getOWLDataFactory();
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "interp/diff.krss");
+		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+		OWLClass cls = f.getOWLClass(IRI.create(ont.getOntologyID() + "#A"));
+		System.out.println(gen.dependenciesUpToHierarchyDepth(cls, 2));
+	}
+
+
 
 }

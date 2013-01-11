@@ -54,7 +54,7 @@ public class DependencyHierarchy {
 		for(OWLLogicalAxiom axiom : logicalAxioms){
 			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
 			OWLClassExpression definiton = AxiomSplitter.getDefinitionofAxiom(axiom);
-			immediateDependencies.put(name,definiton.getClassesInSignature());
+			immediateDependencies.put(name,ModuleUtils.getNamedClassesInSignature(definiton));
 		}
 	}
 
@@ -105,28 +105,10 @@ public class DependencyHierarchy {
 
 	public static void main(String[] args) {
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
-		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"/nci-08.09d-terminology.owl");
+		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"interp/diff2.krss");
+		DependencyHierarchy h = new DependencyHierarchy(ontology.getLogicalAxioms());
+		System.out.println(h);
 
-		Set<OWLLogicalAxiom> logicalAxioms = ontology.getLogicalAxioms();
-		DependencyHierarchy hier = new DependencyHierarchy(logicalAxioms);
-		DefinitorialDependencies deps = new DefinitorialDependencies(logicalAxioms);
-
-		for(OWLClass cls : ModuleUtils.getClassesInSet(logicalAxioms)){
-			int depSize = deps.getDependenciesFor(cls).size();
-			if(depSize > 45 && depSize < 55){
-				int maxHier = hier.getMaxHierarchyDepth(cls);
-				System.out.println(cls + ":" + depSize);
-
-				Set<OWLClass> seenDeps = new HashSet<OWLClass>();
-				for(int i = 1; i<=maxHier; i++){
-					seenDeps.addAll(hier.getDependencyForDepth(cls, i));
-					System.out.println(i + " " + seenDeps.size());
-				}
-
-
-			}
-		}
-		//System.out.println(hier);
 
 	}
 

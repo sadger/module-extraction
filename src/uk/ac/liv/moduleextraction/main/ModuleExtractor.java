@@ -70,12 +70,10 @@ public class ModuleExtractor {
 
 			Set<OWLEntity> signatureAndSigM = new HashSet<OWLEntity>();
 			signatureAndSigM.addAll(signature);
-			System.out.println(ModuleUtils.getEntitiesInSet(module));
 			signatureAndSigM.addAll(ModuleUtils.getEntitiesInSet(module));
 			
-			/* We can reuse this in the LHS check and syntatic check so do it only once */
+			/* We can reuse this in the LHS check and syntactic check so do it only once */
 			HashMap<OWLClass, Set<OWLEntity>> dependW = dependencyCalculator.getDependenciesFor(W);
-
 			HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(dependW, W, signatureAndSigM);
 
 			if(syntaxDepChecker.hasSyntacticSigDependency(dependW, signatureAndSigM)
@@ -117,25 +115,25 @@ public class ModuleExtractor {
 		System.out.println(wSize + ":" + module.size());
 	}
 
-//	public static void main(String[] args) {
-//		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/NCI/expr/nci-08.09d-terminology.owl");
-//		
-//		for(OWLLogicalAxiom ax :ont.getLogicalAxioms()){
-//			System.out.println(ax);
-//			System.out.println(AxiomSplitter.getDefinitionofAxiom(ax));
-//		}
+	public static void main(String[] args) {
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/interp/diff2.krss");
 		
-//		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-//		ModuleExtractor mod = new ModuleExtractor(ont.getLogicalAxioms(), gen.generateRandomClassSignature(500));
-//		try {
-//			mod.extractModule();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (QBFSolverException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		for(OWLLogicalAxiom ax :ont.getLogicalAxioms()){
+			System.out.println(ax);
+		}
+		System.out.println();
+		
+		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+		Set<OWLEntity> signature = gen.generateRandomSignature(3);
+		ModuleExtractor mod = new ModuleExtractor(ont.getLogicalAxioms(), signature);
+		System.out.println("Signature: " + signature);
+		try {
+			mod.extractModule();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (QBFSolverException e) {
+			e.printStackTrace();
+		}
 	
-//	}
+	}
 }

@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
 public class SyntacticDependencyChecker {
 
@@ -15,14 +14,12 @@ public class SyntacticDependencyChecker {
 
 	public boolean hasSyntacticSigDependency(HashMap<OWLClass, Set<OWLEntity>> dependW, Set<OWLEntity> signatureAndSigM){
 		boolean result = false;	
-	
-		System.out.println(dependW);
-		System.out.println(signatureAndSigM);
-		
+			
 		for(OWLEntity cls : signatureAndSigM){
 			Set<OWLEntity> classDeps = dependW.get(cls);
 			if(!(classDeps == null)){
 				classDeps.retainAll(signatureAndSigM);
+				//System.out.print((classDeps.isEmpty()) ? "" : "Syntactic dep on: " + classDeps + "\n");
 				result = result || !classDeps.isEmpty();
 			}
 

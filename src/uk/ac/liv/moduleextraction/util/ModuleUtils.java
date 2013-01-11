@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -18,6 +20,7 @@ import org.semanticweb.owlapi.util.SimpleShortFormProvider;
 
 public class ModuleUtils {
 	
+	private static OWLDataFactory factory = OWLManager.getOWLDataFactory();
 	/**
 	 * Gets the class names only from a set of axioms
 	 */
@@ -25,6 +28,8 @@ public class ModuleUtils {
 		Set<OWLClass> classes = new HashSet<OWLClass>();
 		for(OWLLogicalAxiom axiom : axioms){
 			classes.addAll(axiom.getClassesInSignature());
+			classes.remove(factory.getOWLThing());
+			classes.remove(factory.getOWLNothing());
 		}
 		return classes;
 	}
@@ -36,8 +41,18 @@ public class ModuleUtils {
 		Set<OWLEntity> entities = new HashSet<OWLEntity>();
 		for(OWLLogicalAxiom axiom : axioms){
 			entities.addAll(axiom.getSignature());
+			entities.remove(factory.getOWLThing());
+			entities.remove(factory.getOWLNothing());
 		}
 		return entities;
+	}
+	
+	public static Set<OWLClass> getNamedClassesInSignature(OWLClassExpression cls){
+		Set<OWLClass> classes = cls.getClassesInSignature();
+		classes.remove(factory.getOWLThing());
+		classes.remove(factory.getOWLNothing());
+		
+		return classes;
 	}
 	
 	public static OWLClass getRandomClass(Set<OWLClass> classes){

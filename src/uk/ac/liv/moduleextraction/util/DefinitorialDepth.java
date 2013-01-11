@@ -116,8 +116,12 @@ public class DefinitorialDepth {
 
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/expr/nci-08.09d-terminology.owl");
-		System.out.println("Ontology Loaded");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "interp/diff2.krss");
+		DefinitorialDepth d = new DefinitorialDepth(ont);
+		for(OWLLogicalAxiom ax : d.getDefinitorialSortedList()){
+			OWLClass cls = (OWLClass) AxiomSplitter.getNameofAxiom(ax);
+			System.out.println(d.lookup(cls) + ":" + ax);
+		}
 	
 	}
 }
