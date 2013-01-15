@@ -65,7 +65,7 @@ public class SignatureGenerator {
 	
 	public Set<OWLEntity> generateRandomSignature(int desiredSize) {
 		Set<OWLEntity> result = null;
-		Set<OWLEntity> signature = ModuleUtils.getEntitiesInSet(logicalAxioms);
+		Set<OWLEntity> signature = ModuleUtils.getClassAndRoleNamesInSet(logicalAxioms);
 		signature.remove(factory.getOWLThing());
 		signature.remove(factory.getOWLNothing());
 	

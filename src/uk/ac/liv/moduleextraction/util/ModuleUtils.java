@@ -19,7 +19,7 @@ import org.semanticweb.owlapi.util.OWLEntityRenamer;
 import org.semanticweb.owlapi.util.SimpleShortFormProvider;
 
 public class ModuleUtils {
-	
+
 	private static OWLDataFactory factory = OWLManager.getOWLDataFactory();
 	/**
 	 * Gets the class names only from a set of axioms
@@ -33,37 +33,42 @@ public class ModuleUtils {
 		}
 		return classes;
 	}
-	
+
 	/**
 	 * Gets the class names and role names from a set of axioms
 	 */
-	public static Set<OWLEntity> getEntitiesInSet(Set<OWLLogicalAxiom> axioms){
+	public static Set<OWLEntity> getClassAndRoleNamesInSet(Set<OWLLogicalAxiom> axioms){
 		Set<OWLEntity> entities = new HashSet<OWLEntity>();
 		for(OWLLogicalAxiom axiom : axioms){
-			entities.addAll(axiom.getSignature());
-			entities.remove(factory.getOWLThing());
-			entities.remove(factory.getOWLNothing());
+			for(OWLEntity e : axiom.getSignature()){
+				if(e.isOWLClass() || e.isOWLObjectProperty())
+					entities.add(e);
+			}
 		}
+
+		entities.remove(factory.getOWLThing());
+		entities.remove(factory.getOWLNothing());
+
 		return entities;
 	}
-	
+
 	public static Set<OWLClass> getNamedClassesInSignature(OWLClassExpression cls){
 		Set<OWLClass> classes = cls.getClassesInSignature();
 		classes.remove(factory.getOWLThing());
 		classes.remove(factory.getOWLNothing());
-		
+
 		return classes;
 	}
-	
+
 	public static OWLClass getRandomClass(Set<OWLClass> classes){
 		ArrayList<OWLClass> listOfClasses = new ArrayList<OWLClass>(classes);
 		Collections.shuffle(listOfClasses);
 		return listOfClasses.get(0);
 	}
-		
+
 	public static Set<OWLLogicalAxiom> generateRandomAxioms(Set<OWLLogicalAxiom> originalOntology, int desiredSize){
 		Set<OWLLogicalAxiom> result = null;
-		
+
 		if(desiredSize >= originalOntology.size())
 			result = originalOntology;
 		else{
@@ -71,19 +76,19 @@ public class ModuleUtils {
 			Collections.shuffle(listOfAxioms);
 			result = new HashSet<OWLLogicalAxiom>(listOfAxioms.subList(0, desiredSize));
 		}
-		
+
 		return result;
 	}
-	
+
 	public static String getTimeAsHMS(long timeInMilliseconds){
 		long hours = TimeUnit.MILLISECONDS.toHours(timeInMilliseconds);
 		long minutes = TimeUnit.MILLISECONDS.toMinutes(timeInMilliseconds) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(timeInMilliseconds));
 		long seconds = TimeUnit.MILLISECONDS.toSeconds(timeInMilliseconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeInMilliseconds));
-		
+
 		return hours + "hrs " + minutes + "mins " + seconds + "s";
 	}
-	
-	
+
+
 	public static void remapIRIs(HashSet<OWLOntology> ontologies, String prefix) {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLEntityRenamer renamer = new OWLEntityRenamer(manager, ontologies);

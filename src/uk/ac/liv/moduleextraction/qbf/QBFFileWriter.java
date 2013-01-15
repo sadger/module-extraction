@@ -81,7 +81,7 @@ public class QBFFileWriter {
 	}
 
 	private void populateSignatures() {
-		Set<OWLEntity> ontologyEntities = ModuleUtils.getEntitiesInSet(ontology);
+		Set<OWLEntity> ontologyEntities = ModuleUtils.getClassAndRoleNamesInSet(ontology);
 		
 		signature.retainAll(ontologyEntities);
 	

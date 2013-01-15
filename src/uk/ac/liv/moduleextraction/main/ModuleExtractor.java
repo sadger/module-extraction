@@ -78,7 +78,7 @@ public class ModuleExtractor {
 
 			Set<OWLEntity> signatureAndSigM = new HashSet<OWLEntity>();
 			signatureAndSigM.addAll(signature);
-			signatureAndSigM.addAll(ModuleUtils.getEntitiesInSet(module));
+			signatureAndSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(module));
 			
 			/* We can reuse this in the LHS check and syntactic check so do it only once */
 			HashMap<OWLClass, Set<OWLEntity>> dependW = dependencyCalculator.getDependenciesFor(W);
@@ -127,13 +127,10 @@ public class ModuleExtractor {
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/pathway.obo");
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		Set<OWLEntity> sig = gen.generateRandomSignature(40);
+		Set<OWLEntity> sig = gen.generateRandomSignature(200);
 		
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
-		
-		OWLObjectProperty sadge = f.getOWLObjectProperty(IRI.create("http://www.sadger.co.uk#isBacon"));
-		OWLObjectProperty sadge2 = f.getOWLObjectProperty(IRI.create("http://www.sadger.co.uk#isSadger"));
-		
+
 		for(OWLEntity e : ont.getSignature()){
 			if(e.isOWLObjectProperty())
 				sig.add(e);
