@@ -16,7 +16,7 @@ import uk.ac.liv.moduleextraction.replacers.InverseRolePropertyReplacer;
 
 public class InseperableChecker {
 	
-	public boolean isSeperableFromEmptySet(HashSet<OWLLogicalAxiom> w, Set<OWLEntity> signatureAndSigM) throws IOException, QBFSolverException{
+	public boolean isSeperableFromEmptySet(Set<OWLLogicalAxiom> w, Set<OWLEntity> signatureAndSigM) throws IOException, QBFSolverException{
 		InverseRolePropertyReplacer replacer = new InverseRolePropertyReplacer();
 		//Remove inverse roles from the QBF problem
 		QBFFileWriter writer = new QBFFileWriter(replacer.convert(w),signatureAndSigM);

@@ -19,6 +19,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -62,10 +63,8 @@ public class DumpExtractionToDisk implements Runnable {
 		if(!directory.exists())
 			directory.mkdir();
 		
-		if(!new File(directory.getAbsolutePath() + SIGNATURE_FILE).exists()){
-			writeSignature();
-			System.out.println("Written signature");
-		}
+		writeSignature();
+
 		writeSetToOntology(terminology, TERM_FILE);
 		writeSetToOntology(module, MOD_FILE);
 		
@@ -84,28 +83,44 @@ public class DumpExtractionToDisk implements Runnable {
 		}
 		
 		File saveLocation = new File(directory.getAbsolutePath()+file);
-//		if(saveLocation.exists())
-//			saveLocation.delete();
 		
 		try {
 			ontologyManager.saveOntology(ontologyToWrite,owlFormat,IRI.create(saveLocation));
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		}
+		System.out.println("Written " + file);
 	}
 	
 	private void writeSignature(){
+		File signatureFile = new File(directory.getAbsolutePath()+ SIGNATURE_FILE);
+		if (signatureFile.exists())
+			signatureFile.delete();
+		
 		FileWriter fileWriter = null;
 		try {
-			fileWriter = new FileWriter(directory.getAbsolutePath()+ SIGNATURE_FILE,false);
+			fileWriter = new FileWriter(signatureFile,false);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		BufferedWriter writer = new BufferedWriter(fileWriter);
+		
+		HashSet<OWLClass> classes = new HashSet<OWLClass>();
+		HashSet<OWLObjectProperty> roles = new HashSet<OWLObjectProperty>();
+
+		for(OWLEntity ent: signature){
+			if(ent.isOWLClass())
+				classes.add((OWLClass) ent);
+			else if(ent.isOWLObjectProperty())
+				roles.add((OWLObjectProperty) ent);
+		}
 		try{
-			for(OWLEntity ent: signature){
-				writer.write(ent.getIRI().toString() + "\n");
-			}
+			writer.write("[Classes]\n");
+			for(OWLClass cls : classes)
+				writer.write(cls.getIRI().toString() + "\n");
+			writer.write("[Roles]\n");
+			for(OWLObjectProperty prop : roles)
+				writer.write(prop.getIRI().toString() + "\n");
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -120,6 +135,7 @@ public class DumpExtractionToDisk implements Runnable {
 				e.printStackTrace();
 			}
 		}
+		System.out.println("Written signature");
 	}
 
 }

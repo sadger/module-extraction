@@ -8,15 +8,21 @@ import java.util.Iterator;
 import java.util.Set;
 
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
 import uk.ac.liv.moduleextraction.qbf.QBFSolver;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
+import uk.ac.liv.moduleextraction.reloading.DumpExtractionToDisk;
+import uk.ac.liv.moduleextraction.reloading.ReloadExperimentFromDisk;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.testing.DependencyCalculator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
@@ -30,7 +36,6 @@ public class ModuleExtractor {
 
 	SyntacticDependencyChecker syntaxDepChecker = new SyntacticDependencyChecker();
 	InseperableChecker insepChecker = new InseperableChecker();
-	QBFSolver qbfSolver = new QBFSolver();
 	LHSSigExtractor lhsExtractor = new LHSSigExtractor();
 	DependencyCalculator dependencyCalculator;
 
@@ -38,8 +43,10 @@ public class ModuleExtractor {
 	private Set<OWLLogicalAxiom> module;
 	private Set<OWLEntity> signature;
 	
+	
 	//TODO should only accept own entities which are ClassNames or RoleNames
 	public ModuleExtractor(Set<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature) {
+		System.out.println(term.size() + ":" + signature.size());
 		this.terminology = term;
 		this.signature = signature;
 		this.module = (existingModule == null) ? new HashSet<OWLLogicalAxiom>() : existingModule;
@@ -51,6 +58,13 @@ public class ModuleExtractor {
 	}
 	
 	public Set<OWLLogicalAxiom> extractModule() throws IOException, QBFSolverException{
+		
+		DumpExtractionToDisk dump = new DumpExtractionToDisk(
+				"newwriter",terminology, 
+				module, signature);
+		
+		new Thread(dump).run();
+		
 		HashSet<OWLLogicalAxiom> W  = new HashSet<OWLLogicalAxiom>();
 		Iterator<OWLLogicalAxiom> axiomIterator = terminology.iterator();
 
@@ -82,6 +96,7 @@ public class ModuleExtractor {
 			}
 			dependW.clear();
 		}
+		new Thread(dump).run();
 		return module;
 	}
 
@@ -108,31 +123,26 @@ public class ModuleExtractor {
 		}
 		System.out.println(wSize + ":" + module.size());
 	}
-
+	
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/pathway.obo");
-//		
-//		for(OWLLogicalAxiom ax :ont.getLogicalAxioms()){
-//			System.out.println(ax);
-//		}
-		System.out.println();
-		
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+		Set<OWLEntity> sig = gen.generateRandomSignature(40);
 		
-		AxiomExtractor extractor = new AxiomExtractor();
-	
+		OWLDataFactory f = OWLManager.getOWLDataFactory();
 		
-		ArrayList <OWLEntity> sortedSig = new ArrayList<OWLEntity>(ont.getSignature());
-		for(OWLEntity e : sortedSig){
-			System.out.println(e.getEntityType());
+		OWLObjectProperty sadge = f.getOWLObjectProperty(IRI.create("http://www.sadger.co.uk#isBacon"));
+		OWLObjectProperty sadge2 = f.getOWLObjectProperty(IRI.create("http://www.sadger.co.uk#isSadger"));
+		
+		for(OWLEntity e : ont.getSignature()){
+			if(e.isOWLObjectProperty())
+				sig.add(e);
 		}
-		System.out.println(sortedSig);
 		
-		Set<OWLEntity> signature = new HashSet<OWLEntity>(sortedSig.subList(0, 100));
+		ModuleExtractor mod = new ModuleExtractor(ont.getLogicalAxioms(), sig);
 		
+
 		
-		ModuleExtractor mod = new ModuleExtractor(ont.getLogicalAxioms(), signature);
-		System.out.println("Signature: " + signature);
 		try {
 			mod.extractModule();
 		} catch (IOException e) {
@@ -140,7 +150,6 @@ public class ModuleExtractor {
 		} catch (QBFSolverException e) {
 			e.printStackTrace();
 		}
-	
 	}
 
 }

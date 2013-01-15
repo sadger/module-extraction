@@ -58,13 +58,27 @@ public class ReloadExperimentFromDisk {
 		File signatureFile = new File(EXPERIMENT_LOCATION + SIGNATURE_FILE);
 		Set<OWLEntity> signature = new HashSet<OWLEntity>();
 		
-		//TODO save/load class names AND role names maybe use a config file with headers [Classes] [Roles]
 		if(signatureFile.exists()){
 			BufferedReader br = new BufferedReader(new FileReader(signatureFile));
 			String line;
+			boolean readingRoles = false;
+			
 			while((line = br.readLine()) != null) {
-				String classIRI = line.trim();
-				signature.add(factory.getOWLClass(IRI.create(classIRI)));
+				String trimmedLine = line.trim();
+				
+				if(trimmedLine.equals("[Roles]")){
+					System.out.println("reading roles");
+					readingRoles = true;
+				}
+					
+				if(!trimmedLine.equals("[Classes]") && !trimmedLine.equals("[Roles]"))
+					if(!readingRoles)
+						signature.add(factory.getOWLClass(IRI.create(trimmedLine)));
+					else{
+						System.out.println(trimmedLine);
+						signature.add(factory.getOWLObjectProperty(IRI.create(trimmedLine)));
+					}
+						
 			}
 		}
 		else
@@ -92,9 +106,16 @@ public class ReloadExperimentFromDisk {
 	public static void main(String[] args) {
 		try {
 			
-			ReloadExperimentFromDisk reload = new ReloadExperimentFromDisk(ModulePaths.getOntologyLocation() + "/Results/pathway-random-100/");
+			ReloadExperimentFromDisk reload = new ReloadExperimentFromDisk(ModulePaths.getOntologyLocation() + "/Results/newwriter");
 			System.out.println("Terminology Size: " + reload.getTerminology().size());
 			System.out.println("Module Size: " + reload.getModule().size());
+			System.out.println("Signature Size " + reload.getSignature().size());
+			System.out.println(reload.getSignature());
+			for(OWLEntity e : reload.getSignature()){
+				if(e.isOWLObjectProperty()){
+					System.out.println(e);
+				}
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
