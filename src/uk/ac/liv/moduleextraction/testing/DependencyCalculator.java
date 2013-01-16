@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -15,12 +16,13 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
-
 import uk.ac.liv.moduleextraction.util.AxiomComparator;
 import uk.ac.liv.moduleextraction.util.DefinitorialDepth;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
+import uk.ac.liv.ontologyutils.caching.AxiomCache;
+import uk.ac.liv.ontologyutils.caching.AxiomMetricStore;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 public class DependencyCalculator {
@@ -53,7 +55,8 @@ public class DependencyCalculator {
 		return dependencies;
 	}
 
-	private void addFromTop(OWLLogicalAxiom axiom,HashMap<OWLClass, Set<OWLEntity>> dependencies) {
+	private void addFromTop(OWLLogicalAxiom axiom, HashMap<OWLClass, Set<OWLEntity>> dependencies){
+		
 		OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
 		OWLClassExpression definition = AxiomSplitter.getDefinitionofAxiom(axiom);
 		dependencies.put(name, definition.getSignature());
@@ -68,18 +71,6 @@ public class DependencyCalculator {
 	}
 
 
-	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "interp/diff2.krss");
 
-		DependencyCalculator deps = new DependencyCalculator(ont);
-		HashMap<OWLClass, Set<OWLEntity>> dependencies = deps.getDependenciesFor(ont.getLogicalAxioms());
-		
-		for(OWLClass cls : ont.getClassesInSignature()){
-			System.out.println(cls + ":" + dependencies.get(cls));
-		}
-
-		
-
-	}
 
 }

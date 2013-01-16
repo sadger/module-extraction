@@ -22,22 +22,26 @@ public class SignatureGenerator {
 
 	private Set<OWLLogicalAxiom> logicalAxioms;
 	private DependencyHierarchy hierarchy;
-	private OWLDataFactory factory = OWLManager.getOWLDataFactory();
+	
+	private Set<OWLClass> axiomsClasses;
+	private Set<OWLEntity> axiomsSignature;
 
 	public SignatureGenerator(Set<OWLLogicalAxiom> axioms) {
 		this.logicalAxioms = axioms;
-		this.hierarchy = new DependencyHierarchy(logicalAxioms);
+//		this.hierarchy = new DependencyHierarchy(logicalAxioms);
+		this.axiomsClasses =  ModuleUtils.getClassesInSet(logicalAxioms);
+		this.axiomsSignature = ModuleUtils.getClassAndRoleNamesInSet(logicalAxioms);
 	}
 
-	public Set<OWLClass> dependenciesUpToHierarchyDepth(OWLClass cls, int depth){
-		Set<OWLClass> signature = new HashSet<OWLClass>();
-		int maxDepth = hierarchy.getMaxHierarchyDepth(cls);
-		
-		for(int i = 1; i<=depth && i<=maxDepth; i++)
-			signature.addAll(hierarchy.getDependencyForDepth(cls, i));
-		
-		return signature;
-	}
+//	public Set<OWLClass> dependenciesUpToHierarchyDepth(OWLClass cls, int depth){
+//		Set<OWLClass> signature = new HashSet<OWLClass>();
+//		int maxDepth = hierarchy.getMaxHierarchyDepth(cls);
+//		
+//		for(int i = 1; i<=depth && i<=maxDepth; i++)
+//			signature.addAll(hierarchy.getDependencyForDepth(cls, i));
+//		
+//		return signature;
+//	}
 	
 	/**
 	 * Gets a random signature consisting only of class names
@@ -48,14 +52,11 @@ public class SignatureGenerator {
 	 */
 	public Set<OWLClass> generateRandomClassSignature(int desiredSize){
 		Set<OWLClass> result = null;
-		Set<OWLClass> signature = ModuleUtils.getClassesInSet(logicalAxioms);
-		signature.remove(factory.getOWLThing());
-		signature.remove(factory.getOWLNothing());
 	
-		if(desiredSize >= signature.size())
-			result = signature;
+		if(desiredSize >= axiomsClasses.size())
+			result = axiomsClasses;
 		else{
-			ArrayList<OWLClass> listOfNames = new ArrayList<OWLClass>(signature);
+			ArrayList<OWLClass> listOfNames = new ArrayList<OWLClass>(axiomsClasses);
 			Collections.shuffle(listOfNames);
 			result = new HashSet<OWLClass>(listOfNames.subList(0, desiredSize));
 		}
@@ -65,29 +66,19 @@ public class SignatureGenerator {
 	
 	public Set<OWLEntity> generateRandomSignature(int desiredSize) {
 		Set<OWLEntity> result = null;
-		Set<OWLEntity> signature = ModuleUtils.getClassAndRoleNamesInSet(logicalAxioms);
-		signature.remove(factory.getOWLThing());
-		signature.remove(factory.getOWLNothing());
 	
-		if(desiredSize >= signature.size())
-			result = signature;
+		if(desiredSize >= axiomsSignature.size())
+			result = axiomsSignature;
 		else{
-			ArrayList<OWLEntity> listOfNames = new ArrayList<OWLEntity>(signature);
+			ArrayList<OWLEntity> listOfNames = new ArrayList<OWLEntity>(axiomsSignature);
 			Collections.shuffle(listOfNames);
 			result = new HashSet<OWLEntity>(listOfNames.subList(0, desiredSize));
 		}
 		
 		return result;
 	}
+	
 
-
-	public static void main(String[] args) {
-		OWLDataFactory f = OWLManager.getOWLDataFactory();
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "interp/diff.krss");
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		OWLClass cls = f.getOWLClass(IRI.create(ont.getOntologyID() + "#A"));
-		System.out.println(gen.dependenciesUpToHierarchyDepth(cls, 2));
-	}
 
 
 

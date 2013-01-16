@@ -8,5 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ontologyutils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/propositional"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="var" path="JAR_LOCATION/guava-14.0-rc1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

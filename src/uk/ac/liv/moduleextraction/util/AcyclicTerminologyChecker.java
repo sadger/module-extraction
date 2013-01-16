@@ -22,7 +22,7 @@ public class AcyclicTerminologyChecker {
 	}
 	
 	public static void main(String[] args) {
-		OWLOntology nci1 = OntologyLoader.loadOntology("/home/william/PhD/Ontologies/interp/diff.krss");
+		OWLOntology nci1 = OntologyLoader.loadOntology("/home/william/PhD/Ontologies/moduletest/pharma-alc.owl");
 		AcyclicTerminologyChecker checker = new AcyclicTerminologyChecker(nci1);
 		System.out.println(checker.isAcyclicTerminology());
 	}

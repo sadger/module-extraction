@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -18,6 +20,11 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.util.OWLEntityRenamer;
 import org.semanticweb.owlapi.util.SimpleShortFormProvider;
 
+import uk.ac.liv.ontologyutils.caching.AxiomCache;
+import uk.ac.liv.ontologyutils.caching.AxiomMetricStore;
+
+import com.google.common.cache.LoadingCache;
+
 public class ModuleUtils {
 
 	private static OWLDataFactory factory = OWLManager.getOWLDataFactory();
@@ -25,11 +32,20 @@ public class ModuleUtils {
 	 * Gets the class names only from a set of axioms
 	 */
 	public static Set<OWLClass> getClassesInSet(Set<OWLLogicalAxiom> axioms){
+		
+		LoadingCache<OWLLogicalAxiom,AxiomMetricStore> 
+			axiomCache = AxiomCache.getCache();
+		
 		Set<OWLClass> classes = new HashSet<OWLClass>();
 		for(OWLLogicalAxiom axiom : axioms){
-			classes.addAll(axiom.getClassesInSignature());
-			classes.remove(factory.getOWLThing());
-			classes.remove(factory.getOWLNothing());
+			AxiomMetricStore axiomStore = null;
+			try {
+				axiomStore = axiomCache.get(axiom);
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+			classes.addAll(axiomStore.getNamedClasses());
+			removeTopAndBottomConcept(classes);
 		}
 		return classes;
 	}
@@ -45,21 +61,21 @@ public class ModuleUtils {
 					entities.add(e);
 			}
 		}
-
-		entities.remove(factory.getOWLThing());
-		entities.remove(factory.getOWLNothing());
-
+		removeTopAndBottomConcept(entities);
 		return entities;
 	}
 
 	public static Set<OWLClass> getNamedClassesInSignature(OWLClassExpression cls){
 		Set<OWLClass> classes = cls.getClassesInSignature();
-		classes.remove(factory.getOWLThing());
-		classes.remove(factory.getOWLNothing());
-
+		removeTopAndBottomConcept(classes);
 		return classes;
 	}
 
+	private static void removeTopAndBottomConcept(Set<? extends OWLEntity> entities){
+		entities.remove(factory.getOWLThing());
+		entities.remove(factory.getOWLNothing());
+	}
+	
 	public static OWLClass getRandomClass(Set<OWLClass> classes){
 		ArrayList<OWLClass> listOfClasses = new ArrayList<OWLClass>(classes);
 		Collections.shuffle(listOfClasses);
@@ -84,11 +100,19 @@ public class ModuleUtils {
 		long hours = TimeUnit.MILLISECONDS.toHours(timeInMilliseconds);
 		long minutes = TimeUnit.MILLISECONDS.toMinutes(timeInMilliseconds) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(timeInMilliseconds));
 		long seconds = TimeUnit.MILLISECONDS.toSeconds(timeInMilliseconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeInMilliseconds));
-
 		return hours + "hrs " + minutes + "mins " + seconds + "s";
 	}
 
 
+	public static Set<OWLLogicalAxiom> getLogicalAxioms(Set<OWLAxiom> axioms){
+		HashSet<OWLLogicalAxiom> result = new HashSet<OWLLogicalAxiom>();
+		for(OWLAxiom ax : axioms){
+			if(ax.isLogicalAxiom())
+				result.add((OWLLogicalAxiom) ax);
+		}
+		return result;
+	}
+	
 	public static void remapIRIs(HashSet<OWLOntology> ontologies, String prefix) {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLEntityRenamer renamer = new OWLEntityRenamer(manager, ontologies);

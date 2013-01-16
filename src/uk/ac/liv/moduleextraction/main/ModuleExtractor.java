@@ -75,7 +75,6 @@ public class ModuleExtractor {
 			W.add(chosenAxiom);
 
 			//printPercentageComplete(W, terminology, module);
-
 			Set<OWLEntity> signatureAndSigM = new HashSet<OWLEntity>();
 			signatureAndSigM.addAll(signature);
 			signatureAndSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(module));
@@ -89,6 +88,7 @@ public class ModuleExtractor {
 
 				terminology.remove(chosenAxiom);
 				System.out.println("Adding " + chosenAxiom);
+				
 				module.add(chosenAxiom);
 				W.clear();
 				/* reset the iterator */
@@ -127,26 +127,26 @@ public class ModuleExtractor {
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/pathway.obo");
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		Set<OWLEntity> sig = gen.generateRandomSignature(200);
+		Set<OWLEntity> sig = gen.generateRandomSignature(100);
+		
+		
 		
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
 
-		for(OWLEntity e : ont.getSignature()){
-			if(e.isOWLObjectProperty())
-				sig.add(e);
-		}
+	
+	
 		
-		ModuleExtractor mod = new ModuleExtractor(ont.getLogicalAxioms(), sig);
-		
-
-		
-		try {
-			mod.extractModule();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (QBFSolverException e) {
-			e.printStackTrace();
-		}
+//		ModuleExtractor mod = new ModuleExtractor(ont.getLogicalAxioms(), sig);
+//		
+//
+//		
+//		try {
+//			mod.extractModule();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} catch (QBFSolverException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 }
