@@ -123,30 +123,6 @@ public class ModuleExtractor {
 		}
 		System.out.println(wSize + ":" + module.size());
 	}
-	
-	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/pathway.obo");
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		Set<OWLEntity> sig = gen.generateRandomSignature(100);
-		
-		
-		
-		OWLDataFactory f = OWLManager.getOWLDataFactory();
 
-	
-	
-		
-//		ModuleExtractor mod = new ModuleExtractor(ont.getLogicalAxioms(), sig);
-//		
-//
-//		
-//		try {
-//			mod.extractModule();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} catch (QBFSolverException e) {
-//			e.printStackTrace();
-//		}
-	}
 
 }

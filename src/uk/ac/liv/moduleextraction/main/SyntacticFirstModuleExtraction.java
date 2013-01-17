@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
@@ -21,6 +22,8 @@ import uk.ac.liv.moduleextraction.testing.DependencyCalculator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
+import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
+import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
 public class SyntacticFirstModuleExtraction {
 	
@@ -95,23 +98,35 @@ public class SyntacticFirstModuleExtraction {
 	}
 
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology("/home/william/PhD/Ontologies/NCI/pathway-term.obo");
+		OWLOntology ont = OntologyLoader.loadOntology("/home/william/PhD/Ontologies/NCI/nci-08.09d-terminology.owl");
 
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		Set<OWLEntity> sig = gen.generateRandomSignature(200);
+		Set<OWLEntity> sig = gen.generateRandomSignature(50);
 		
-		SyntacticFirstModuleExtraction syntmod = new SyntacticFirstModuleExtraction(ont.getLogicalAxioms(), sig);
-		ModuleExtractor mod =  new ModuleExtractor(ont.getLogicalAxioms(), sig);
+		SyntacticLocalityModuleExtractor syntaxModExtractor = 
+				new SyntacticLocalityModuleExtractor(OWLManager.createOWLOntologyManager(), ont, ModuleType.STAR);
+
+		
+		Set<OWLLogicalAxiom> starModule = ModuleUtils.getLogicalAxioms(syntaxModExtractor.extract(sig));
+		
+		
+		System.out.println("Star module size " + starModule.size());
+		
+		SyntacticFirstModuleExtraction syntmod = new SyntacticFirstModuleExtraction(starModule, sig);
+	//	ModuleExtractor mod =  new ModuleExtractor(starModule, sig);
 		
 		Set<OWLLogicalAxiom> syntfirstExtracted = null;
 		Set<OWLLogicalAxiom> modExtracted = null;
 		
 		try {
 			System.out.println("== Starting syntactic extraction ==");
+			long startTime = System.currentTimeMillis();
 			syntfirstExtracted = syntmod.extractModule();
-			System.out.println("Module size: " + syntfirstExtracted.size());
+			System.out.println("Time taken: " + ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
 			System.out.println("== Starting semantic extraction ==");
-			modExtracted = mod.extractModule();
+//			startTime = System.currentTimeMillis();
+//			modExtracted = mod.extractModule();
+//			System.out.println("Time taken: " +ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (QBFSolverException e) {
@@ -119,7 +134,7 @@ public class SyntacticFirstModuleExtraction {
 		}
 
 		System.out.println("Synsize: " + syntfirstExtracted.size());
-		System.out.println("Modsize: " + modExtracted.size());
-		System.out.println("Syntmod == Mod: " + syntfirstExtracted.equals(modExtracted));
+		//System.out.println("Modsize: " + modExtracted.size());
+		//System.out.println("Syntmod == Mod: " + syntfirstExtracted.equals(modExtracted));
 	}
 }

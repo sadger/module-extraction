@@ -32,10 +32,9 @@ public class ModuleUtils {
 	 * Gets the class names only from a set of axioms
 	 */
 	public static Set<OWLClass> getClassesInSet(Set<OWLLogicalAxiom> axioms){
-		
 		LoadingCache<OWLLogicalAxiom,AxiomMetricStore> 
-			axiomCache = AxiomCache.getCache();
-		
+		axiomCache = AxiomCache.getCache();
+
 		Set<OWLClass> classes = new HashSet<OWLClass>();
 		for(OWLLogicalAxiom axiom : axioms){
 			AxiomMetricStore axiomStore = null;
@@ -54,9 +53,17 @@ public class ModuleUtils {
 	 * Gets the class names and role names from a set of axioms
 	 */
 	public static Set<OWLEntity> getClassAndRoleNamesInSet(Set<OWLLogicalAxiom> axioms){
+		LoadingCache<OWLLogicalAxiom,AxiomMetricStore> 
+		axiomCache = AxiomCache.getCache();
 		Set<OWLEntity> entities = new HashSet<OWLEntity>();
+		AxiomMetricStore axiomStore = null;
 		for(OWLLogicalAxiom axiom : axioms){
-			for(OWLEntity e : axiom.getSignature()){
+			try {
+				axiomStore = axiomCache.get(axiom);
+			} catch (ExecutionException e1) {
+				e1.printStackTrace();
+			}
+			for(OWLEntity e : axiomStore.getSignature()){
 				if(e.isOWLClass() || e.isOWLObjectProperty())
 					entities.add(e);
 			}
@@ -75,7 +82,7 @@ public class ModuleUtils {
 		entities.remove(factory.getOWLThing());
 		entities.remove(factory.getOWLNothing());
 	}
-	
+
 	public static OWLClass getRandomClass(Set<OWLClass> classes){
 		ArrayList<OWLClass> listOfClasses = new ArrayList<OWLClass>(classes);
 		Collections.shuffle(listOfClasses);
@@ -112,7 +119,7 @@ public class ModuleUtils {
 		}
 		return result;
 	}
-	
+
 	public static void remapIRIs(HashSet<OWLOntology> ontologies, String prefix) {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLEntityRenamer renamer = new OWLEntityRenamer(manager, ontologies);

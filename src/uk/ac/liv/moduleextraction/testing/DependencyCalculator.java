@@ -5,9 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-
-
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -18,17 +15,14 @@ import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.liv.moduleextraction.util.AxiomComparator;
 import uk.ac.liv.moduleextraction.util.DefinitorialDepth;
-import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
-import uk.ac.liv.ontologyutils.caching.AxiomCache;
-import uk.ac.liv.ontologyutils.caching.AxiomMetricStore;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 public class DependencyCalculator {
 
-	HashMap<OWLClass, Integer> definitorialMap;
+	private HashMap<OWLClass, Integer> definitorialMap;
 	private OWLDataFactory factory = OWLManager.getOWLDataFactory();
+	private HashMap<OWLClass, Set<OWLEntity>> dependencies;
 
 	public DependencyCalculator(OWLOntology ont) {
 		this(ont.getLogicalAxioms());
@@ -39,24 +33,28 @@ public class DependencyCalculator {
 	}
 
 	public HashMap<OWLClass, Set<OWLEntity>> getDependenciesFor(Set<OWLLogicalAxiom> subsetOfAxioms){
+		dependencies = new HashMap<OWLClass, Set<OWLEntity>>();
 		
-		HashMap<OWLClass, Set<OWLEntity>> dependencies = new HashMap<OWLClass, Set<OWLEntity>>();
-		ArrayList<OWLLogicalAxiom> sortedAxioms = new ArrayList<OWLLogicalAxiom>(subsetOfAxioms);
-		Collections.sort(sortedAxioms, new AxiomComparator(definitorialMap));
+		intialiseMappings(subsetOfAxioms);
+		populateDependencies(subsetOfAxioms);
 		
-
-		for(OWLClass cls : ModuleUtils.getClassesInSet(subsetOfAxioms))
-			dependencies.put(cls, new HashSet<OWLEntity>());
-
-		for(OWLLogicalAxiom axiom : sortedAxioms)
-			addFromTop(axiom, dependencies);
-		
-
 		return dependencies;
 	}
 
-	private void addFromTop(OWLLogicalAxiom axiom, HashMap<OWLClass, Set<OWLEntity>> dependencies){
+	private void intialiseMappings(Set<OWLLogicalAxiom> axioms){
+		for(OWLClass cls : ModuleUtils.getClassesInSet(axioms))
+			dependencies.put(cls, new HashSet<OWLEntity>());
+	}
+	
+	private void populateDependencies(Set<OWLLogicalAxiom> axioms){
+		ArrayList<OWLLogicalAxiom> sortedAxioms = new ArrayList<OWLLogicalAxiom>(axioms);
+		Collections.sort(sortedAxioms, new AxiomComparator(definitorialMap));
+		for(OWLLogicalAxiom axiom : sortedAxioms)
+			addFromTop(axiom, dependencies);
 		
+	}
+	
+	private void addFromTop(OWLLogicalAxiom axiom, HashMap<OWLClass, Set<OWLEntity>> dependencies){
 		OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
 		OWLClassExpression definition = AxiomSplitter.getDefinitionofAxiom(axiom);
 		dependencies.put(name, definition.getSignature());
