@@ -6,4 +6,4 @@ bin/**
 build/**
 
 syntax: regexp
-^\.attach_pid3875$
+^\.attach_pid.*$
