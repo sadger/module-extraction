@@ -1,5 +1,6 @@
 package uk.ac.liv.moduleextraction.main;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.reloading.ReloadExperimentFromDisk;
+import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.testing.DependencyCalculator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
@@ -101,21 +103,23 @@ public class SyntacticFirstModuleExtraction {
 		Iterator<OWLLogicalAxiom> axiomIterator = terminology.iterator();
 
 		//Terminology is the value of T\M as we remove items as we add them to the module
-		while(!terminology.equals(W)){
+		
+		boolean addedAxiom = false;
+		
+		while(!addedAxiom){
 			OWLLogicalAxiom chosenAxiom = axiomIterator.next();
 
 			W.add(chosenAxiom);
 
-			//printPercentageComplete(W, terminology, module);
 			Set<OWLEntity> signatureAndSigM = new HashSet<OWLEntity>();
 			signatureAndSigM.addAll(signature);
 			signatureAndSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(module));
 			
-			/* We can reuse this in the LHS check and syntactic check so do it only once */
 			HashMap<OWLClass, Set<OWLEntity>> dependW = dependencyCalculator.getDependenciesFor(W);
 			HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(dependW, W, signatureAndSigM);
 
 			if(insepChecker.isSeperableFromEmptySet(lhsSigT, signatureAndSigM)){
+				addedAxiom = true;
 				terminology.remove(chosenAxiom);
 				System.out.println("Adding " + chosenAxiom);
 				module.add(chosenAxiom);
@@ -131,18 +135,12 @@ public class SyntacticFirstModuleExtraction {
 	
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology("/LOCAL/wgatens/Ontologies/nci-08.09d-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntology("/home/william/PhD/Ontologies/NCI/nci-08.09d-terminology.owl");
 
+		
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
 		
-		ReloadExperimentFromDisk reloader = null;
-		try {
-			reloader = new ReloadExperimentFromDisk(ModulePaths.getOntologyLocation() + "Results/newwriter");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		
-		Set<OWLEntity> sig = reloader.getSignature();
+		Set<OWLEntity> sig =  gen.generateRandomSignature(200);
 		
 		SyntacticLocalityModuleExtractor syntaxModExtractor = 
 				new SyntacticLocalityModuleExtractor(OWLManager.createOWLOntologyManager(), ont, ModuleType.STAR);
@@ -156,7 +154,6 @@ public class SyntacticFirstModuleExtraction {
 		SyntacticFirstModuleExtraction syntmod = new SyntacticFirstModuleExtraction(starModule, sig);
 		
 		Set<OWLLogicalAxiom> syntfirstExtracted = null;
-		Set<OWLLogicalAxiom> modExtracted = null;
 		
 		try {
 			System.out.println("== Starting syntactic extraction ==");
