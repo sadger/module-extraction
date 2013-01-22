@@ -71,21 +71,18 @@ public class ModuleExtractor {
 			HashMap<OWLClass, Set<OWLEntity>> dependW = dependencyCalculator.getDependenciesFor(W);
 			HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(dependW, W, signatureAndSigM);
 
-			if(syntaxDepChecker.hasSyntacticSigDependency(dependW, signatureAndSigM)
-					|| insepChecker.isSeperableFromEmptySet(lhsSigT, signatureAndSigM)){
-
+			if(insepChecker.isSeperableFromEmptySet(lhsSigT, signatureAndSigM)){
 				terminology.remove(chosenAxiom);
 				System.out.println("Adding " + chosenAxiom);
-				
 				module.add(chosenAxiom);
 				W.clear();
-				/* reset the iterator */
-				axiomIterator = terminology.iterator();
+				return new SyntacticFirstModuleExtraction(terminology, module,signature).extractModule();
 			}
 			dependW.clear();
 		}
-		new Thread(dump).run();
+		System.err.println("SHOULD NEVER GET HERE - ERROR");
 		return module;
+
 	}
 
 	public Set<OWLLogicalAxiom> getModule() {

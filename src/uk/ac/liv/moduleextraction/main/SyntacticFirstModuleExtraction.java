@@ -56,10 +56,10 @@ public class SyntacticFirstModuleExtraction {
 		HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(dependterm, terminology, sigUnionSigM);
 		
 		if(insepChecker.isSeperableFromEmptySet(lhsSigT, sigUnionSigM)){
-			return new ModuleExtractor(terminology, module, signature).extractModule();
+			collectSemanticDependentAxioms();
 		}
-		else
-			return module;
+
+		return module;
 	}
 	
 	private Set<OWLEntity> getSigUnionSigModule() {
@@ -79,9 +79,7 @@ public class SyntacticFirstModuleExtraction {
 
 			W.add(chosenAxiom);
 
-			Set<OWLEntity> signatureAndSigM = new HashSet<OWLEntity>();
-			signatureAndSigM.addAll(signature);
-			signatureAndSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(module));
+			Set<OWLEntity> signatureAndSigM = getSigUnionSigModule();
 			
 			/* We can reuse this in the LHS check and syntactic check so do it only once */
 			HashMap<OWLClass, Set<OWLEntity>> dependW = dependencyCalculator.getDependenciesFor(W);
@@ -97,7 +95,41 @@ public class SyntacticFirstModuleExtraction {
 			dependW.clear();
 		}
 	}
+	
+	private void collectSemanticDependentAxioms() throws IOException, QBFSolverException {
+		HashSet<OWLLogicalAxiom> W  = new HashSet<OWLLogicalAxiom>();
+		Iterator<OWLLogicalAxiom> axiomIterator = terminology.iterator();
 
+		//Terminology is the value of T\M as we remove items as we add them to the module
+		while(!terminology.equals(W)){
+			OWLLogicalAxiom chosenAxiom = axiomIterator.next();
+
+			W.add(chosenAxiom);
+
+			//printPercentageComplete(W, terminology, module);
+			Set<OWLEntity> signatureAndSigM = new HashSet<OWLEntity>();
+			signatureAndSigM.addAll(signature);
+			signatureAndSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(module));
+			
+			/* We can reuse this in the LHS check and syntactic check so do it only once */
+			HashMap<OWLClass, Set<OWLEntity>> dependW = dependencyCalculator.getDependenciesFor(W);
+			HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(dependW, W, signatureAndSigM);
+
+			if(insepChecker.isSeperableFromEmptySet(lhsSigT, signatureAndSigM)){
+				terminology.remove(chosenAxiom);
+				System.out.println("Adding " + chosenAxiom);
+				module.add(chosenAxiom);
+				W.clear();
+				collectSyntacticDependentAxioms();
+			}
+			dependW.clear();
+		}
+	}
+
+	
+	
+	
+	
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntology("/LOCAL/wgatens/Ontologies/nci-08.09d-terminology.owl");
 
@@ -122,7 +154,6 @@ public class SyntacticFirstModuleExtraction {
 		System.out.println("Star module size " + starModule.size());
 		
 		SyntacticFirstModuleExtraction syntmod = new SyntacticFirstModuleExtraction(starModule, sig);
-	//	ModuleExtractor mod =  new ModuleExtractor(starModule, sig);
 		
 		Set<OWLLogicalAxiom> syntfirstExtracted = null;
 		Set<OWLLogicalAxiom> modExtracted = null;
@@ -133,9 +164,6 @@ public class SyntacticFirstModuleExtraction {
 			syntfirstExtracted = syntmod.extractModule();
 			System.out.println("Time taken: " + ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
 			System.out.println("== Starting semantic extraction ==");
-//			startTime = System.currentTimeMillis();
-//			modExtracted = mod.extractModule();
-//			System.out.println("Time taken: " +ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (QBFSolverException e) {
@@ -143,7 +171,5 @@ public class SyntacticFirstModuleExtraction {
 		}
 
 		System.out.println("Synsize: " + syntfirstExtracted.size());
-		//System.out.println("Modsize: " + modExtracted.size());
-		//System.out.println("Syntmod == Mod: " + syntfirstExtracted.equals(modExtracted));
 	}
 }
