@@ -153,6 +153,24 @@ public class ExtractionComparision {
 		return result;
 	}
 
+	
+	public static void main(String[] args) {
+		try {
+			ExtractionComparision comp = new ExtractionComparision(ModulePaths.getOntologyLocation() + "Results/newwriter");
+			comp.compareExtractionApproaches();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (OWLOntologyStorageException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (OWLOntologyCreationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (QBFSolverException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 
 }

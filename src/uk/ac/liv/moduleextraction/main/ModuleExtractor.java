@@ -1,34 +1,22 @@
 package uk.ac.liv.moduleextraction.main;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
-import uk.ac.liv.moduleextraction.qbf.QBFSolver;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.reloading.DumpExtractionToDisk;
-import uk.ac.liv.moduleextraction.reloading.ReloadExperimentFromDisk;
-import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.testing.DependencyCalculator;
-import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
-import uk.ac.liv.ontologyutils.axioms.AxiomExtractor;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 public class ModuleExtractor {
 
@@ -60,7 +48,7 @@ public class ModuleExtractor {
 	public Set<OWLLogicalAxiom> extractModule() throws IOException, QBFSolverException{
 		
 		DumpExtractionToDisk dump = new DumpExtractionToDisk(
-				"newwriter",terminology, 
+				"pos",terminology, 
 				module, signature);
 		
 		new Thread(dump).run();

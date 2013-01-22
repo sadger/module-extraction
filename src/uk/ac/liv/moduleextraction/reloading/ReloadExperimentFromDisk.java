@@ -79,11 +79,19 @@ public class ReloadExperimentFromDisk {
 						signature.add(factory.getOWLObjectProperty(IRI.create(trimmedLine)));
 					}
 						
+			
+			}
+			try{
+				br.close();
+			}
+			catch (IOException e) {
+				// TODO: handle exception
 			}
 		}
 		else
 			System.err.println("No signature file found");
-	
+		
+
 		return signature;
 	}
 	

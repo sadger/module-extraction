@@ -17,6 +17,7 @@ import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
+import uk.ac.liv.moduleextraction.reloading.ReloadExperimentFromDisk;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.testing.DependencyCalculator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
@@ -98,10 +99,18 @@ public class SyntacticFirstModuleExtraction {
 	}
 
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology("/home/william/PhD/Ontologies/NCI/nci-08.09d-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntology("/LOCAL/wgatens/Ontologies/nci-08.09d-terminology.owl");
 
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		Set<OWLEntity> sig = gen.generateRandomSignature(50);
+		
+		ReloadExperimentFromDisk reloader = null;
+		try {
+			reloader = new ReloadExperimentFromDisk(ModulePaths.getOntologyLocation() + "Results/newwriter");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		Set<OWLEntity> sig = reloader.getSignature();
 		
 		SyntacticLocalityModuleExtractor syntaxModExtractor = 
 				new SyntacticLocalityModuleExtractor(OWLManager.createOWLOntologyManager(), ont, ModuleType.STAR);

@@ -54,6 +54,13 @@ public class SigManager {
 				String classIRI = line.trim();
 				signature.add(factory.getOWLClass(IRI.create(classIRI)));
 			}
+			
+			try{
+				br.close();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		else
 			System.err.println("No signature file found");
