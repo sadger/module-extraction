@@ -131,16 +131,23 @@ public class SyntacticFirstModuleExtraction {
 	}
 
 	
-	
-	
-	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology("/home/william/PhD/Ontologies/NCI/nci-08.09d-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
 
 		
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
 		
-		Set<OWLEntity> sig =  gen.generateRandomSignature(200);
+
+		SigManager sigManager = new SigManager(new File(ModulePaths.getOntologyLocation()));
+		
+		Set<OWLEntity> sig = null;
+		try {
+			sig = sigManager.readFile(ModulePaths.getOntologyLocation() + "testingSig");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		System.out.println(sig);
 		
 		SyntacticLocalityModuleExtractor syntaxModExtractor = 
 				new SyntacticLocalityModuleExtractor(OWLManager.createOWLOntologyManager(), ont, ModuleType.STAR);

@@ -85,7 +85,7 @@ public class ReloadExperimentFromDisk {
 				br.close();
 			}
 			catch (IOException e) {
-				// TODO: handle exception
+				e.printStackTrace();
 			}
 		}
 		else

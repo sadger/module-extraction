@@ -16,6 +16,7 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.liv.moduleextraction.util.ModulePaths;
@@ -32,29 +33,79 @@ public class SigManager {
 		this.directory = directory;
 	}
 
-	public void writeFile(Set<OWLClass> signature, String name) throws IOException{
-		BufferedWriter writer = new BufferedWriter(new FileWriter(new File(directory.getAbsolutePath() + "/" + name)));
-
-		for(OWLClass cls : signature){
-			writer.write(cls.getIRI().toString() + "\n");
+	public void writeFile(Set<OWLEntity> signature, String name) throws IOException{
+		File signatureFile = new File(directory.getAbsolutePath()+ "/" + name);
+		if (signatureFile.exists())
+			signatureFile.delete();
+		
+		FileWriter fileWriter = null;
+		try {
+			fileWriter = new FileWriter(signatureFile,false);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		BufferedWriter writer = new BufferedWriter(fileWriter);
+		
+		HashSet<OWLClass> classes = new HashSet<OWLClass>();
+		HashSet<OWLObjectProperty> roles = new HashSet<OWLObjectProperty>();
 
-		writer.flush();
-		writer.close();
+		for(OWLEntity ent: signature){
+			if(ent.isOWLClass())
+				classes.add((OWLClass) ent);
+			else if(ent.isOWLObjectProperty())
+				roles.add((OWLObjectProperty) ent);
+		}
+		try{
+			writer.write("[Classes]\n");
+			for(OWLClass cls : classes)
+				writer.write(cls.getIRI().toString() + "\n");
+			writer.write("[Roles]\n");
+			for(OWLObjectProperty prop : roles)
+				writer.write(prop.getIRI().toString() + "\n");
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		finally{
+			try {
+				fileWriter.flush();
+				writer.flush();
+				fileWriter.close();
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println("Written signature");
 	}
+	
 
 	public Set<OWLEntity> readFile(String location) throws IOException{
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		File signatureFile = new File(location);
 		Set<OWLEntity> signature = new HashSet<OWLEntity>();
+		
 		if(signatureFile.exists()){
 			BufferedReader br = new BufferedReader(new FileReader(signatureFile));
 			String line;
-			while((line = br.readLine()) != null) {
-				String classIRI = line.trim();
-				signature.add(factory.getOWLClass(IRI.create(classIRI)));
-			}
+			boolean readingRoles = false;
 			
+			while((line = br.readLine()) != null) {
+				String trimmedLine = line.trim();
+				
+				if(trimmedLine.equals("[Roles]")){
+					System.out.println("reading roles");
+					readingRoles = true;
+				}
+					
+				if(!trimmedLine.equals("[Classes]") && !trimmedLine.equals("[Roles]"))
+					if(!readingRoles)
+						signature.add(factory.getOWLClass(IRI.create(trimmedLine)));
+					else{
+						System.out.println(trimmedLine);
+						signature.add(factory.getOWLObjectProperty(IRI.create(trimmedLine)));
+					}
+			}
 			try{
 				br.close();
 			}
@@ -64,24 +115,10 @@ public class SigManager {
 		}
 		else
 			System.err.println("No signature file found");
+		
 
 		return signature;
 	}
 
-	public static void main(String[] args) {
-		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"/NCI/nci-08.09d-terminology.owl");
-		SigManager writer = new SigManager(new File(ModulePaths.getOntologyLocation() + "sigs/random"));
-		SignatureGenerator gen = new SignatureGenerator(ontology.getLogicalAxioms());
-
-		for(int i=1; i<=50; i++){
-			Set<OWLClass> randomSig = gen.generateRandomClassSignature(50);
-			try {
-				writer.writeFile(randomSig, "random50-" + i);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-
-	}
+	
 }
