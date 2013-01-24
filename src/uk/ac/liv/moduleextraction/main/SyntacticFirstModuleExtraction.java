@@ -22,6 +22,7 @@ import uk.ac.liv.moduleextraction.reloading.ReloadExperimentFromDisk;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.testing.DependencyCalculator;
+import uk.ac.liv.moduleextraction.testing.ImprovedDependencyCalculator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
@@ -30,7 +31,7 @@ import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
 public class SyntacticFirstModuleExtraction {
 	
-	private DependencyCalculator dependencyCalculator;
+	private ImprovedDependencyCalculator dependencyCalculator;
 	private SyntacticDependencyChecker syntaxDepChecker = new SyntacticDependencyChecker();
 	private LHSSigExtractor lhsExtractor = new LHSSigExtractor();
 	private InseperableChecker insepChecker = new InseperableChecker();
@@ -43,7 +44,7 @@ public class SyntacticFirstModuleExtraction {
 		this.terminology = term;
 		this.signature = sig;
 		this.module = (existingModule == null) ? new HashSet<OWLLogicalAxiom>() : existingModule;
-		this.dependencyCalculator = new DependencyCalculator(term);
+		this.dependencyCalculator = new ImprovedDependencyCalculator(term);
 	}
 	
 	public SyntacticFirstModuleExtraction(Set<OWLLogicalAxiom> terminology, Set<OWLEntity> signature) {
@@ -88,7 +89,7 @@ public class SyntacticFirstModuleExtraction {
 
 			if(syntaxDepChecker.hasSyntacticSigDependency(dependW, signatureAndSigM)){
 				terminology.remove(chosenAxiom);
-				System.out.println("Adding " + chosenAxiom);
+				//System.out.println("Adding " + chosenAxiom);
 				module.add(chosenAxiom);
 				W.clear();
 				/* reset the iterator */
@@ -132,7 +133,7 @@ public class SyntacticFirstModuleExtraction {
 
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-08.09d-terminology.owl");
 
 		
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
@@ -140,40 +141,38 @@ public class SyntacticFirstModuleExtraction {
 
 		SigManager sigManager = new SigManager(new File(ModulePaths.getOntologyLocation()));
 		
-		Set<OWLEntity> sig = null;
-		try {
-			sig = sigManager.readFile(ModulePaths.getOntologyLocation() + "testingSig");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
 		
-		System.out.println(sig);
 		
-		SyntacticLocalityModuleExtractor syntaxModExtractor = 
-				new SyntacticLocalityModuleExtractor(OWLManager.createOWLOntologyManager(), ont, ModuleType.STAR);
+		for (int i = 0; i < 20; i++) {
+			Set<OWLEntity> sig = gen.generateRandomSignature(50);
 
-		
-		Set<OWLLogicalAxiom> starModule = ModuleUtils.getLogicalAxioms(syntaxModExtractor.extract(sig));
-		
-		
-		System.out.println("Star module size " + starModule.size());
-		
-		SyntacticFirstModuleExtraction syntmod = new SyntacticFirstModuleExtraction(starModule, sig);
-		
-		Set<OWLLogicalAxiom> syntfirstExtracted = null;
-		
-		try {
-			System.out.println("== Starting syntactic extraction ==");
-			long startTime = System.currentTimeMillis();
-			syntfirstExtracted = syntmod.extractModule();
-			System.out.println("Time taken: " + ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
-			System.out.println("== Starting semantic extraction ==");
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (QBFSolverException e) {
-			e.printStackTrace();
+			
+			SyntacticLocalityModuleExtractor syntaxModExtractor = 
+					new SyntacticLocalityModuleExtractor(OWLManager.createOWLOntologyManager(), ont, ModuleType.STAR);
+
+			
+			Set<OWLLogicalAxiom> starModule = ModuleUtils.getLogicalAxioms(syntaxModExtractor.extract(sig));
+			
+			
+			System.out.println("Star module size " + starModule.size());
+			
+			SyntacticFirstModuleExtraction syntmod = new SyntacticFirstModuleExtraction(starModule, sig);
+			
+			Set<OWLLogicalAxiom> syntfirstExtracted = null;
+			
+			try {
+				long startTime = System.currentTimeMillis();
+				syntfirstExtracted = syntmod.extractModule();
+				System.out.println("Time taken: " + ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (QBFSolverException e) {
+				e.printStackTrace();
+			}
+
+			System.out.println("Synsize: " + syntfirstExtracted.size());
+			System.out.println();
 		}
 
-		System.out.println("Synsize: " + syntfirstExtracted.size());
 	}
 }

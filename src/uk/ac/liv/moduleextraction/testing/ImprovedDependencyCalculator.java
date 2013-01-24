@@ -30,11 +30,9 @@ public class ImprovedDependencyCalculator {
 	}
 
 	public ImprovedDependencyCalculator(Set<OWLLogicalAxiom> axioms) {
-		System.out.println("Started getting deps");
 		this.definitorialMap = new DefinitorialDepth(axioms).getDefinitorialMap();
 		this.allAxiomsSorted = new ArrayList<OWLLogicalAxiom>(axioms);
 		Collections.sort(allAxiomsSorted, new AxiomComparator(definitorialMap));
-		System.out.println("Sorting done");
 	}
 
 	public HashMap<OWLClass, Set<OWLEntity>> getDependenciesFor(Set<OWLLogicalAxiom> subsetOfAxioms){
