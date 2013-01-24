@@ -19,13 +19,14 @@ import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.liv.moduleextraction.main.ModuleExtractor;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
+import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 public class ReloadExperimentFromDisk {
 
 	//TODO make these global to dumping/loading
-	private static final String SIGNATURE_FILE = "/sig";
+	private static final String SIGNATURE_FILE = "sig";
 	private static final String TERM_FILE = "/terminology.owl";
 	private static final String MOD_FILE = "/module.owl";
 	private static final String SYNT_FILE = "/syntacticModule.owl";
@@ -54,45 +55,8 @@ public class ReloadExperimentFromDisk {
 	}
 	
 	private Set<OWLEntity> populateSignature() throws IOException{
-		OWLDataFactory factory = OWLManager.getOWLDataFactory();
-		File signatureFile = new File(EXPERIMENT_LOCATION + SIGNATURE_FILE);
-		Set<OWLEntity> signature = new HashSet<OWLEntity>();
-		
-		if(signatureFile.exists()){
-			BufferedReader br = new BufferedReader(new FileReader(signatureFile));
-			String line;
-			boolean readingRoles = false;
-			
-			while((line = br.readLine()) != null) {
-				String trimmedLine = line.trim();
-				
-				if(trimmedLine.equals("[Roles]")){
-					System.out.println("reading roles");
-					readingRoles = true;
-				}
-					
-				if(!trimmedLine.equals("[Classes]") && !trimmedLine.equals("[Roles]"))
-					if(!readingRoles)
-						signature.add(factory.getOWLClass(IRI.create(trimmedLine)));
-					else{
-						System.out.println(trimmedLine);
-						signature.add(factory.getOWLObjectProperty(IRI.create(trimmedLine)));
-					}
-						
-			
-			}
-			try{
-				br.close();
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		else
-			System.err.println("No signature file found");
-		
-
-		return signature;
+		SigManager manager = new SigManager(new File(EXPERIMENT_LOCATION));
+		return manager.readFile(SIGNATURE_FILE);
 	}
 	
 	public Set<OWLLogicalAxiom> getSyntacticModule(){
@@ -114,7 +78,7 @@ public class ReloadExperimentFromDisk {
 	public static void main(String[] args) {
 		try {
 			
-			ReloadExperimentFromDisk reload = new ReloadExperimentFromDisk(ModulePaths.getOntologyLocation() + "/Results/newwriter");
+			ReloadExperimentFromDisk reload = new ReloadExperimentFromDisk(ModulePaths.getOntologyLocation() + "/Results/combined");
 			System.out.println("Terminology Size: " + reload.getTerminology().size());
 			System.out.println("Module Size: " + reload.getModule().size());
 			System.out.println("Signature Size " + reload.getSignature().size());

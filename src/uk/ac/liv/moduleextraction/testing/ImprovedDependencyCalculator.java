@@ -54,6 +54,7 @@ public class ImprovedDependencyCalculator {
 			if(axiomstoSort.contains(axiom)){
 				sortedAxioms.add(axiom);
 			}
+			
 			if(sortedAxioms.size() == axiomstoSort.size())
 				break;
 		}

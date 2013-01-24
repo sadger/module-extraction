@@ -80,9 +80,9 @@ public class SigManager {
 	}
 	
 
-	public Set<OWLEntity> readFile(String location) throws IOException{
+	public Set<OWLEntity> readFile(String name) throws IOException{
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
-		File signatureFile = new File(location);
+		File signatureFile = new File(directory.getAbsolutePath() + "/" + name);
 		Set<OWLEntity> signature = new HashSet<OWLEntity>();
 		
 		if(signatureFile.exists()){
@@ -93,10 +93,8 @@ public class SigManager {
 			while((line = br.readLine()) != null) {
 				String trimmedLine = line.trim();
 				
-				if(trimmedLine.equals("[Roles]")){
-					System.out.println("reading roles");
+				if(trimmedLine.equals("[Roles]"))
 					readingRoles = true;
-				}
 					
 				if(!trimmedLine.equals("[Classes]") && !trimmedLine.equals("[Roles]"))
 					if(!readingRoles)

@@ -21,6 +21,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
+import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 
 public class DumpExtractionToDisk implements Runnable {
@@ -34,11 +35,11 @@ public class DumpExtractionToDisk implements Runnable {
 	Date timeStarted;
 	File directory;
 	
-	private static final String SIGNATURE_FILE = "/sig";
+	private static final String SIGNATURE_FILE = "sig";
 	private static final String TERM_FILE = "/terminology.owl";
 	private static final String MOD_FILE = "/module.owl";
 
-	public DumpExtractionToDisk(String folderName, Set<OWLLogicalAxiom> term,Set<OWLLogicalAxiom> mod, Set<OWLEntity> signature) {
+	public DumpExtractionToDisk(String folderName, Set<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> mod, Set<OWLEntity> signature) {
 		this.terminology = term;
 		this.module = mod;
 		this.signature = signature;
@@ -50,9 +51,9 @@ public class DumpExtractionToDisk implements Runnable {
 
 	@Override
 	public void run() {
-		System.out.println("Terminology Size: " + terminology.size());
-		System.out.println("Module Size: " + module.size());
-		System.out.println("Signature Size: " + signature.size());
+//		System.out.println("Terminology Size: " + terminology.size());
+//		System.out.println("Module Size: " + module.size());
+//		System.out.println("Signature Size: " + signature.size());
 
 		directory = new File(ModulePaths.getOntologyLocation() + "/Results/" + name);
 
@@ -89,49 +90,12 @@ public class DumpExtractionToDisk implements Runnable {
 	}
 	
 	private void writeSignature(){
-		File signatureFile = new File(directory.getAbsolutePath()+ SIGNATURE_FILE);
-		if (signatureFile.exists())
-			signatureFile.delete();
-		
-		FileWriter fileWriter = null;
+		SigManager man = new SigManager(directory);
 		try {
-			fileWriter = new FileWriter(signatureFile,false);
+			man.writeFile(signature, SIGNATURE_FILE);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		BufferedWriter writer = new BufferedWriter(fileWriter);
-		
-		HashSet<OWLClass> classes = new HashSet<OWLClass>();
-		HashSet<OWLObjectProperty> roles = new HashSet<OWLObjectProperty>();
-
-		for(OWLEntity ent: signature){
-			if(ent.isOWLClass())
-				classes.add((OWLClass) ent);
-			else if(ent.isOWLObjectProperty())
-				roles.add((OWLObjectProperty) ent);
-		}
-		try{
-			writer.write("[Classes]\n");
-			for(OWLClass cls : classes)
-				writer.write(cls.getIRI().toString() + "\n");
-			writer.write("[Roles]\n");
-			for(OWLObjectProperty prop : roles)
-				writer.write(prop.getIRI().toString() + "\n");
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		finally{
-			try {
-				fileWriter.flush();
-				writer.flush();
-				fileWriter.close();
-				writer.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		System.out.println("Written signature");
 	}
 
 }
