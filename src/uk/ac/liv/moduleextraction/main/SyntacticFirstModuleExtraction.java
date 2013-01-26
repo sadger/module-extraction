@@ -2,7 +2,6 @@ package uk.ac.liv.moduleextraction.main;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,10 +18,8 @@ import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.reloading.DumpExtractionToDisk;
-import uk.ac.liv.moduleextraction.reloading.ReloadExperimentFromDisk;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
-import uk.ac.liv.moduleextraction.testing.DependencyCalculator;
 import uk.ac.liv.moduleextraction.testing.ImprovedDependencyCalculator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
