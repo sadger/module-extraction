@@ -44,7 +44,7 @@ public class SyntacticFirstModuleExtraction {
 		this.signature = sig;
 		this.module = (existingModule == null) ? new HashSet<OWLLogicalAxiom>() : existingModule;
 		this.dependencyCalculator = new ImprovedDependencyCalculator(term);
-		this.dump = new  DumpExtractionToDisk("combined", terminology, module, signature);
+		this.dump = new  DumpExtractionToDisk("test4-50", terminology, module, signature);
 	}
 	
 	public SyntacticFirstModuleExtraction(Set<OWLLogicalAxiom> terminology, Set<OWLEntity> signature) {
@@ -135,7 +135,7 @@ public class SyntacticFirstModuleExtraction {
 
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-08.09d-terminology.owl");
 
 		
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
@@ -146,7 +146,8 @@ public class SyntacticFirstModuleExtraction {
 		
 		
 //		for (int i = 0; i < 20; i++) {
-			Set<OWLEntity> sig = gen.generateRandomSignature(40);
+		
+			Set<OWLEntity> sig = gen.generateRandomSignature(50);
 
 			
 			SyntacticLocalityModuleExtractor syntaxModExtractor = 
@@ -177,7 +178,7 @@ public class SyntacticFirstModuleExtraction {
 
 			System.out.println("Synsize: " + syntfirstExtracted.size());
 			System.out.println();
-//		}
+		}
 
-	}
+//	}
 }

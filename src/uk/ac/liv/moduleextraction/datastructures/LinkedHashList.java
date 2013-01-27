@@ -21,7 +21,7 @@ public class LinkedHashList<E> extends AbstractList<E> {
 	private DoubleNode listStart = null;
 	private DoubleNode listEnd = null;
 	private HashMap<E, DoubleNode> nodes;
-	
+
 	public LinkedHashList(Collection<? extends E> collection) {
 		nodes = new HashMap<E, DoubleNode>();
 		for(E item : collection)
@@ -43,7 +43,14 @@ public class LinkedHashList<E> extends AbstractList<E> {
 			}
 			nodes.put(item, newNode);
 		}
+	}
 	
+	public E getFirst(){
+		return listStart.value;
+	}
+	
+	public E getLast(){
+		return listEnd.value;
 	}
 
 	@Override
@@ -64,7 +71,7 @@ public class LinkedHashList<E> extends AbstractList<E> {
 
 	@Override
 	public boolean isEmpty() {
-		return size() > 0;
+		return size() == 0;
 	}
 
 	@Override
@@ -72,7 +79,7 @@ public class LinkedHashList<E> extends AbstractList<E> {
 		return new Iterator<E>() {
 			/* Take the iterator back to the start of the list */
 			DoubleNode currentElement = listStart;
-			
+
 			@Override
 			public boolean hasNext() {
 				return currentElement != null;
@@ -115,14 +122,16 @@ public class LinkedHashList<E> extends AbstractList<E> {
 			nodes.remove(obj);
 			return true;
 		}
-	
+
 	}
 
 	@Override
-	public boolean removeAll(Collection<?> arg0) {
-		boolean removedAny = false;
-		
-		return removedAny;
+	public boolean removeAll(Collection<?> c) {
+		boolean modified = false;
+		for (Iterator<?> i = c.iterator(); i.hasNext();){
+				modified |= remove(i.next());
+		} 
+		return modified;
 	}
 
 	@Override
@@ -137,14 +146,15 @@ public class LinkedHashList<E> extends AbstractList<E> {
 
 	@Override
 	public Object[] toArray() {
-		return null;
+		Object[] a = new Object[size()];
+		int j=0;
+		for(Iterator<?> i = iterator();  i.hasNext(); j++){
+			a[j] = i.next();
+		}
+		return a;
 	}
 
-	@Override
-	public <T> T[] toArray(T[] arg0) {
-		return null;
-	}
-	
+
 	@Override
 	public boolean add(E arg0) {
 		throw new UnsupportedOperationException();
@@ -154,36 +164,27 @@ public class LinkedHashList<E> extends AbstractList<E> {
 	public boolean addAll(Collection<? extends E> arg0) {
 		throw new UnsupportedOperationException();
 	}
-	
-	public void thing() {
-		DoubleNode n = listStart;
-	    while (n != null)
-	      {
-	    	 System.out.println(n.value);
-	         n = n.next;
-	      }
-	}
+
 
 	private class DoubleNode{
 		DoubleNode previous;
 		E value;
 		DoubleNode  next;
-		
+
 		public DoubleNode(DoubleNode prev, E value) {
 			this.previous = prev;
 			this.value = value; 
 			this.next = null;
 		}
 	}
-	
+
 	@Override
 	public E get(int arg0) {
-		// TODO Auto-generated method stub
-		return null;
+		@SuppressWarnings("unchecked")
+		E[] a = (E[]) toArray();
+		return a[arg0];
 	}
-	
 
-	
 	public static void main(String[] args) {
 		HashSet<Integer> custom = new HashSet<Integer>();
 		custom.add(10);
@@ -191,17 +192,31 @@ public class LinkedHashList<E> extends AbstractList<E> {
 		custom.add(20);
 		custom.add(12);
 		System.out.println(custom);
-		
+
 		ArrayList<Integer> ints = new ArrayList<Integer>(custom);
 		System.out.println(ints);
-		
+
 		Collections.sort(ints);
-		
-		
+
+		HashSet<Integer> custom2 = new HashSet<Integer>();
+		custom2.add(10);
+		custom2.add(1);
+		custom2.add(20);
+		custom2.add(40);
+		custom2.add(5);
+		custom2.add(12);
+
+
+
 		LinkedHashList<Integer> x = new LinkedHashList<Integer>(ints);
 		System.out.println(x);
 		System.out.println(x.containsAll(ints));
 
+
+		x.removeAll(custom2);
+		
+		System.out.println(x.getFirst());
+	
 	}
 
 
