@@ -11,7 +11,6 @@ import java.util.Iterator;
 /*
  * == Properties ==
  * - No repeat elements
- * - No adding elements
  * - Constant time removal
  * - Stays in order entered
  */
@@ -25,10 +24,15 @@ public class LinkedHashList<E> extends AbstractList<E> {
 	public LinkedHashList(Collection<? extends E> collection) {
 		nodes = new HashMap<E, DoubleNode>();
 		for(E item : collection)
-			insert(item);
+			add(item);
 	}
 
-	private void insert(E item) {
+	public LinkedHashList() {
+		nodes = new HashMap<E, DoubleNode>();
+	}
+	
+	@Override
+	public boolean add(E item) {
 		if(!nodes.containsKey(item)){
 			DoubleNode newNode = null;
 			if(listStart == null){
@@ -42,7 +46,9 @@ public class LinkedHashList<E> extends AbstractList<E> {
 				listEnd = newNode;
 			}
 			nodes.put(item, newNode);
+			return true;
 		}
+		return false;
 	}
 	
 	public E getFirst(){
@@ -57,6 +63,18 @@ public class LinkedHashList<E> extends AbstractList<E> {
 	public void clear() {
 		listStart = null;
 		nodes.clear();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(o instanceof LinkedHashList<?>){
+			LinkedHashList<?> list = (LinkedHashList<?>) o;
+			if(list.size() != size())
+				return false;
+			else
+				return super.equals(o);
+		}
+		return super.equals(o);
 	}
 
 	@Override
@@ -155,10 +173,7 @@ public class LinkedHashList<E> extends AbstractList<E> {
 	}
 
 
-	@Override
-	public boolean add(E arg0) {
-		throw new UnsupportedOperationException();
-	}
+
 
 	@Override
 	public boolean addAll(Collection<? extends E> arg0) {
@@ -181,6 +196,7 @@ public class LinkedHashList<E> extends AbstractList<E> {
 	@Override
 	public E get(int arg0) {
 		@SuppressWarnings("unchecked")
+		
 		E[] a = (E[]) toArray();
 		return a[arg0];
 	}
@@ -213,7 +229,7 @@ public class LinkedHashList<E> extends AbstractList<E> {
 		System.out.println(x.containsAll(ints));
 
 
-		x.removeAll(custom2);
+
 		
 		System.out.println(x.getFirst());
 	

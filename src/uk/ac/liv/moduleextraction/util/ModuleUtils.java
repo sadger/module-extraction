@@ -71,6 +71,7 @@ public class ModuleUtils {
 		removeTopAndBottomConcept(entities);
 		return entities;
 	}
+	
 
 	public static Set<OWLClass> getNamedClassesInSignature(OWLClassExpression cls){
 		Set<OWLClass> classes = cls.getClassesInSignature();
