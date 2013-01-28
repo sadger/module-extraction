@@ -76,7 +76,7 @@ public class SigManager {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("Written signature");
+		System.out.println("Written signature " + name);
 	}
 	
 

@@ -31,10 +31,11 @@ public class LHSSigExtractor {
 		
 
 		for(OWLLogicalAxiom axiom : sortedOntology){
-			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
-			if(signatureAndSigM.contains(name) || isInSigDependencies(name))
+//			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
+//			if(signatureAndSigM.contains(name) || isInSigDependencies(name))
 				lhsSigT.add(axiom);
 		}
+		System.out.println("Size: " + lhsSigT.size());
 		return lhsSigT;
 	}
 
