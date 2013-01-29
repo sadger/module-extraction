@@ -66,7 +66,7 @@ public class QBFFileWriter {
 		FILE_TO_WRITE =  ModulePaths.getQBFSolverLocation() + "Files/qbf" + System.currentTimeMillis() + ".qdimacs";
 		this.toWrite = new ArrayList<String>();
 		this.ontology = ontology;
-		this.signature = signatureAndSigM;
+		this.signature = new HashSet<OWLEntity>(signatureAndSigM);
 		this.classesNotInSignature = new HashSet<OWLEntity>();
 
 		convertOntologyToQBFClauses();

@@ -18,24 +18,24 @@ import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 
 public class LHSSigExtractor {
 	
-	private ChainDependencies dependencies = new ChainDependencies();
 	private Set<OWLEntity> signatureDependencies = new HashSet<OWLEntity>();
 	
+	ChainDependencies dependencies;
 
-	public HashSet<OWLLogicalAxiom> getLHSSigAxioms(List<OWLLogicalAxiom> sortedOntology, Set<OWLEntity> signatureAndSigM){
+	public HashSet<OWLLogicalAxiom> getLHSSigAxioms(List<OWLLogicalAxiom> sortedOntology, 
+			Set<OWLEntity> signatureAndSigM, ChainDependencies depends){
 		
+		this.dependencies = depends;
 		HashSet<OWLLogicalAxiom> lhsSigT = new HashSet<OWLLogicalAxiom>();
-		
-		dependencies.updateDependenciesWith(sortedOntology);
 		generateSignatureDependencies(signatureAndSigM);
+		
 		
 
 		for(OWLLogicalAxiom axiom : sortedOntology){
-//			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
-//			if(signatureAndSigM.contains(name) || isInSigDependencies(name))
+			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
+			if(signatureAndSigM.contains(name) || isInSigDependencies(name))
 				lhsSigT.add(axiom);
 		}
-		System.out.println("Size: " + lhsSigT.size());
 		return lhsSigT;
 	}
 
