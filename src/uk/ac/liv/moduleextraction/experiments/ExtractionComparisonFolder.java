@@ -35,9 +35,9 @@ public class ExtractionComparisonFolder {
 	}
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/NCI/nci-08.09d-terminology.owl");
 		try {
-			new ExtractionComparisonFolder(ont, new File("/LOCAL/wgatens/Signatures/Intermediate_Fibrocytic_Neoplasm"));
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/nci08-09d_random5200"));
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		} catch (OWLOntologyCreationException e) {

@@ -125,8 +125,8 @@ public class ExtractionComparision {
 	public void writeResults(Set<OWLLogicalAxiom> semanticModule) throws IOException{
 		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results", false));
 		
-		writer.write("#Signature Size\t Syntactic Size\t Synt->Semantic Size\n");
-		writer.write(signature.size() + ":" + syntaticSize + ":" +semanticModule.size() + "\n");
+		writer.write("#Syntactic Size\t Synt->Semantic Size\n");
+		writer.write(syntaticSize + "," +semanticModule.size() + "\n");
 		writer.flush();
 		writer.close();
 

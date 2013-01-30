@@ -116,7 +116,7 @@ public class SyntacticFirstModuleExtraction {
 				addedCount++;
 				Set<OWLLogicalAxiom> axiomsWithDeps = syntaxDepChecker.getAxiomsWithDependencies();
 				terminology.removeAll(axiomsWithDeps);
-				System.out.println("Adding " + axiomsWithDeps);
+				//System.out.println("Adding " + axiomsWithDeps);
 				
 				module.add(chosenAxiom);
 				sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(axiomsWithDeps));
