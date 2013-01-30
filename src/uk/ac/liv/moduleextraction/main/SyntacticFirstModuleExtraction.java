@@ -116,7 +116,7 @@ public class SyntacticFirstModuleExtraction {
 				addedCount++;
 				Set<OWLLogicalAxiom> axiomsWithDeps = syntaxDepChecker.getAxiomsWithDependencies();
 				terminology.removeAll(axiomsWithDeps);
-				//System.out.println("Adding " + axiomsWithDeps);
+				System.out.println("Adding " + axiomsWithDeps);
 				
 				module.add(chosenAxiom);
 				sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(axiomsWithDeps));
@@ -165,7 +165,7 @@ public class SyntacticFirstModuleExtraction {
 
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
 
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 1; i++) {
 			Set<OWLEntity> sig = gen.generateRandomSignature(100);
 			
 			SyntacticLocalityModuleExtractor syntaxModExtractor = 
