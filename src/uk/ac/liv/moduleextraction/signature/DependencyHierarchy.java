@@ -10,10 +10,11 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import uk.ac.liv.moduleextraction.checkers.DefinitorialDependencies;
+import uk.ac.liv.moduleextraction.chaindependencies.DependencySet;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
@@ -24,9 +25,9 @@ import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 public class DependencyHierarchy {
 
 	private Set<OWLLogicalAxiom> logicalAxioms;
-	private HashMap<OWLClass, Set<OWLClass>> immediateDependencies = new HashMap<OWLClass, Set<OWLClass>>();
-	private HashMap<OWLClass, HashMap<Integer, Set<OWLClass>>> dependencyHierarchy = 
-			new HashMap<OWLClass, HashMap<Integer,Set<OWLClass>>>();
+	private HashMap<OWLClass, DependencySet> immediateDependencies = new HashMap<OWLClass, DependencySet>();
+	private HashMap<OWLClass, HashMap<Integer, DependencySet>> dependencyHierarchy = 
+			new HashMap<OWLClass, HashMap<Integer,DependencySet>>();
 
 	public DependencyHierarchy(Set<OWLLogicalAxiom> logicalAxioms) {
 		this.logicalAxioms = logicalAxioms;
@@ -34,46 +35,49 @@ public class DependencyHierarchy {
 		generateHierarchy();
 	}
 
-	public Set<OWLClass> getDependencyForDepth(OWLClass cls, int depth){
-		HashMap<Integer, Set<OWLClass>> hierarchy = dependencyHierarchy.get(cls);
+	public DependencySet getDependencyForDepth(OWLClass cls, int depth){
+		HashMap<Integer, DependencySet> hierarchy = dependencyHierarchy.get(cls);
 		return hierarchy.get(depth); 
 	}
 
 	public int getMaxHierarchyDepth(OWLClass cls){
-		HashMap<Integer, Set<OWLClass>> hierarchy = dependencyHierarchy.get(cls);
-		if(hierarchy.isEmpty())
+		HashMap<Integer, DependencySet> hierarchy = dependencyHierarchy.get(cls);
+		if(hierarchy == null ||hierarchy.isEmpty())
 			return 0;
 		else
 			return Collections.max(hierarchy.keySet());
 	}
 	
 	private void populateImmediateDependencies() {
-		for(OWLClass cls : ModuleUtils.getClassesInSet(logicalAxioms))
-			immediateDependencies.put(cls, new HashSet<OWLClass>());
-
+		for(OWLClass cls : ModuleUtils.getClassesInSet(logicalAxioms)){
+			immediateDependencies.put(cls, new DependencySet());
+		}
 		for(OWLLogicalAxiom axiom : logicalAxioms){
 			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
 			OWLClassExpression definiton = AxiomSplitter.getDefinitionofAxiom(axiom);
-			immediateDependencies.put(name,ModuleUtils.getNamedClassesInSignature(definiton));
+			immediateDependencies.put(name,ModuleUtils.convertToDependencySet(definiton.getSignature()));
 		}
 	}
 
 	private void generateHierarchy(){
-		for(OWLClass cls : ModuleUtils.getClassesInSet(logicalAxioms))
+		for(OWLClass cls : ModuleUtils.getClassesInSet(logicalAxioms)){
 			generateHierarchyForClass(cls);
+		}
+			
 	}
 
 	private void generateHierarchyForClass(OWLClass cls){
-		HashMap<Integer, Set<OWLClass>> hierarchy = new HashMap<Integer, Set<OWLClass>>();
-		Set<OWLClass> currentDependencies = immediateDependencies.get(cls);
+		HashMap<Integer, DependencySet> hierarchy = new HashMap<Integer, DependencySet>();
+		DependencySet currentDependencies = immediateDependencies.get(cls);
 
 		int depDepth = 1;
 
 		while(!currentDependencies.isEmpty()){
-			Set<OWLClass> newDeps = new HashSet<OWLClass>();
+			DependencySet newDeps = new DependencySet();
 
-			for(OWLClass dep : currentDependencies){
-				newDeps.addAll(immediateDependencies.get(dep));
+			for(OWLEntity dep : currentDependencies.asOWLEntities()){
+				if(dep.isOWLClass())
+					newDeps.addAll(immediateDependencies.get((OWLClass)dep));
 			}
 			hierarchy.put(depDepth, currentDependencies);
 
@@ -89,7 +93,7 @@ public class DependencyHierarchy {
 		String toPrint = "";
 		HashSet<OWLClass> emptyHierarchy = new HashSet<OWLClass>();
 		for(OWLClass cls : dependencyHierarchy.keySet()){
-			HashMap<Integer, Set<OWLClass>> hierarchy = dependencyHierarchy.get(cls);
+			HashMap<Integer, DependencySet> hierarchy = dependencyHierarchy.get(cls);
 			if(!hierarchy.isEmpty()){
 				toPrint += cls + "\n";
 				for(Integer i : hierarchy.keySet())
@@ -105,11 +109,11 @@ public class DependencyHierarchy {
 
 	public static void main(String[] args) {
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
-		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"interp/diff2.krss");
+		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
+		//OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"interp/diff.krss");
+//		System.out.println(ontology);
 		DependencyHierarchy h = new DependencyHierarchy(ontology.getLogicalAxioms());
-		System.out.println(h);
-
-
+//		System.out.println(h);
 	}
 
 }

@@ -76,7 +76,7 @@ public class SigManager {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("Written signature " + name);
+		System.out.println("Written signature \"" + name + "\"");
 	}
 	
 
@@ -84,6 +84,7 @@ public class SigManager {
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		File signatureFile = new File(directory.getAbsolutePath() + "/" + name);
 		Set<OWLEntity> signature = new HashSet<OWLEntity>();
+	
 		
 		if(signatureFile.exists()){
 			BufferedReader br = new BufferedReader(new FileReader(signatureFile));
@@ -100,7 +101,6 @@ public class SigManager {
 					if(!readingRoles)
 						signature.add(factory.getOWLClass(IRI.create(trimmedLine)));
 					else{
-						System.out.println(trimmedLine);
 						signature.add(factory.getOWLObjectProperty(IRI.create(trimmedLine)));
 					}
 			}

@@ -1,34 +1,24 @@
 package uk.ac.liv.moduleextraction.reloading;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.EntityType;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
-import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 public class ReloadExperimentFromDisk {
 
 	//TODO make these global to dumping/loading
 	private static final String SIGNATURE_FILE = "sig";
-	private static final String TERM_FILE = "/terminology.owl";
-	private static final String MOD_FILE = "/module.owl";
-	private static final String SYNT_FILE = "/syntacticModule.owl";
+	private static final String TERM_FILE = "terminology.owl";
+	private static final String MOD_FILE = "module.owl";
+	private static final String SYNT_FILE = "syntacticModule.owl";
 
 	private final String EXPERIMENT_LOCATION;
 	
@@ -46,7 +36,7 @@ public class ReloadExperimentFromDisk {
 	}
 
 	private Set<OWLLogicalAxiom> restoreOntology(String ontLocation){
-		OWLOntology ontology = OntologyLoader.loadOntology(EXPERIMENT_LOCATION + ontLocation);
+		OWLOntology ontology = OntologyLoader.loadOntology(EXPERIMENT_LOCATION + "/" + ontLocation);
 		if(ontology == null)
 			System.err.println("Ontology " + ontLocation + " not found");
 		
@@ -74,21 +64,4 @@ public class ReloadExperimentFromDisk {
 		return signature;
 	}
 
-	public static void main(String[] args) {
-		try {
-			
-			ReloadExperimentFromDisk reload = new ReloadExperimentFromDisk(ModulePaths.getOntologyLocation() + "/Results/combined");
-			System.out.println("Terminology Size: " + reload.getTerminology().size());
-			System.out.println("Module Size: " + reload.getModule().size());
-			System.out.println("Signature Size " + reload.getSignature().size());
-			System.out.println(reload.getSignature());
-			for(OWLEntity e : reload.getSignature()){
-				if(e.isOWLObjectProperty()){
-					System.out.println(e);
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 }

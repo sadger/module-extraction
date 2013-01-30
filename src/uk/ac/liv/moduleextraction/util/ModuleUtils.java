@@ -20,6 +20,8 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.util.OWLEntityRenamer;
 import org.semanticweb.owlapi.util.SimpleShortFormProvider;
 
+import uk.ac.liv.moduleextraction.chaindependencies.Dependency;
+import uk.ac.liv.moduleextraction.chaindependencies.DependencySet;
 import uk.ac.liv.ontologyutils.caching.AxiomCache;
 import uk.ac.liv.ontologyutils.caching.AxiomMetricStore;
 
@@ -121,6 +123,16 @@ public class ModuleUtils {
 		return result;
 	}
 
+	public static DependencySet convertToDependencySet(Set<OWLEntity> entities){
+		DependencySet dependencies = new DependencySet();
+		for(OWLEntity e : entities){
+			if(!e.isTopEntity() && !e.isBottomEntity())
+				dependencies.add(new Dependency(e));
+		}
+		
+		return dependencies;
+	}
+	
 	public static void remapIRIs(HashSet<OWLOntology> ontologies, String prefix) {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLEntityRenamer renamer = new OWLEntityRenamer(manager, ontologies);

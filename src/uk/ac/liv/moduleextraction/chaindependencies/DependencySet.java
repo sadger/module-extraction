@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLEntity;
 
-public class DependencySet extends HashSet<Dependency>{
+public class  DependencySet extends HashSet<Dependency>{
 
 	private static final long serialVersionUID = 5147803484884184934L;
 	

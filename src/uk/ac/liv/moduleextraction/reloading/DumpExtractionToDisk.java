@@ -1,21 +1,18 @@
 package uk.ac.liv.moduleextraction.reloading;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -28,22 +25,21 @@ public class DumpExtractionToDisk implements Runnable {
 
 	OWLOntologyManager ontologyManager;
 	
-	private Set<OWLLogicalAxiom> terminology;
+	private List<OWLLogicalAxiom> terminology;
 	Set<OWLLogicalAxiom> module;
 	Set<OWLEntity> signature;
-	String name;
 	Date timeStarted;
 	File directory;
 	
 	private static final String SIGNATURE_FILE = "sig";
-	private static final String TERM_FILE = "/terminology.owl";
-	private static final String MOD_FILE = "/module.owl";
+	private static final String TERM_FILE = "terminology.owl";
+	private static final String MOD_FILE = "module.owl";
 
-	public DumpExtractionToDisk(String folderName, Set<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> mod, Set<OWLEntity> signature) {
+	public DumpExtractionToDisk(File location, List<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> mod, Set<OWLEntity> signature) {
 		this.terminology = term;
 		this.module = mod;
 		this.signature = signature;
-		this.name = folderName;
+		this.directory = location;
 		this.timeStarted = new Date();
 		
 		this.ontologyManager = OWLManager.createOWLOntologyManager();
@@ -51,24 +47,16 @@ public class DumpExtractionToDisk implements Runnable {
 
 	@Override
 	public void run() {
-//		System.out.println("Terminology Size: " + terminology.size());
-//		System.out.println("Module Size: " + module.size());
-//		System.out.println("Signature Size: " + signature.size());
-
-		directory = new File(ModulePaths.getOntologyLocation() + "/Results/" + name);
-
 		if(!directory.exists())
 			directory.mkdir();
 		
 		writeSignature();
-
-		writeSetToOntology(terminology, TERM_FILE);
+		writeSetToOntology(new HashSet<OWLLogicalAxiom>(terminology), TERM_FILE);
 		writeSetToOntology(module, MOD_FILE);
 		
 		System.out.println("Dumped to: " + directory.getAbsolutePath() + " at " + new Date());
 		
 	}
-	
 	
 	private void writeSetToOntology(Set<OWLLogicalAxiom> ontology, String file){
 		OWLXMLOntologyFormat owlFormat = new OWLXMLOntologyFormat();
@@ -79,14 +67,14 @@ public class DumpExtractionToDisk implements Runnable {
 			e.printStackTrace();
 		}
 		
-		File saveLocation = new File(directory.getAbsolutePath()+file);
+		File saveLocation = new File(directory.getAbsolutePath()+ "/" + file);
 		
 		try {
 			ontologyManager.saveOntology(ontologyToWrite,owlFormat,IRI.create(saveLocation));
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Written " + file);
+		System.out.println("Written " + file + "(" + ontology.size() + ")");
 	}
 	
 	private void writeSignature(){
