@@ -1,21 +1,22 @@
 package uk.ac.liv.moduleextraction.datastructures;
 
-import java.util.AbstractList;
-import java.util.ArrayList;
+import java.util.AbstractSequentialList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 
 /*
  * == Properties ==
- * - No repeat elements
- * - Constant time removal
+ * - Doubly linked
+ * - Constant time removal/addition
  * - Stays in order entered
  */
 
-public class LinkedHashList<E> extends AbstractList<E> {
+public class LinkedHashList<E> extends AbstractSequentialList<E> {
 
 	private DoubleNode listStart = null;
 	private DoubleNode listEnd = null;
@@ -94,27 +95,7 @@ public class LinkedHashList<E> extends AbstractList<E> {
 
 	@Override
 	public Iterator<E> iterator() {
-		return new Iterator<E>() {
-			/* Take the iterator back to the start of the list */
-			DoubleNode currentElement = listStart;
-
-			@Override
-			public boolean hasNext() {
-				return currentElement != null;
-			}
-
-			@Override
-			public E next() {
-				E value = currentElement.value;
-				currentElement = currentElement.next;
-				return value;
-			}
-
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
-		};
+		return listIterator();
 	}
 
 	@Override
@@ -173,14 +154,102 @@ public class LinkedHashList<E> extends AbstractList<E> {
 	}
 
 
-
-
 	@Override
 	public boolean addAll(Collection<? extends E> arg0) {
 		throw new UnsupportedOperationException();
 	}
 
 
+
+
+	@Override
+	public ListIterator<E> listIterator(int index) {
+		return new LinkedIterator(index);
+	}
+	
+
+	private class LinkedIterator implements ListIterator<E>{
+		private DoubleNode nextNode;
+		private int nextIndex;
+		
+		public LinkedIterator(int index) {
+			int size = size();
+			
+			if(index < 0 || index > size)
+				throw new IndexOutOfBoundsException("Index:" + index + ", Size:" + size);
+			
+			/* If the index is less than half way along */
+			if (index < (size >> 1)) {
+				 nextNode = listStart;
+				 /*Start from front end to find item */
+				 for (nextIndex=0; nextIndex<index; nextIndex++){
+					 nextNode = nextNode.next;
+				 }
+			}
+			else{
+				/* Otherwise start at back end */
+				nextNode = listEnd;
+				for (nextIndex=size; nextIndex>index; nextIndex--){
+					 nextNode = nextNode.previous;
+				}
+			}
+		}
+		
+		@Override
+		public boolean hasNext() {
+			return nextNode != null;
+		}
+
+		@Override
+		public boolean hasPrevious() {
+			return nextNode.previous != null;
+		}
+
+		@Override
+		public E next() {
+			E value = nextNode.value;
+			nextNode = nextNode.next;
+			nextIndex++;
+			return value;
+		}
+
+		@Override
+		public int nextIndex() {
+			return nextIndex;
+		}
+
+		@Override
+		public E previous() {
+			nextNode = nextNode.previous;
+			E value = nextNode.value;
+			return value;
+		}
+
+		@Override
+		public int previousIndex() {
+			return nextIndex-1;
+		}
+		
+		@Override
+		public void add(E e) {
+			throw new UnsupportedOperationException();
+		}
+
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+			
+		}
+
+		@Override
+		public void set(E e) {
+			throw new UnsupportedOperationException();
+		}
+		
+	}
+	
+	
 	private class DoubleNode{
 		DoubleNode previous;
 		E value;
@@ -192,48 +261,40 @@ public class LinkedHashList<E> extends AbstractList<E> {
 			this.next = null;
 		}
 	}
-
+	
 	@Override
-	public E get(int arg0) {
-		@SuppressWarnings("unchecked")
-		
-		E[] a = (E[]) toArray();
-		return a[arg0];
+	public List<E> subList(int fromIndex, int toIndex) {
+		return super.subList(fromIndex,toIndex);
 	}
+
 
 	public static void main(String[] args) {
 		HashSet<Integer> custom = new HashSet<Integer>();
 		custom.add(10);
-		custom.add(1);
+		
+		custom.add(3);
 		custom.add(20);
 		custom.add(12);
+		custom.add(13);
+		custom.add(22);
+		custom.add(13);
 		System.out.println(custom);
 
-		ArrayList<Integer> ints = new ArrayList<Integer>(custom);
+		LinkedList<Integer> ints = new LinkedList<Integer>(custom);
 		System.out.println(ints);
 
-		Collections.sort(ints);
-
-		HashSet<Integer> custom2 = new HashSet<Integer>();
-		custom2.add(10);
-		custom2.add(1);
-		custom2.add(20);
-		custom2.add(40);
-		custom2.add(5);
-		custom2.add(12);
-
-
-
 		LinkedHashList<Integer> x = new LinkedHashList<Integer>(ints);
-		System.out.println(x);
-		System.out.println(x.containsAll(ints));
-
-
-
+		x.get(1);
 		
-		System.out.println(x.getFirst());
+
+
+
 	
+		System.out.println(x.get(1));
 	}
+
+
+
 
 
 
