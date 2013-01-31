@@ -32,8 +32,7 @@ public class ChainDependencies extends HashMap<OWLClass, DependencySet>{
 	public void updateDependenciesWith(List<OWLLogicalAxiom> sortedAxioms){
 		for(Iterator<OWLLogicalAxiom> it = sortedAxioms.iterator(); it.hasNext();){
 			updateDependenciesWith(it.next());
-		}
-			
+		}	
 	}
 	
 

@@ -165,8 +165,8 @@ public class SyntacticFirstModuleExtraction {
 
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
 
-		for (int i = 0; i < 1; i++) {
-			Set<OWLEntity> sig = gen.generateRandomSignature(100);
+		for (int i = 0; i < 10; i++) {
+			Set<OWLEntity> sig = gen.generateRandomSignature(1000);
 			
 			SyntacticLocalityModuleExtractor syntaxModExtractor = 
 					new SyntacticLocalityModuleExtractor(OWLManager.createOWLOntologyManager(), ont, ModuleType.STAR);
@@ -180,7 +180,7 @@ public class SyntacticFirstModuleExtraction {
 
 			try {
 				long startTime = System.currentTimeMillis();
-				SyntacticFirstModuleExtraction syntmod = new SyntacticFirstModuleExtraction(starModule, sig);
+				SyntacticFirstModuleExtraction syntmod = new SyntacticFirstModuleExtraction(ont.getLogicalAxioms(), sig);
 				syntfirstExtracted = syntmod.extractModule();
 				System.out.println("Time taken: " + ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
 			} catch (IOException e) {
