@@ -23,7 +23,7 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 	private HashMap<E, DoubleNode> nodes;
 
 	public LinkedHashList(Collection<? extends E> collection) {
-		nodes = new HashMap<E, DoubleNode>();
+		nodes = new HashMap<E, DoubleNode>(collection.size());
 		for(E item : collection)
 			add(item);
 	}
@@ -34,6 +34,8 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 	
 	@Override
 	public boolean add(E item) {
+//		if(size() >= 1230 && size() <=1240)
+//			System.out.println("Adding " + item);
 		if(!nodes.containsKey(item)){
 			DoubleNode newNode = null;
 			if(listStart == null){
@@ -49,8 +51,19 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 			nodes.put(item, newNode);
 			return true;
 		}
+		System.out.println("Not adding " + item);
 		return false;
 	}
+	
+	@Override
+	public boolean addAll(Collection<? extends E> arg0) {
+		boolean result = false;
+		for(E e : arg0){
+			result |= add(e);
+		}
+		return result;
+	}
+
 	
 	public E getFirst(){
 		return listStart.value;
@@ -143,24 +156,6 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 		return nodes.size();
 	}
 
-	@Override
-	public Object[] toArray() {
-		Object[] a = new Object[size()];
-		int j=0;
-		for(Iterator<?> i = iterator();  i.hasNext(); j++){
-			a[j] = i.next();
-		}
-		return a;
-	}
-
-
-	@Override
-	public boolean addAll(Collection<? extends E> arg0) {
-		throw new UnsupportedOperationException();
-	}
-
-
-
 
 	@Override
 	public ListIterator<E> listIterator(int index) {
@@ -179,20 +174,20 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 				throw new IndexOutOfBoundsException("Index:" + index + ", Size:" + size);
 			
 			/* If the index is less than half way along */
-			if (index < (size >> 1)) {
+//			if (index < (size >> 1)) {
 				 nextNode = listStart;
 				 /*Start from front end to find item */
 				 for (nextIndex=0; nextIndex<index; nextIndex++){
 					 nextNode = nextNode.next;
 				 }
-			}
-			else{
-				/* Otherwise start at back end */
-				nextNode = listEnd;
-				for (nextIndex=size; nextIndex>index; nextIndex--){
-					 nextNode = nextNode.previous;
-				}
-			}
+//			}
+//			else{
+//				/* Otherwise start at back end */
+//				nextNode = listEnd;
+//				for (nextIndex=size; nextIndex>=index; nextIndex--){
+//					 nextNode = nextNode.previous;
+//				}
+//			}
 		}
 		
 		@Override
@@ -262,36 +257,7 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 		}
 	}
 	
-	@Override
-	public List<E> subList(int fromIndex, int toIndex) {
-		return super.subList(fromIndex,toIndex);
-	}
 
-
-	public static void main(String[] args) {
-		HashSet<Integer> custom = new HashSet<Integer>();
-		custom.add(10);
-		
-		custom.add(3);
-		custom.add(20);
-		custom.add(12);
-		custom.add(13);
-		custom.add(22);
-		custom.add(13);
-		System.out.println(custom);
-
-		LinkedList<Integer> ints = new LinkedList<Integer>(custom);
-		System.out.println(ints);
-
-		LinkedHashList<Integer> x = new LinkedHashList<Integer>(ints);
-		x.get(1);
-		
-
-
-
-	
-		System.out.println(x.get(1));
-	}
 
 
 
