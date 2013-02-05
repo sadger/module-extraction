@@ -24,8 +24,6 @@ public class AlternativeApproach {
 	private Set<OWLLogicalAxiom> module;
 	private Set<OWLEntity> sigUnionSigM;
 	
-
-	
 	
 	public AlternativeApproach(LinkedHashList<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> mod, Set<OWLEntity> sig) throws IOException, QBFSolverException{
 		System.out.println("|Term|: " + term.size());
@@ -37,88 +35,62 @@ public class AlternativeApproach {
 		
 		this.sigUnionSigM = sig;
 		sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(module));
-		
-		splitTest(  );
 	}
 	
-	private void splitTest() throws IOException, QBFSolverException{	
-		
-
+	public OWLLogicalAxiom getInseperableAxiom() throws IOException, QBFSolverException{	
 		/* Represents the last axioms added or removed from the split test */
 		LinkedHashList<OWLLogicalAxiom> lastAdded = getTopHalf(terminology);
-		LinkedHashList<OWLLogicalAxiom> bottom = getBottomHalf(terminology);
-		
+		LinkedHashList<OWLLogicalAxiom> lastRemoved = getBottomHalf(terminology);
 		
 		LinkedHashList<OWLLogicalAxiom> W = lastAdded;
-		LinkedHashList<OWLLogicalAxiom> x = new LinkedHashList<OWLLogicalAxiom>(); 
-		x.addAll(lastAdded);
-		x.addAll(bottom);
-		
-		int i = 0;
-		for(OWLLogicalAxiom ax : terminology){
-			if(!x.contains(ax)){
-				System.out.println(i + ":" + ax);
-			}
-			i++;
-		}
-		
-		System.out.println("X: " + x.size());
-		
-		while(lastAdded.size() >= 1){
+
+		while(lastAdded.size() > 0){
 			
 			ChainDependencies Wdeps = new ChainDependencies();
 			Wdeps.updateDependenciesWith(W);
 			Set<OWLLogicalAxiom> lhsW = lhsExtractor.getLHSSigAxioms(W, sigUnionSigM, Wdeps);
+			
 			if(!insepChecker.isSeperableFromEmptySet(lhsW, sigUnionSigM)){
-				lastAdded = getTopHalf(bottom);
+				lastAdded = getTopHalf(lastRemoved);
 				W.addAll(lastAdded);
-				bottom.removeAll(lastAdded);
+				lastRemoved.removeAll(lastAdded);
+				
+				System.out.println("Adding: " + lastAdded.size());
 
 			}
 			else{
-				System.out.println("Seperable");
 				
-			LinkedHashList<OWLLogicalAxiom> toRemove = getBottomHalf(lastAdded);
-			lastAdded = getTopHalf(lastAdded);
-			
-			W.removeAll(toRemove);
-			
-			LinkedHashList<OWLLogicalAxiom> tmp = new LinkedHashList<OWLLogicalAxiom>(toRemove);
-			tmp.addAll(bottom);
-			
-			bottom = tmp;
-			
-				
-				
-			}
-			System.out.println("W :" + W.size());
-		}
+			lastRemoved = getBottomHalf(lastAdded);
+			W.removeAll(lastRemoved);
+			lastAdded.removeAll(lastRemoved);
 
-		
-		
+			System.out.println("Removing: " + lastRemoved.size());
+
+			
+			}
+
+		}
+		return  terminology.get(W.size());
 	}
+
 
 	
 	private LinkedHashList<OWLLogicalAxiom> getTopHalf(LinkedHashList<OWLLogicalAxiom> axiomList){
-		
 		int fromIndex = 0;
 		int toIndex = (int) Math.floor(axiomList.size()/2);
 		
 		LinkedHashList<OWLLogicalAxiom> topHalf =
 				new LinkedHashList<OWLLogicalAxiom>(axiomList.subList(fromIndex, toIndex));
-		System.out.println("|Top Half|: " + topHalf.size());
 		return topHalf;
 
 	}
 	
 	private LinkedHashList<OWLLogicalAxiom> getBottomHalf(LinkedHashList<OWLLogicalAxiom> axiomList){
-		
 		int fromIndex = (int) Math.floor(axiomList.size()/2);
 		int toIndex = axiomList.size();
 			
 		LinkedHashList<OWLLogicalAxiom> bottomHalf =
 				new LinkedHashList<OWLLogicalAxiom>(axiomList.subList(fromIndex, toIndex));
-		System.out.println("|Bottom Half|: " + bottomHalf.size());
 		return bottomHalf;
 
 	}

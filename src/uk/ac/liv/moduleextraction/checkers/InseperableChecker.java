@@ -16,17 +16,21 @@ import uk.ac.liv.moduleextraction.replacers.InverseRolePropertyReplacer;
 
 public class InseperableChecker {
 	
+	static int testCount = 0;
+	
 	public boolean isSeperableFromEmptySet(Set<OWLLogicalAxiom> w, Set<OWLEntity> signatureAndSigM) throws IOException, QBFSolverException{
 		InverseRolePropertyReplacer replacer = new InverseRolePropertyReplacer();
 		//Remove inverse roles from the QBF problem
 		QBFFileWriter writer = new QBFFileWriter(replacer.convert(w),signatureAndSigM);
 		QBFSolver solver =  new QBFSolver();
+		
 
 
 		boolean isInseperable = true;
-		
+
 		//If W is empty of course it IS the empty set so is not inseperable from itself
 		if(!w.isEmpty()){
+			testCount++;
 			File qbfProblem = writer.generateQBFProblem();
 			isInseperable = solver.isSatisfiable(qbfProblem);
 
@@ -37,6 +41,10 @@ public class InseperableChecker {
 
 		//We test for inseperablity and return the negation
 		return !isInseperable;
+	}
+	
+	public static int getTestCount() {
+		return testCount;
 	}
 
 }

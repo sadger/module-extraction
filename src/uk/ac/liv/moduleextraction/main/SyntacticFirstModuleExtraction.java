@@ -102,8 +102,14 @@ public class SyntacticFirstModuleExtraction {
 
 		if(insepChecker.isSeperableFromEmptySet(lhsSigT, sigUnionSigM)){
 			//sigManager.writeFile(signature, "insep" + Math.abs(signature.hashCode()));
-			//collectSemanticDependentAxioms();
-			new AlternativeApproach(terminology, module, signature);
+//			collectSemanticDependentAxioms();
+			AlternativeApproach search = new AlternativeApproach(terminology, module, signature);
+			OWLLogicalAxiom insepAxiom = search.getInseperableAxiom();
+			System.out.println("Adding: " + insepAxiom);
+			module.add(insepAxiom);
+			sigUnionSigM.addAll(insepAxiom.getSignature());
+			terminology.remove(insepAxiom);
+			extractModule();
 		}
 
 		return module;
@@ -127,7 +133,7 @@ public class SyntacticFirstModuleExtraction {
 				addedCount++;
 				Set<OWLLogicalAxiom> axiomsWithDeps = syntaxDepChecker.getAxiomsWithDependencies();
 				terminology.removeAll(axiomsWithDeps);
-				System.out.println("Adding " + axiomsWithDeps);
+				//System.out.println("Adding " + axiomsWithDeps);
 
 				module.add(chosenAxiom);
 				sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(axiomsWithDeps));
@@ -180,10 +186,11 @@ public class SyntacticFirstModuleExtraction {
 
 		Set<OWLEntity> sig = null;
 		try {
-			sig = sigManager.readFile("insep1278797273");
+			sig = sigManager.readFile("insep904271410");
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+		
 
 		SyntacticLocalityModuleExtractor syntaxModExtractor = 
 				new SyntacticLocalityModuleExtractor(OWLManager.createOWLOntologyManager(), ont, ModuleType.STAR);
@@ -206,6 +213,7 @@ public class SyntacticFirstModuleExtraction {
 		}
 
 		System.out.println("Synsize: " + syntfirstExtracted.size());
+		System.out.println("QBF Checks " + InseperableChecker.getTestCount());
 		System.out.println();
 	}
 
