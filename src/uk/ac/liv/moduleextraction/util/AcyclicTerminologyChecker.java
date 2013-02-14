@@ -22,8 +22,7 @@ public class AcyclicTerminologyChecker {
 	}
 	
 	public static void main(String[] args) {
-		OWLOntology nci1 = OntologyLoader.loadOntology("/home/william/PhD/Ontologies/moduletest/pharma-alc.owl");
-		AcyclicTerminologyChecker checker = new AcyclicTerminologyChecker(nci1);
-		System.out.println(checker.isAcyclicTerminology());
+		OWLOntology nci1 = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.10e-alc-no-disjoint.owl");
+		System.out.println(ModuleUtils.getClassAndRoleNamesInSet(nci1.getLogicalAxioms()).size());
 	}
 }

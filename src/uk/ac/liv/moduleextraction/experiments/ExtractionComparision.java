@@ -62,6 +62,7 @@ public class ExtractionComparision {
 		this.signature = sig;
 		this.ontology = extractor.extractInclusionsAndEqualities(ontology);
 		System.out.println("Extracted inclusions and equalities only");
+		System.out.println("Ont:" + ontology.getLogicalAxiomCount());
 	}
 
 	public ExtractionComparision(File experimentLocation) throws IOException{

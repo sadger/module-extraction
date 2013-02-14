@@ -10,7 +10,9 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -60,16 +62,16 @@ public class SyntacticFirstModuleExtraction {
 		HashMap<OWLClass, Integer> definitorialMap = new DefinitorialDepth(term).getDefinitorialMap();
 		Collections.sort(listOfAxioms, new AxiomComparator(definitorialMap));
 
-	
+
 		this.terminology = new LinkedHashList<OWLLogicalAxiom>(listOfAxioms);
 		this.signature = sig;
 		this.module = (existingModule == null) ? new HashSet<OWLLogicalAxiom>() : existingModule;
 		
+
 		boolean result = true;
 		for(int i=0; i<listOfAxioms.size(); i++){
 			result = result && terminology.get(i).equals(listOfAxioms.get(i));
 		}
-		
 		System.out.println("Lists are equal?: " + result);
 
 		
@@ -101,11 +103,11 @@ public class SyntacticFirstModuleExtraction {
 		HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(terminology,sigUnionSigM,tminusMDependencies);
 
 		if(insepChecker.isSeperableFromEmptySet(lhsSigT, sigUnionSigM)){
-			//sigManager.writeFile(signature, "insep" + Math.abs(signature.hashCode()));
+//			sigManager.writeFile(signature, "insep" + Math.abs(signature.hashCode()));
 //			collectSemanticDependentAxioms();
 			AlternativeApproach search = new AlternativeApproach(terminology, module, signature);
 			OWLLogicalAxiom insepAxiom = search.getInseperableAxiom();
-			System.out.println("Adding: " + insepAxiom);
+			//System.out.println("Adding: " + insepAxiom);
 			module.add(insepAxiom);
 			sigUnionSigM.addAll(insepAxiom.getSignature());
 			terminology.remove(insepAxiom);
@@ -126,18 +128,19 @@ public class SyntacticFirstModuleExtraction {
 			OWLLogicalAxiom chosenAxiom = axiomIterator.next();
 
 			W.add(chosenAxiom);
+			
 
 			syntaticDependencies.updateDependenciesWith(chosenAxiom);
+			
 
 			if(syntaxDepChecker.hasSyntacticSigDependency(W, syntaticDependencies, sigUnionSigM)){
 				addedCount++;
 				Set<OWLLogicalAxiom> axiomsWithDeps = syntaxDepChecker.getAxiomsWithDependencies();
 				terminology.removeAll(axiomsWithDeps);
-				//System.out.println("Adding " + axiomsWithDeps);
+				System.out.println("Adding " + axiomsWithDeps);
 
 				module.add(chosenAxiom);
 				sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(axiomsWithDeps));
-
 
 				W.clear();
 				/* reset the iterator */
@@ -178,44 +181,59 @@ public class SyntacticFirstModuleExtraction {
 
 	public static void main(String[] args) {
 
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-08.09d-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "interp/semanticdep.krss");
 		System.out.println("Loaded Ontology");
 
+		System.out.println(ont);
+		
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
 		SigManager sigManager = new SigManager(new File(ModulePaths.getSignatureLocation() + "/insepSigs"));
-
-		Set<OWLEntity> sig = null;
-		try {
-			sig = sigManager.readFile("insep904271410");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+		
+		OWLDataFactory f = OWLManager.getOWLDataFactory();
+		
 		
 
-		SyntacticLocalityModuleExtractor syntaxModExtractor = 
-				new SyntacticLocalityModuleExtractor(OWLManager.createOWLOntologyManager(), ont, ModuleType.STAR);
-		Set<OWLLogicalAxiom> starModule = ModuleUtils.getLogicalAxioms(syntaxModExtractor.extract(sig));
-		System.out.println("Star module size " + starModule.size());
+
+		OWLClass lion = f.getOWLClass(IRI.create(ont.getOntologyID() + "#Lion"));
+		OWLClass dog = f.getOWLClass(IRI.create(ont.getOntologyID() + "#Dog"));
+		OWLClass fox = f.getOWLClass(IRI.create(ont.getOntologyID() + "#Fox"));
+		
+		Set<OWLEntity> signature = new HashSet<OWLEntity>();
+		signature.add(fox);
+		signature.add(lion);
+		signature.add(dog);
+	
+		
+			Set<OWLEntity> sig = signature;
+
+			SyntacticLocalityModuleExtractor syntaxModExtractor = 
+					new SyntacticLocalityModuleExtractor(OWLManager.createOWLOntologyManager(), ont, ModuleType.STAR);
+			Set<OWLLogicalAxiom> starModule = ModuleUtils.getLogicalAxioms(syntaxModExtractor.extract(sig));
+		
+			int starSize = starModule.size();
 
 
-		Set<OWLLogicalAxiom> syntfirstExtracted = null;
-		System.out.println("|Signature|: " + sig.size());
+			Set<OWLLogicalAxiom> syntfirstExtracted = null;
+			System.out.println("|Signature|: " + sig);
 
-		try {
-			long startTime = System.currentTimeMillis();
-			SyntacticFirstModuleExtraction syntmod = new SyntacticFirstModuleExtraction(starModule, sig);
-			syntfirstExtracted = syntmod.extractModule();
-			System.out.println("Time taken: " + ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (QBFSolverException e) {
-			e.printStackTrace();
+			try {
+				long startTime = System.currentTimeMillis();
+				SyntacticFirstModuleExtraction syntmod = new SyntacticFirstModuleExtraction(ont.getLogicalAxioms(), sig);
+				syntfirstExtracted = syntmod.extractModule();
+				System.out.println("Time taken: " + ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (QBFSolverException e) {
+				e.printStackTrace();
+			}
+
+			System.out.println("Star module size: " + starSize);
+			System.out.println("Synsize: " + syntfirstExtracted.size());
+			//System.out.println("QBF Checks " + InseperableChecker.getTestCount());
+			System.out.println();
 		}
-
-		System.out.println("Synsize: " + syntfirstExtracted.size());
-		System.out.println("QBF Checks " + InseperableChecker.getTestCount());
-		System.out.println();
-	}
+	
+	
 
 
 	//	}
