@@ -24,6 +24,7 @@ import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
 import org.semanticweb.owlapi.model.OWLObjectOneOf;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLObjectUnionOf;
+import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 
@@ -31,6 +32,14 @@ import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 
 public class ELChecker implements OWLClassExpressionVisitorEx<Boolean>{
 
+	public boolean isELOntology(OWLOntology ont) {
+		for(OWLLogicalAxiom axiom : ont.getLogicalAxioms()){
+			if(!isELAxiom(axiom)){
+				return false;
+			}
+		}
+		return true;
+	}
 	
 	public boolean isELAxiom(OWLLogicalAxiom axiom){
 		OWLClassExpression name = AxiomSplitter.getNameofAxiom(axiom);
