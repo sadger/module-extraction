@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
@@ -62,18 +61,9 @@ public class SyntacticFirstModuleExtraction {
 		HashMap<OWLClass, Integer> definitorialMap = new DefinitorialDepth(term).getDefinitorialMap();
 		Collections.sort(listOfAxioms, new AxiomComparator(definitorialMap));
 
-
 		this.terminology = new LinkedHashList<OWLLogicalAxiom>(listOfAxioms);
 		this.signature = sig;
 		this.module = (existingModule == null) ? new HashSet<OWLLogicalAxiom>() : existingModule;
-		
-
-		boolean result = true;
-		for(int i=0; i<listOfAxioms.size(); i++){
-			result = result && terminology.get(i).equals(listOfAxioms.get(i));
-		}
-		System.out.println("Lists are equal?: " + result);
-
 		
 		populateSignature();
 	}
@@ -134,11 +124,11 @@ public class SyntacticFirstModuleExtraction {
 			
 
 			if(syntaxDepChecker.hasSyntacticSigDependency(W, syntaticDependencies, sigUnionSigM)){
-				addedCount++;
+
 				Set<OWLLogicalAxiom> axiomsWithDeps = syntaxDepChecker.getAxiomsWithDependencies();
 				terminology.removeAll(axiomsWithDeps);
-				System.out.println("Adding " + axiomsWithDeps);
-
+				System.out.println("Adding " + axiomsWithDeps.size() + " axiom(s)");
+				addedCount += axiomsWithDeps.size();
 				module.addAll(axiomsWithDeps);
 				sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(axiomsWithDeps));
 
@@ -148,60 +138,22 @@ public class SyntacticFirstModuleExtraction {
 			}
 		}
 		if(addedCount > 0)
-			System.out.println("Adding " + addedCount + " axiom(s) to module");
+			System.out.println("Total Added: " + addedCount);
 	}
-
-	private void collectSemanticDependentAxioms() throws IOException, QBFSolverException {
-		System.out.println("Collecting semantic dependencies");
-		ChainDependencies lhsDependencies = new ChainDependencies();
-		LinkedHashList<OWLLogicalAxiom> W  = new LinkedHashList<OWLLogicalAxiom>();
-		Iterator<OWLLogicalAxiom> axiomIterator = terminology.iterator();
-
-		boolean axiomFound = false;
-		while(!axiomFound){
-			OWLLogicalAxiom chosenAxiom = axiomIterator.next();
-
-			W.add(chosenAxiom);
-			lhsDependencies.updateDependenciesWith(chosenAxiom);
-			System.out.println(W.size());
-
-			Set<OWLLogicalAxiom> lhs = lhsExtractor.getLHSSigAxioms(W, sigUnionSigM,lhsDependencies);
-			if(insepChecker.isSeperableFromEmptySet(lhs, sigUnionSigM)){
-				System.out.println("Adding: " + chosenAxiom);
-				module.add(chosenAxiom);
-				sigUnionSigM.addAll(chosenAxiom.getSignature());
-				terminology.remove(chosenAxiom);
-				extractModule();
-				axiomFound = true;
-			}
-		}
-
-	}
-
 
 	public static void main(String[] args) {
 
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "moduletest/chaintest1.krss");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-08.09d-terminology.owl");
 		System.out.println("Loaded Ontology");
 
-		System.out.println(ont);
-		
+
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
 		SigManager sigManager = new SigManager(new File(ModulePaths.getSignatureLocation() + "/insepSigs"));
 		
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
-		
-		
 
-
-		OWLClass lion = f.getOWLClass(IRI.create(ont.getOntologyID() + "#A"));
-		OWLClass dog = f.getOWLClass(IRI.create(ont.getOntologyID() + "#E"));
-		//OWLClass fox = f.getOWLClass(IRI.create(ont.getOntologyID() + "#Fox"));
 		
-		Set<OWLEntity> signature = new HashSet<OWLEntity>();
-		signature.add(lion);
-		signature.add(dog);
-	
+		Set<OWLEntity> signature = gen.generateRandomSignature(1000);
 		
 			Set<OWLEntity> sig = signature;
 
@@ -213,7 +165,7 @@ public class SyntacticFirstModuleExtraction {
 
 
 			Set<OWLLogicalAxiom> syntfirstExtracted = null;
-			System.out.println("|Signature|: " + sig);
+			System.out.println("|Signature|: " + sig.size());
 
 			try {
 				long startTime = System.currentTimeMillis();
