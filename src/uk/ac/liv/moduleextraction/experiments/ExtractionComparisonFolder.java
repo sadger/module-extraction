@@ -10,6 +10,7 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
+import uk.ac.liv.moduleextraction.reloading.ReloadExperimentFromDisk;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
@@ -23,21 +24,21 @@ public class ExtractionComparisonFolder {
 		this.manager = new SigManager(signaturesLocation);
 		for(File f : signaturesLocation.listFiles()){
 			if(f.isFile()){
+				System.out.println("Testing sig: " + f.getName());
 				File experimentLocation = new File(ModulePaths.getResultLocation() + "/" + signaturesLocation.getName() + "/" + f.getName());
-				if(experimentLocation.exists())
-					compare = new ExtractionComparision(experimentLocation);
-				else
-					compare = new ExtractionComparision(ontology, manager.readFile(f.getName()), experimentLocation);
-
+				compare = new ExtractionComparision(ontology, manager.readFile(f.getName()), experimentLocation);
 				compare.compareExtractionApproaches();
+				
+				ReloadExperimentFromDisk reload = new ReloadExperimentFromDisk(ModulePaths.getResultLocation() + "chainold/" + signaturesLocation.getName() + "/" + f.getName());
+				System.out.println("Same module?: " + reload.getModule().equals(compare.getSemanticModule()));
 			}
 		}
-	}
+	}  
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "no-disjoint-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-08.09d-terminology.owl");
 		try {
-			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/michel"));
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/chainrandom500"));
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		} catch (OWLOntologyCreationException e) {
