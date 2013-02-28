@@ -23,16 +23,14 @@ public class ReloadExperimentFromDisk {
 	private final String EXPERIMENT_LOCATION;
 	
 	private Set<OWLEntity> signature;
-	private Set<OWLLogicalAxiom> terminology;
 	private Set<OWLLogicalAxiom> module;
 
 	public ReloadExperimentFromDisk(String location) throws IOException {
 		this.EXPERIMENT_LOCATION = new File(location).getAbsolutePath();
 		this.signature = populateSignature();
-		this.terminology = restoreOntology(TERM_FILE);
 		this.module = restoreOntology(MOD_FILE);
 		System.out.println("Reloaded: " + location);
-		System.out.format("T:%d, M:%d, S:%d\n", terminology.size(), module.size(), signature.size());
+		System.out.format("M:%d, S:%d\n", module.size(), signature.size());
 	}
 
 	private Set<OWLLogicalAxiom> restoreOntology(String ontLocation){
@@ -52,10 +50,6 @@ public class ReloadExperimentFromDisk {
 		return restoreOntology(SYNT_FILE);
 	}
 
-	public Set<OWLLogicalAxiom> getTerminology() {
-		return terminology;
-	}
-	
 	public Set<OWLLogicalAxiom> getModule() {
 		return module;
 	}

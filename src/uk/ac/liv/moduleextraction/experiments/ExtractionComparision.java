@@ -48,8 +48,7 @@ public class ExtractionComparision {
 	private Set<OWLEntity> signature;
 
 	private DumpExtractionToDisk dump;
-	private ScheduledFuture<?> dumpHandle;
-	private ReloadExperimentFromDisk reloader;
+
 
 	private int syntaticSize = 0;
 
@@ -65,13 +64,6 @@ public class ExtractionComparision {
 		System.out.println("Ont:" + ontology.getLogicalAxiomCount());
 	}
 
-	public ExtractionComparision(File experimentLocation) throws IOException{
-		this.experimentLocation = experimentLocation;
-		this.resumingExperiments = true;
-		reloader = new ReloadExperimentFromDisk(experimentLocation.getAbsolutePath());
-		this.signature = reloader.getSignature();
-	}
-
 
 	public void compareExtractionApproaches() throws IOException, QBFSolverException, OWLOntologyStorageException, OWLOntologyCreationException{	
 		File experimentResultFile = new File(experimentLocation + "/" + "experiment-results");
@@ -83,7 +75,6 @@ public class ExtractionComparision {
 		long startTime = System.currentTimeMillis();
 
 		Set<OWLLogicalAxiom> syntacticModule = null;
-		if(!resumingExperiments){
 			manager = OWLManager.createOWLOntologyManager();
 			syntaxModExtractor = new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.STAR);
 			
@@ -97,12 +88,8 @@ public class ExtractionComparision {
 			syntacticModule = getLogicalAxioms(syntacticOntology);
 
 			/* Store the size here as the semantic approach is destructive */
-			this.moduleExtractor = new SyntacticFirstModuleExtraction(syntacticModule,signature);
-		}
-		else{
-			this.moduleExtractor = new SyntacticFirstModuleExtraction(reloader.getTerminology(), reloader.getModule(),signature);
-			syntacticModule = reloader.getSyntacticModule();
-		}
+			this.moduleExtractor = new SyntacticFirstModuleExtraction(ontology.getLogicalAxioms(),signature);
+		
 
 
 		syntaticSize = syntacticModule.size();
@@ -110,11 +97,8 @@ public class ExtractionComparision {
 
 
 		this.dump = new DumpExtractionToDisk(
-				experimentLocation,moduleExtractor.getTerminology(), 
+				experimentLocation,
 				moduleExtractor.getModule(), signature);
-
-		this.dumpHandle = scheduler.scheduleAtFixedRate(dump,
-				30, 30, TimeUnit.MINUTES);
 
 		Set<OWLLogicalAxiom> semanticModule = moduleExtractor.extractModule();
 		writeResults(semanticModule);
@@ -133,10 +117,6 @@ public class ExtractionComparision {
 
 		/* Dump the results one last time before finishing */
 		new Thread(dump).start();
-
-		/* Finish the scheduling dumps */
-		dumpHandle.cancel(true);
-		scheduler.shutdownNow();
 	}
 
 

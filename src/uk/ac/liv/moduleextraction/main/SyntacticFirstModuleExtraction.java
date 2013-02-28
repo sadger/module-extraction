@@ -66,14 +66,7 @@ public class SyntacticFirstModuleExtraction {
 		this.terminology = new LinkedHashList<OWLLogicalAxiom>(listOfAxioms);
 		this.signature = sig;
 		this.module = (existingModule == null) ? new HashSet<OWLLogicalAxiom>() : existingModule;
-		
-
-		boolean result = true;
-		for(int i=0; i<listOfAxioms.size(); i++){
-			result = result && terminology.get(i).equals(listOfAxioms.get(i));
-		}
-		System.out.println("Lists are equal?: " + result);
-
+	
 		
 		populateSignature();
 	}
@@ -118,6 +111,7 @@ public class SyntacticFirstModuleExtraction {
 	}
 
 	private void collectSyntacticDependentAxioms() {
+		System.out.println("Collecting Syntactic dependent axioms");
 		LinkedHashList<OWLLogicalAxiom> W  = new LinkedHashList<OWLLogicalAxiom>();
 		Iterator<OWLLogicalAxiom> axiomIterator = terminology.iterator();
 		ChainDependencies syntaticDependencies = new ChainDependencies();
@@ -137,7 +131,7 @@ public class SyntacticFirstModuleExtraction {
 				addedCount++;
 				Set<OWLLogicalAxiom> axiomsWithDeps = syntaxDepChecker.getAxiomsWithDependencies();
 				terminology.removeAll(axiomsWithDeps);
-				System.out.println("Adding " + axiomsWithDeps);
+				//System.out.println("Adding " + axiomsWithDeps);
 
 				module.add(chosenAxiom);
 				sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(axiomsWithDeps));
@@ -149,33 +143,6 @@ public class SyntacticFirstModuleExtraction {
 		}
 		if(addedCount > 0)
 			System.out.println("Adding " + addedCount + " axiom(s) to module");
-	}
-
-	private void collectSemanticDependentAxioms() throws IOException, QBFSolverException {
-		System.out.println("Collecting semantic dependencies");
-		ChainDependencies lhsDependencies = new ChainDependencies();
-		LinkedHashList<OWLLogicalAxiom> W  = new LinkedHashList<OWLLogicalAxiom>();
-		Iterator<OWLLogicalAxiom> axiomIterator = terminology.iterator();
-
-		boolean axiomFound = false;
-		while(!axiomFound){
-			OWLLogicalAxiom chosenAxiom = axiomIterator.next();
-
-			W.add(chosenAxiom);
-			lhsDependencies.updateDependenciesWith(chosenAxiom);
-			System.out.println(W.size());
-
-			Set<OWLLogicalAxiom> lhs = lhsExtractor.getLHSSigAxioms(W, sigUnionSigM,lhsDependencies);
-			if(insepChecker.isSeperableFromEmptySet(lhs, sigUnionSigM)){
-				System.out.println("Adding: " + chosenAxiom);
-				module.add(chosenAxiom);
-				sigUnionSigM.addAll(chosenAxiom.getSignature());
-				terminology.remove(chosenAxiom);
-				extractModule();
-				axiomFound = true;
-			}
-		}
-
 	}
 
 

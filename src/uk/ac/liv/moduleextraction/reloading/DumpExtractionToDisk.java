@@ -25,7 +25,6 @@ public class DumpExtractionToDisk implements Runnable {
 
 	OWLOntologyManager ontologyManager;
 	
-	private List<OWLLogicalAxiom> terminology;
 	Set<OWLLogicalAxiom> module;
 	Set<OWLEntity> signature;
 	Date timeStarted;
@@ -35,12 +34,10 @@ public class DumpExtractionToDisk implements Runnable {
 	private static final String TERM_FILE = "terminology.owl";
 	private static final String MOD_FILE = "module.owl";
 
-	public DumpExtractionToDisk(File location, List<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> mod, Set<OWLEntity> signature) {
-		this.terminology = term;
+	public DumpExtractionToDisk(File location, Set<OWLLogicalAxiom> mod, Set<OWLEntity> signature) {
 		this.module = mod;
 		this.signature = signature;
 		this.directory = location;
-		this.timeStarted = new Date();
 		
 		this.ontologyManager = OWLManager.createOWLOntologyManager();
 	}
@@ -51,7 +48,6 @@ public class DumpExtractionToDisk implements Runnable {
 			directory.mkdir();
 		
 		writeSignature();
-		writeSetToOntology(new HashSet<OWLLogicalAxiom>(terminology), TERM_FILE);
 		writeSetToOntology(module, MOD_FILE);
 		
 		System.out.println("Dumped to: " + directory.getAbsolutePath() + " at " + new Date());

@@ -23,21 +23,18 @@ public class ExtractionComparisonFolder {
 		this.manager = new SigManager(signaturesLocation);
 		for(File f : signaturesLocation.listFiles()){
 			if(f.isFile()){
+				System.out.println("Testing sig: " + f.getName());
 				File experimentLocation = new File(ModulePaths.getResultLocation() + "/" + signaturesLocation.getName() + "/" + f.getName());
-				if(experimentLocation.exists())
-					compare = new ExtractionComparision(experimentLocation);
-				else
-					compare = new ExtractionComparision(ontology, manager.readFile(f.getName()), experimentLocation);
-
+				compare = new ExtractionComparision(ontology, manager.readFile(f.getName()), experimentLocation);
 				compare.compareExtractionApproaches();
 			}
 		}
-	}
+	}  
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "no-disjoint-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-08.09d-terminology.owl");
 		try {
-			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/michel"));
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/chainrandom500"));
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		} catch (OWLOntologyCreationException e) {
