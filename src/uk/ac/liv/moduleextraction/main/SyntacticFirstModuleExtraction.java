@@ -139,7 +139,7 @@ public class SyntacticFirstModuleExtraction {
 				terminology.removeAll(axiomsWithDeps);
 				System.out.println("Adding " + axiomsWithDeps);
 
-				module.add(chosenAxiom);
+				module.addAll(axiomsWithDeps);
 				sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(axiomsWithDeps));
 
 				W.clear();
@@ -181,7 +181,7 @@ public class SyntacticFirstModuleExtraction {
 
 	public static void main(String[] args) {
 
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "interp/semanticdep.krss");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "moduletest/chaintest1.krss");
 		System.out.println("Loaded Ontology");
 
 		System.out.println(ont);
@@ -194,12 +194,11 @@ public class SyntacticFirstModuleExtraction {
 		
 
 
-		OWLClass lion = f.getOWLClass(IRI.create(ont.getOntologyID() + "#Lion"));
-		OWLClass dog = f.getOWLClass(IRI.create(ont.getOntologyID() + "#Dog"));
-		OWLClass fox = f.getOWLClass(IRI.create(ont.getOntologyID() + "#Fox"));
+		OWLClass lion = f.getOWLClass(IRI.create(ont.getOntologyID() + "#A"));
+		OWLClass dog = f.getOWLClass(IRI.create(ont.getOntologyID() + "#E"));
+		//OWLClass fox = f.getOWLClass(IRI.create(ont.getOntologyID() + "#Fox"));
 		
 		Set<OWLEntity> signature = new HashSet<OWLEntity>();
-		signature.add(fox);
 		signature.add(lion);
 		signature.add(dog);
 	
