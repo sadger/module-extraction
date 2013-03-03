@@ -16,7 +16,6 @@ public class ReloadExperimentFromDisk {
 
 	//TODO make these global to dumping/loading
 	private static final String SIGNATURE_FILE = "sig";
-	private static final String TERM_FILE = "terminology.owl";
 	private static final String MOD_FILE = "module.owl";
 	private static final String SYNT_FILE = "syntacticModule.owl";
 
