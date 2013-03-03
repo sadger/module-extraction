@@ -1,4 +1,4 @@
-package uk.ac.liv.moduleextraction.testing;
+package uk.ac.liv.moduleextraction.qbf;
 
 import java.io.IOException;
 import java.util.Set;
@@ -10,10 +10,9 @@ import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.datastructures.LinkedHashList;
-import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 
-public class AlternativeApproach {
+public class SeparabilityAxiomLocator {
 	
 	/* Semantic Checking */
 	private LHSSigExtractor lhsExtractor = new LHSSigExtractor();
@@ -25,11 +24,7 @@ public class AlternativeApproach {
 	private Set<OWLEntity> sigUnionSigM;
 	
 	
-	public AlternativeApproach(LinkedHashList<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> mod, Set<OWLEntity> sig) throws IOException, QBFSolverException{
-		System.out.println("|Term|: " + term.size());
-		System.out.println("|Mod|: " + mod.size());
-		System.out.println("|Sig|: " + sig.size());
-		
+	public SeparabilityAxiomLocator(LinkedHashList<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> mod, Set<OWLEntity> sig) throws IOException, QBFSolverException{
 		this.terminology = term;
 		this.module = mod;
 		

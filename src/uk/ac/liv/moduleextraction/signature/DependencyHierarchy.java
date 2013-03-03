@@ -6,19 +6,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-
 import uk.ac.liv.moduleextraction.chaindependencies.DependencySet;
-import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 
 
@@ -107,13 +101,6 @@ public class DependencyHierarchy {
 		return toPrint;
 	}
 
-	public static void main(String[] args) {
-		OWLDataFactory f = OWLManager.getOWLDataFactory();
-		OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
-		//OWLOntology ontology = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation()+"interp/diff.krss");
-//		System.out.println(ontology);
-		DependencyHierarchy h = new DependencyHierarchy(ontology.getLogicalAxioms());
-//		System.out.println(h);
-	}
+
 
 }

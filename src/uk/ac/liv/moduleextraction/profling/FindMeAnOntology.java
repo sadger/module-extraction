@@ -1,13 +1,13 @@
-package uk.ac.liv.moduleextraction.testing;
+package uk.ac.liv.moduleextraction.profling;
 
 import java.io.File;
 import java.util.Arrays;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import uk.ac.liv.moduleextraction.checkers.ELChecker;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.ontologyutils.axioms.ALCValidator;
+import uk.ac.liv.ontologyutils.axioms.ELValidator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.terminology.EquivalentToTerminologyChecker;
 import uk.ac.liv.ontologyutils.terminology.TerminologyChecker;
@@ -15,7 +15,7 @@ import uk.ac.liv.ontologyutils.terminology.TerminologyChecker;
 public class FindMeAnOntology {
 	
 	ALCValidator validator = new ALCValidator();
-	ELChecker checker = new ELChecker();
+	ELValidator elvalidator = new ELValidator();
 	TerminologyChecker termChecker = new TerminologyChecker();
 	EquivalentToTerminologyChecker equivTermChecker = new EquivalentToTerminologyChecker();
 	private File ontologyDirectory;
@@ -37,7 +37,7 @@ public class FindMeAnOntology {
 	
 	private void profileOntology(OWLOntology ont){
 		System.out.println("Logical Axiom Count: " + ont.getLogicalAxiomCount());
-		System.out.println("Is EL?: " + checker.isELOntology(ont));
+		System.out.println("Is EL?: " + elvalidator.isELOntology(ont));
 		System.out.println("Is ALC?: " + validator.isALCOntology(ont));
 		boolean isTerm = termChecker.isTerminology(ont);
 		System.out.println("Is terminology?: " + isTerm);

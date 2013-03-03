@@ -3,7 +3,6 @@ package uk.ac.liv.moduleextraction.signature;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,10 +16,7 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLOntology;
-
 import uk.ac.liv.moduleextraction.util.ModulePaths;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 public class SigManager {
 

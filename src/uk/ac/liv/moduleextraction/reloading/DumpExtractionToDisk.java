@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -19,7 +18,6 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 import uk.ac.liv.moduleextraction.signature.SigManager;
-import uk.ac.liv.moduleextraction.util.ModulePaths;
 
 public class DumpExtractionToDisk implements Runnable {
 
@@ -31,7 +29,6 @@ public class DumpExtractionToDisk implements Runnable {
 	File directory;
 	
 	private static final String SIGNATURE_FILE = "sig";
-	private static final String TERM_FILE = "terminology.owl";
 	private static final String MOD_FILE = "module.owl";
 
 	public DumpExtractionToDisk(File location, Set<OWLLogicalAxiom> mod, Set<OWLEntity> signature) {

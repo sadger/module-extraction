@@ -7,11 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
 import org.semanticweb.owlapi.model.IRI;
@@ -24,10 +19,9 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 
-import uk.ac.liv.moduleextraction.main.SyntacticFirstModuleExtraction;
+import uk.ac.liv.moduleextraction.extractor.SyntacticFirstModuleExtraction;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.reloading.DumpExtractionToDisk;
-import uk.ac.liv.moduleextraction.reloading.ReloadExperimentFromDisk;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
@@ -42,17 +36,12 @@ public class ExtractionComparision {
 	OWLOntology ontology;
 	SyntacticFirstModuleExtraction moduleExtractor;
 	SyntacticLocalityModuleExtractor syntaxModExtractor;
-	private final ScheduledExecutorService scheduler =
-			Executors.newScheduledThreadPool(1);
 
 	private Set<OWLEntity> signature;
-
 	private DumpExtractionToDisk dump;
-
 
 	private int syntaticSize = 0;
 
-	private boolean resumingExperiments = false;
 	private File experimentLocation;
 
 	public ExtractionComparision(OWLOntology ontology, Set<OWLEntity> sig, File experimentLocation) {

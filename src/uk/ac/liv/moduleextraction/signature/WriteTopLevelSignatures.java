@@ -3,8 +3,6 @@ package uk.ac.liv.moduleextraction.signature;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import org.semanticweb.owlapi.model.OWLClass;
@@ -13,10 +11,9 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
+import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
 import uk.ac.liv.moduleextraction.chaindependencies.Dependency;
 import uk.ac.liv.moduleextraction.datastructures.LinkedHashList;
-import uk.ac.liv.moduleextraction.util.AxiomComparator;
-import uk.ac.liv.moduleextraction.util.DefinitorialDepth;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
@@ -28,10 +25,11 @@ public class WriteTopLevelSignatures {
 	public WriteTopLevelSignatures(OWLOntology ont, File location) {
 		this.ontology = ont;
 		this.location = location;
-		ArrayList<OWLLogicalAxiom> listOfAxioms = new ArrayList<OWLLogicalAxiom>(ont.getLogicalAxioms());
-		HashMap<OWLClass, Integer> definitorialMap = new DefinitorialDepth(ont.getLogicalAxioms()).getDefinitorialMap();
-		Collections.sort(listOfAxioms, new AxiomComparator(definitorialMap));
-		LinkedHashList<OWLLogicalAxiom> terminology = new LinkedHashList<OWLLogicalAxiom>(listOfAxioms);
+		
+		DefinitorialDepth definitorialDepth = new DefinitorialDepth(ont.getLogicalAxioms());
+		ArrayList<OWLLogicalAxiom> depthSortedAxioms = definitorialDepth.getDefinitorialSortedList();
+		LinkedHashList<OWLLogicalAxiom> terminology = new LinkedHashList<OWLLogicalAxiom>(depthSortedAxioms);
+		
 		d = new ChainDependencies();
 		d.updateDependenciesWith(terminology);
 	}

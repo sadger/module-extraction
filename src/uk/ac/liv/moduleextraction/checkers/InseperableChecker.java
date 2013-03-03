@@ -2,10 +2,8 @@ package uk.ac.liv.moduleextraction.checkers;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
@@ -28,7 +26,7 @@ public class InseperableChecker {
 
 		boolean isInseperable = true;
 
-		//If W is empty of course it IS the empty set so is not inseperable from itself
+		/* If W is empty it IS the empty set so cannot be separable from itself */
 		if(!w.isEmpty()){
 			testCount++;
 			File qbfProblem = writer.generateQBFProblem();
@@ -39,7 +37,7 @@ public class InseperableChecker {
 			}
 		}
 
-		//We test for inseperablity and return the negation
+		//We test for inseparablity and return the negation
 		return !isInseperable;
 	}
 	
