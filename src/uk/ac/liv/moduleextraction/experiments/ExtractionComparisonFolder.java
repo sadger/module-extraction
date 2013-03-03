@@ -29,8 +29,6 @@ public class ExtractionComparisonFolder {
 				compare = new ExtractionComparision(ontology, manager.readFile(f.getName()), experimentLocation);
 				compare.compareExtractionApproaches();
 				
-				ReloadExperimentFromDisk reload = new ReloadExperimentFromDisk(ModulePaths.getResultLocation() + "chainold/" + signaturesLocation.getName() + "/" + f.getName());
-				System.out.println("Same module?: " + reload.getModule().equals(compare.getSemanticModule()));
 			}
 		}
 	}  
@@ -38,7 +36,7 @@ public class ExtractionComparisonFolder {
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-08.09d-terminology.owl");
 		try {
-			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/chainrandom500"));
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/chainrandom100"));
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		} catch (OWLOntologyCreationException e) {
