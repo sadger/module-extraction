@@ -17,6 +17,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import uk.ac.liv.moduleextraction.extractor.SyntacticFirstModuleExtraction;
@@ -32,6 +34,8 @@ import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
 public class ExtractionComparision {
 
+	Logger logger = LoggerFactory.getLogger(ExtractionComparision.class);
+	
 	OWLOntologyManager manager;
 	OWLOntology ontology;
 	SyntacticFirstModuleExtraction moduleExtractor;
@@ -92,7 +96,7 @@ public class ExtractionComparision {
 		Set<OWLLogicalAxiom> semanticModule = moduleExtractor.extractModule();
 		writeResults(semanticModule);
 
-		System.out.println(ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
+		logger.info("Time taken {}",ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
 
 	}
 
@@ -117,33 +121,6 @@ public class ExtractionComparision {
 		}
 		return result;
 	}
-
-	
-	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
-		System.out.println("Loaded Ontology");
-
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-
-		
-		Set<OWLEntity> sig = gen.generateRandomSignature(100);
-			
-		try {
-			ExtractionComparision comp = new ExtractionComparision(ont,sig,new File(ModulePaths.getResultLocation() + "/random-100-nci"));
-			//ExtractionComparision comp = new ExtractionComparision(new File(getResultLocation() + "random-100-nci");
-			comp.compareExtractionApproaches();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (OWLOntologyStorageException e) {
-			e.printStackTrace();
-		} catch (OWLOntologyCreationException e) {
-			e.printStackTrace();
-		} catch (QBFSolverException e) {
-			e.printStackTrace();
-		}
-	}
-
-
 
 
 }

@@ -9,5 +9,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/propositional"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="var" path="JAR_LOCATION/guava-14.0-rc1.jar"/>
+	<classpathentry kind="var" path="JAR_LOCATION/slf4j-api-1.7.2.jar"/>
+	<classpathentry kind="var" path="JAR_LOCATION/slf4j-simple-1.7.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

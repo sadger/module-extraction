@@ -9,6 +9,9 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
@@ -23,6 +26,9 @@ import uk.ac.liv.moduleextraction.util.ModuleUtils;
 
 public class SyntacticFirstModuleExtraction {
 
+	Logger logger = LoggerFactory.getLogger(SyntacticFirstModuleExtraction.class);
+
+	
 	/* Syntactic Checking */
 	private SyntacticDependencyChecker syntaxDepChecker = new SyntacticDependencyChecker();
 
@@ -76,11 +82,9 @@ public class SyntacticFirstModuleExtraction {
 		HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(terminology,sigUnionSigM,tminusMDependencies);
 
 		if(insepChecker.isSeperableFromEmptySet(lhsSigT, sigUnionSigM)){
-//			sigManager.writeFile(signature, "insep" + Math.abs(signature.hashCode()));
-//			collectSemanticDependentAxioms();
 			SeparabilityAxiomLocator search = new SeparabilityAxiomLocator(terminology, module, signature);
 			OWLLogicalAxiom insepAxiom = search.getInseperableAxiom();
-			//System.out.println("Adding: " + insepAxiom);
+			logger.info("Adding {}",insepAxiom);
 			module.add(insepAxiom);
 			sigUnionSigM.addAll(insepAxiom.getSignature());
 			terminology.remove(insepAxiom);
@@ -112,6 +116,10 @@ public class SyntacticFirstModuleExtraction {
 				module.addAll(axiomsWithDeps);
 				addedCount += axiomsWithDeps.size();
 				terminology.removeAll(axiomsWithDeps);
+				
+				logger.trace("Adding {}",axiomsWithDeps);
+				logger.debug("Adding {} axiom(s)",axiomsWithDeps.size());
+				
 				sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(axiomsWithDeps));
 
 				W.clear();
@@ -120,7 +128,7 @@ public class SyntacticFirstModuleExtraction {
 			}
 		}
 		if(addedCount > 0)
-			System.out.println("Adding " + addedCount + " axiom(s) to module");
+			logger.info("Total axioms added: {}",addedCount);
 	}
 
 }

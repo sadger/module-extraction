@@ -27,8 +27,10 @@ public class ExtractionMain {
 
 	@SuppressWarnings("unused")
 	public static void main(String[] args) {
+		
+		
 
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "interp/semanticdep.krss");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "moduletest/chaintest1.krss");
 		System.out.println("Loaded Ontology");
 
 		System.out.println(ont);
@@ -39,19 +41,9 @@ public class ExtractionMain {
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
 		
 		
-
-
-		OWLClass lion = f.getOWLClass(IRI.create(ont.getOntologyID() + "#Lion"));
-		OWLClass dog = f.getOWLClass(IRI.create(ont.getOntologyID() + "#Dog"));
-		OWLClass fox = f.getOWLClass(IRI.create(ont.getOntologyID() + "#Fox"));
-		
-		Set<OWLEntity> signature = new HashSet<OWLEntity>();
-		signature.add(fox);
-		signature.add(lion);
-		signature.add(dog);
 	
 		
-			Set<OWLEntity> sig = signature;
+			Set<OWLEntity> sig = gen.generateRandomSignature(2);
 
 			SyntacticLocalityModuleExtractor syntaxModExtractor = 
 					new SyntacticLocalityModuleExtractor(OWLManager.createOWLOntologyManager(), ont, ModuleType.STAR);

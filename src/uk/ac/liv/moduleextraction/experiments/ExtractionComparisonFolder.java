@@ -2,6 +2,7 @@ package uk.ac.liv.moduleextraction.experiments;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -21,7 +22,9 @@ public class ExtractionComparisonFolder {
 
 	public ExtractionComparisonFolder(OWLOntology ontology, File signaturesLocation) throws IOException, OWLOntologyStorageException, OWLOntologyCreationException, QBFSolverException {
 		this.manager = new SigManager(signaturesLocation);
-		for(File f : signaturesLocation.listFiles()){
+		File[] files = signaturesLocation.listFiles();
+		Arrays.sort(files); 
+		for(File f : files){
 			if(f.isFile()){
 				System.out.println("Testing sig: " + f.getName());
 				File experimentLocation = new File(ModulePaths.getResultLocation() + "/" + signaturesLocation.getName() + "/" + f.getName());
@@ -35,7 +38,7 @@ public class ExtractionComparisonFolder {
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-08.09d-terminology.owl");
 		try {
-			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/chainrandom200"));
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/chainrandom100"));
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		} catch (OWLOntologyCreationException e) {
