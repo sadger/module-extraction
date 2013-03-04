@@ -51,7 +51,7 @@ public class AcyclicChecker {
 	private boolean causesCycle(OWLLogicalAxiom axiom) {
 		OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
 		DependencySet toCheck = immediateDependencies.get(name);
-		
+
 		while(!toCheck.isEmpty()){
 			if(toCheck.contains(new Dependency(name)))
 				return true;

@@ -16,11 +16,16 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import uk.ac.liv.moduleextraction.extractor.SyntacticFirstModuleExtraction;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 
 public class DumpExtractionToDisk implements Runnable {
 
+	Logger logger = LoggerFactory.getLogger(DumpExtractionToDisk.class);
+	
 	OWLOntologyManager ontologyManager;
 	
 	Set<OWLLogicalAxiom> module;
@@ -47,7 +52,7 @@ public class DumpExtractionToDisk implements Runnable {
 		writeSignature();
 		writeSetToOntology(module, MOD_FILE);
 		
-		System.out.println("Dumped to: " + directory.getAbsolutePath() + " at " + new Date());
+		logger.debug("Dumped to: {} at {}",directory.getAbsolutePath(),new Date());
 		
 	}
 	
@@ -67,7 +72,7 @@ public class DumpExtractionToDisk implements Runnable {
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Written " + file + "(" + ontology.size() + ")");
+		logger.debug("Written {} ({})",file, ontology.size());
 	}
 	
 	private void writeSignature(){

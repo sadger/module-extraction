@@ -35,8 +35,8 @@ public class WriteRandomSigs {
 	}
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/NCI/nci-08.09d-terminology.owl");
-		WriteRandomSigs writer = new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "/nci08-09d_random500"));
-		writer.writeSignature(500, 100);
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
+		WriteRandomSigs writer = new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "/qbfcount"));
+		writer.writeSignature(100, 10);
 	}
 }

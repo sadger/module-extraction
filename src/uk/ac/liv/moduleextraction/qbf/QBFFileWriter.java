@@ -50,6 +50,12 @@ public class QBFFileWriter {
 	private ClauseSettoSATClauses clauseSetConvertor;
 	private NumberMap numberMap;
 	private IVec<IVecInt> clauses;
+	
+	private static int clauseTotal = 0;
+	private static int varTotal = 0;
+	private static int maxClause = 0;
+	private static int maxVar = 0;
+	private static int checkTotal = 0;
 
 	public QBFFileWriter(Set<OWLLogicalAxiom> ontology, Set<OWLEntity> signatureAndSigM) {
 		FILE_TO_WRITE =  ModulePaths.getQBFSolverLocation() + "Files/qbf" + System.currentTimeMillis() + ".qdimacs";
@@ -60,7 +66,19 @@ public class QBFFileWriter {
 
 		convertOntologyToQBFClauses();
 		populateSignatures();
+		
+		checkTotal++;
 	}
+	
+	public static void printMetrics(){
+		System.out.println("== Variables ==");
+		System.out.println("Max " + maxVar);
+		System.out.println("Average " + (double) varTotal/checkTotal);
+		System.out.println("== Clauses ==");
+		System.out.println("Max " + maxClause);
+		System.out.println("Average " + (double) clauseTotal/checkTotal);
+		
+	} 
 
 	private void convertOntologyToQBFClauses(){
 		this.ontologyAsClauseSet = ontologyConvertor.convertOntology(ontology);
@@ -87,8 +105,15 @@ public class QBFFileWriter {
 	}
 
 	private void writeHeaders() {
-		//toWrite.add("c " + numberMap + "\n");
-		toWrite.add("p cnf " + ontologyAsClauseSet.getVariables().size() + " " + ontologyAsClauseSet.getClauses().size() + "\n");
+		int variableCount = ontologyAsClauseSet.getVariables().size();
+		int clauseCount = ontologyAsClauseSet.getClauses().size();
+		toWrite.add("p cnf " + variableCount + " " + clauseCount + "\n");
+		
+		clauseTotal += clauseCount;
+		varTotal += variableCount;
+		maxClause = Math.max(maxClause, clauseCount);
+		maxVar = Math.max(maxVar, variableCount);
+		
 	}
 
 	private List<String> createStringsToWrite(){
