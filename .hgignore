@@ -1,0 +1,9 @@
+s is .hgignore
+syntax: glob
+*.class
+*.log
+bin/**
+build/**
+
+syntax: regexp
+^\.attach_pid.*$
