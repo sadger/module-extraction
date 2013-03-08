@@ -42,6 +42,10 @@ public class SyntacticFirstModuleExtraction {
 	private Set<OWLEntity> signature;
 	private HashSet<OWLEntity> sigUnionSigM;
 
+	private static int maxChain = 0;
+	private static int chainTotal = 0;
+	private static int syntacticIterations = 0;
+	
 	/* For writing sigs that cause inseperability */
 	SigManager sigManager = new SigManager(new File(ModulePaths.getSignatureLocation() + "/insepSigs"));
 
@@ -60,6 +64,12 @@ public class SyntacticFirstModuleExtraction {
 		populateSignature();
 	}
 
+	public static void printMetrics(){
+		System.out.println("Iterations: " + syntacticIterations);
+		System.out.println("Max chain: " + maxChain);
+		System.out.println("Average chain: " + (double) chainTotal/syntacticIterations);
+	}
+	
 	public LinkedHashList<OWLLogicalAxiom> getTerminology() {
 		return terminology;
 	}
@@ -111,10 +121,16 @@ public class SyntacticFirstModuleExtraction {
 			
 
 			if(syntaxDepChecker.hasSyntacticSigDependency(W, syntaticDependencies, sigUnionSigM)){
-		
+				syntacticIterations++;
 				Set<OWLLogicalAxiom> axiomsWithDeps = syntaxDepChecker.getAxiomsWithDependencies();
 				module.addAll(axiomsWithDeps);
-				addedCount += axiomsWithDeps.size();
+				
+				int addingSize = axiomsWithDeps.size();
+				addedCount += addingSize;
+				
+				maxChain = Math.max(maxChain, addingSize);
+				chainTotal += addingSize;
+				
 				terminology.removeAll(axiomsWithDeps);
 				
 				logger.trace("Adding {}",axiomsWithDeps);
