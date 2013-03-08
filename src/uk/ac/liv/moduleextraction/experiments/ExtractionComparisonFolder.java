@@ -8,6 +8,8 @@ import java.util.Arrays;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import uk.ac.liv.moduleextraction.extractor.SyntacticFirstModuleExtraction;
@@ -19,6 +21,8 @@ import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 public class ExtractionComparisonFolder {
 
+	Logger logger = LoggerFactory.getLogger(ExtractionComparisonFolder.class);
+
 	private ExtractionComparision compare;
 	private SigManager manager;
 
@@ -28,11 +32,10 @@ public class ExtractionComparisonFolder {
 		Arrays.sort(files); 
 		for(File f : files){
 			if(f.isFile()){
-				System.out.println("Testing sig: " + f.getName());
+				logger.info("Testing signature: {}",f.getName());
 				File experimentLocation = new File(ModulePaths.getResultLocation() + "/" + signaturesLocation.getName() + "/" + f.getName());
 				compare = new ExtractionComparision(ontology, manager.readFile(f.getName()), experimentLocation);
 				compare.compareExtractionApproaches();
-				
 			}
 		}
 		QBFFileWriter.printMetrics();
@@ -40,9 +43,9 @@ public class ExtractionComparisonFolder {
 	}  
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-08.09d-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
 		try {
-			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/chainrandom500"));
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/chainrandom200"));
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		} catch (OWLOntologyCreationException e) {

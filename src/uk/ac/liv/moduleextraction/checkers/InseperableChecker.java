@@ -6,13 +6,17 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import uk.ac.liv.moduleextraction.experiments.ExtractionComparision;
 import uk.ac.liv.moduleextraction.qbf.QBFFileWriter;
 import uk.ac.liv.moduleextraction.qbf.QBFSolver;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.replacers.InverseRolePropertyReplacer;
 
 public class InseperableChecker {
+	Logger logger = LoggerFactory.getLogger(InseperableChecker.class);
 	
 	static int testCount = 0;
 	
@@ -23,7 +27,6 @@ public class InseperableChecker {
 		QBFSolver solver =  new QBFSolver();
 		
 
-
 		boolean isInseperable = true;
 
 		/* If W is empty it IS the empty set so cannot be separable from itself */
@@ -33,7 +36,7 @@ public class InseperableChecker {
 			isInseperable = solver.isSatisfiable(qbfProblem);
 
 			if(!isInseperable){
-				System.out.println("Separable from ∅?: " + !isInseperable);
+				logger.debug("Separable from ∅?: {}",!isInseperable);
 			}
 		}
 

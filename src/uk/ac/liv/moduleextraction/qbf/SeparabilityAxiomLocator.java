@@ -5,6 +5,8 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
@@ -13,6 +15,8 @@ import uk.ac.liv.moduleextraction.datastructures.LinkedHashList;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 
 public class SeparabilityAxiomLocator {
+	
+	Logger logger = LoggerFactory.getLogger(SeparabilityAxiomLocator.class);
 	
 	/* Semantic Checking */
 	private LHSSigExtractor lhsExtractor = new LHSSigExtractor();
@@ -34,6 +38,8 @@ public class SeparabilityAxiomLocator {
 	
 	public OWLLogicalAxiom getInseperableAxiom() throws IOException, QBFSolverException{	
 		/* Represents the last axioms added or removed from the split test */
+		
+		logger.debug("Finding separability causing axiom");
 		LinkedHashList<OWLLogicalAxiom> lastAdded = getTopHalf(terminology);
 		LinkedHashList<OWLLogicalAxiom> lastRemoved = getBottomHalf(terminology);
 		
@@ -50,7 +56,7 @@ public class SeparabilityAxiomLocator {
 				W.addAll(lastAdded);
 				lastRemoved.removeAll(lastAdded);
 				
-				System.out.println("Adding: " + lastAdded.size());
+				logger.trace("Adding: {}",lastAdded.size());
 
 			}
 			else{
@@ -59,7 +65,7 @@ public class SeparabilityAxiomLocator {
 			W.removeAll(lastRemoved);
 			lastAdded.removeAll(lastRemoved);
 
-			System.out.println("Removing: " + lastRemoved.size());
+			logger.trace("Removing: {}",lastRemoved.size());
 
 			
 			}

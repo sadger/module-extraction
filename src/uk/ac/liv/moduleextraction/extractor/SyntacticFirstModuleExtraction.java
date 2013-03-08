@@ -92,9 +92,11 @@ public class SyntacticFirstModuleExtraction {
 		HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(terminology,sigUnionSigM,tminusMDependencies);
 
 		if(insepChecker.isSeperableFromEmptySet(lhsSigT, sigUnionSigM)){
+			logger.debug("Collecting semantic dependent axioms");
 			SeparabilityAxiomLocator search = new SeparabilityAxiomLocator(terminology, module, signature);
 			OWLLogicalAxiom insepAxiom = search.getInseperableAxiom();
-			logger.info("Adding {}",insepAxiom);
+			logger.trace("Adding {}",insepAxiom);
+			logger.info("Adding 1 axiom through semantic check");
 			module.add(insepAxiom);
 			sigUnionSigM.addAll(insepAxiom.getSignature());
 			terminology.remove(insepAxiom);
@@ -105,7 +107,7 @@ public class SyntacticFirstModuleExtraction {
 	}
 
 	private void collectSyntacticDependentAxioms() {
-		System.out.println("Collecting Syntactic dependent axioms");
+		logger.debug("Collecting syntactic dependent axioms");
 		LinkedHashList<OWLLogicalAxiom> W  = new LinkedHashList<OWLLogicalAxiom>();
 		Iterator<OWLLogicalAxiom> axiomIterator = terminology.iterator();
 		ChainDependencies syntaticDependencies = new ChainDependencies();
@@ -144,7 +146,7 @@ public class SyntacticFirstModuleExtraction {
 			}
 		}
 		if(addedCount > 0)
-			logger.info("Total axioms added: {}",addedCount);
+			logger.info("Adding {} axiom(s) through syntactic check",addedCount);
 	}
 
 }

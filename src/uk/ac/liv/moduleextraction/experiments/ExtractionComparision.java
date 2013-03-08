@@ -53,15 +53,14 @@ public class ExtractionComparision {
 		this.experimentLocation = experimentLocation;
 		this.signature = sig;
 		this.ontology = extractor.extractInclusionsAndEqualities(ontology);
-		System.out.println("Extracted inclusions and equalities only");
-		System.out.println("Ont:" + ontology.getLogicalAxiomCount());
+		logger.info("Extracted inclusions and equalities only ({} logical axioms)", ontology.getLogicalAxiomCount());
 	}
 
 
 	public void compareExtractionApproaches() throws IOException, QBFSolverException, OWLOntologyStorageException, OWLOntologyCreationException{	
 		File experimentResultFile = new File(experimentLocation + "/" + "experiment-results");
 		if(experimentResultFile.exists()){
-			System.out.println("Already complete");
+			logger.info("Already complete" + "\n");
 			return;
 		}
 
@@ -84,7 +83,6 @@ public class ExtractionComparision {
 			this.moduleExtractor = new SyntacticFirstModuleExtraction(ontology.getLogicalAxioms(),signature);
 		
 
-
 		syntaticSize = syntacticModule.size();
 		System.out.println("Syntsize: " + syntaticSize);
 
@@ -96,7 +94,7 @@ public class ExtractionComparision {
 		Set<OWLLogicalAxiom> semanticModule = moduleExtractor.extractModule();
 		writeResults(semanticModule);
 
-		logger.info("Time taken {}",ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
+		logger.info("Complete - Time taken {} \n",ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
 
 	}
 
