@@ -2,9 +2,11 @@ package uk.ac.liv.moduleextraction.profling;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.semanticweb.owlapi.util.DLExpressivityChecker;
 
 import uk.ac.liv.moduleextraction.util.AcyclicChecker;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
@@ -34,10 +36,12 @@ public class FindMeAnOntology {
 		Arrays.sort(ontologyFiles);
 		for(File f: ontologyFiles){
 			if(f.isFile()){
-	
+				System.out.println(f.getName());
 				OWLOntology ont = OntologyLoader.loadOntology(f.getAbsolutePath());
 
-				System.out.println(f.getName());
+				
+				
+	
 				profileOntology(f.getAbsolutePath(),ont);
 				System.out.println();
 
@@ -48,24 +52,27 @@ public class FindMeAnOntology {
 	}
 
 	private void profileOntology(String fileName,OWLOntology ont){
-//				System.out.println("Logical Axiom Count: " + ont.getLogicalAxiomCount());
-//				System.out.println("Is EL?: " + elvalidator.isELOntology(ont));
-//				System.out.println("Is ALC?: " + validator.isALCOntology(ont));
+				System.out.println("Logical Axiom Count: " + ont.getLogicalAxiomCount());
+				System.out.println("Is EL?: " + elvalidator.isELOntology(ont));
+				System.out.println("Is ALC?: " + validator.isALCOntology(ont));
+				AcyclicChecker acyclic = new AcyclicChecker(ont);
+				//System.out.println("Is acyclic " + acyclic.isAcyclic());
+				DLExpressivityChecker checker = new DLExpressivityChecker(Collections.singleton(ont));
+				System.out.println("Expressivity: " + checker.getDescriptionLogicName());
 //				boolean isTerm = termChecker.isTerminology(ont);
-//				System.out.println("Is terminology?: " + isTerm);
-
-				System.out.println(ont.getLogicalAxiomCount() + ":" + elvalidator.isELOntology(ont) + ":" + validator.isALCOntology(ont));
-
-		//		if(!isTerm)
-		//			System.out.println("\t" + termChecker.getCheckStatus());
-		//System.out.println("Logically equivalent to terminology?: " + equivTermChecker.isEquivalentToTerminology(ont));
-		//		System.out.println(equivTermChecker.isEquivalentToTerminology(ont));
+//
+//				if(!isTerm)
+//					System.out.println("\t" + termChecker.getCheckStatus());
+//				
+//				System.out.println("Logically equivalent to terminology?: " + equivTermChecker.isEquivalentToTerminology(ont));
+	
 	}
 
 	public static void main(String[] args) {
-		FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "Acyclic"));
+		FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "Bioportal/NOTEL/Terminologies"));
 		find.profileOntologies();
 	}
+
 
 
 
