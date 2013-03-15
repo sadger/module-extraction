@@ -35,8 +35,12 @@ public class AxiomTypeProfile {
 
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "Acyclic/fmaOwlDlComponent_1_4_0-converted");
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + 
+				"Bioportal/NOTEL/Terminologies/Acyclic/Big/test.krss");
+		
+		System.out.println(ont);
 		AxiomTypeProfile types = new AxiomTypeProfile(ont);
+		System.out.println("Axioms: " + ont.getLogicalAxiomCount());
 		types.printMetrics();
 		ExpressionTypeProfiler typeyy = new ExpressionTypeProfiler();
 		typeyy.profileOntology(ont);

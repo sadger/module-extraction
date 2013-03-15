@@ -39,12 +39,24 @@ public class FindMeAnOntology {
 				System.out.println(f.getName());
 				OWLOntology ont = OntologyLoader.loadOntology(f.getAbsolutePath());
 
-				
-				
 	
+				//System.out.println(ont);
+				
 				profileOntology(f.getAbsolutePath(),ont);
+				
+//				if(!termChecker.isTerminology(ont) && equivTermChecker.isEquivalentToTerminology(ont)){
+//					ToTerminologyConvertor convertor = new ToTerminologyConvertor(ont);
+//					try {
+//						convertor.writeConvertedOntology(ModulePaths.getOntologyLocation() + "Acyclic/Broken/Testing/" + f.getName() + "-converted");
+//						f.delete();
+//					} catch (OWLOntologyStorageException e) {
+//						e.printStackTrace();
+//					}
+//				}
+				
+				
+				
 				System.out.println();
-
 
 
 			}
@@ -56,20 +68,21 @@ public class FindMeAnOntology {
 				System.out.println("Is EL?: " + elvalidator.isELOntology(ont));
 				System.out.println("Is ALC?: " + validator.isALCOntology(ont));
 				AcyclicChecker acyclic = new AcyclicChecker(ont);
-				//System.out.println("Is acyclic " + acyclic.isAcyclic());
+				System.out.println("Is acyclic " + acyclic.isAcyclic());
 				DLExpressivityChecker checker = new DLExpressivityChecker(Collections.singleton(ont));
 				System.out.println("Expressivity: " + checker.getDescriptionLogicName());
-//				boolean isTerm = termChecker.isTerminology(ont);
+				boolean isTerm = termChecker.isTerminology(ont);
 //
-//				if(!isTerm)
-//					System.out.println("\t" + termChecker.getCheckStatus());
-//				
-//				System.out.println("Logically equivalent to terminology?: " + equivTermChecker.isEquivalentToTerminology(ont));
+				if(!isTerm)
+					System.out.println("\t" + termChecker.getCheckStatus());
+				System.out.println("Is terminology: " + isTerm);
+				System.out.println("Logically equivalent to terminology?: " + equivTermChecker.isEquivalentToTerminology(ont));
 	
 	}
 
 	public static void main(String[] args) {
-		FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "Bioportal/NOTEL/Terminologies"));
+		FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "Bioportal/NOTEL/Terminologies/Acyclic/Big"));
+	//FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "Acyclic/Broken"));
 		find.profileOntologies();
 	}
 

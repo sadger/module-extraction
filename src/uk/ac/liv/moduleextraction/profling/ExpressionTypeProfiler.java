@@ -44,9 +44,14 @@ public class ExpressionTypeProfiler implements OWLClassExpressionVisitor{
 	public void profileAxiom(OWLLogicalAxiom axiom){
 		OWLClassExpression name = AxiomSplitter.getNameofAxiom(axiom);
 		OWLClassExpression definition = AxiomSplitter.getDefinitionofAxiom(axiom);
-		
-		name.accept(this);
-		definition.accept(this);
+
+		if(name != null && definition != null){
+			name.accept(this);
+			definition.accept(this);
+		}
+		else{
+			System.out.println("Not profiling " + axiom);
+		}
 	}
 	
 	public void printMetrics(){
@@ -66,7 +71,6 @@ public class ExpressionTypeProfiler implements OWLClassExpressionVisitor{
 	}
 	
 
-	
 	@Override
 	public void visit(OWLClass arg0) {
 		addBaseExpression(arg0);

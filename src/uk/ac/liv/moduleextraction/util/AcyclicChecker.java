@@ -1,6 +1,8 @@
 package uk.ac.liv.moduleextraction.util;
 
 import java.util.HashMap;
+import java.util.HashSet;
+
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEntity;
@@ -34,6 +36,8 @@ public class AcyclicChecker {
 		}
 		
 		immediateDependencies.put(name, axiomDeps);
+		
+		
 	}
 	
 	
@@ -41,7 +45,8 @@ public class AcyclicChecker {
 		int axiomCount = 0;
 		for(OWLLogicalAxiom axiom : ontology.getLogicalAxioms()){
 			axiomCount++;
-			System.out.println("Checking axiom " + axiomCount + "/" + ontology.getLogicalAxiomCount());
+//			System.out.println("Checking axiom " + axiomCount + "/" + ontology.getLogicalAxiomCount());
+//			System.out.println(axiom);
 			if(causesCycle(axiom))
 				return false;
 		}
@@ -54,18 +59,25 @@ public class AcyclicChecker {
 	private boolean causesCycle(OWLLogicalAxiom axiom) {
 		OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
 		DependencySet toCheck = immediateDependencies.get(name);
+		HashSet<DependencySet> seenDependencies = new HashSet<DependencySet>();
 
+		/* If there is nothing left to check */
 		while(!toCheck.isEmpty()){
-			if(toCheck.contains(new Dependency(name)))
+//			System.out.println(toCheck.hashCode());
+			/* If the name we are searching for is in it's own dependencies
+			 * or we find some dependencies to check we have already seen we have a cycle */
+			if(toCheck.contains(new Dependency(name)) || seenDependencies.contains(toCheck)){
 				return true;
+			}
 			else{
 				DependencySet newDependencies = new DependencySet();
 				for(Dependency d : toCheck){
 					DependencySet depSet = immediateDependencies.get(d.getValue());
 					if(depSet != null){
-						newDependencies.mergeWith(depSet);
+						newDependencies.addAll(depSet);
 					}
 				}
+				seenDependencies.add(toCheck);
 				toCheck = newDependencies;
 			}
 
@@ -73,6 +85,8 @@ public class AcyclicChecker {
 		return false;
 		
 	}
+	
+	
 	
 	
 	
