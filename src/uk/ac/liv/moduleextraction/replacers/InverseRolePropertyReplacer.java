@@ -44,7 +44,7 @@ public class InverseRolePropertyReplacer implements OWLClassExpressionVisitorEx<
 	private OWLDataFactory factory = OWLManager.getOWLDataFactory();
 	private OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 	
-	public boolean isInverseRole(OWLObjectPropertyExpression role){
+	private boolean isInverseRole(OWLObjectPropertyExpression role){
 		return (role instanceof OWLObjectInverseOf);
 	}
 
@@ -147,37 +147,60 @@ public class InverseRolePropertyReplacer implements OWLClassExpressionVisitorEx<
 		OWLClassExpression filler = all.getFiller();
 		
 		if(isInverseRole(role)){
-			role = role.getInverseProperty();
+			role = role.getInverseProperty().getSimplified();
 		}
 		
 		return factory.getOWLObjectAllValuesFrom(role, filler.accept(this));
 	}
-
-
 	
 	
-	/* Nominals and cardinality restrictions - DO Nothing
-	 * Although they can contain inverse roles but don't exists in ALCI ontologies
-	 * so we can ignore them
-	 */
-	
-	@Override
-	public OWLClassExpression visit(OWLObjectHasValue ce) {
-		return ce;
-	}
-
 	@Override
 	public OWLClassExpression visit(OWLObjectMinCardinality ce) {
-		return ce;
+		int cardinality = ce.getCardinality();
+		OWLObjectPropertyExpression role = ce.getProperty();
+		OWLClassExpression filler = ce.getFiller();
+		
+		if(isInverseRole(role)){
+			role = role.getInverseProperty().getSimplified();
+		}
+		
+		return factory.getOWLObjectMinCardinality(cardinality, role, filler.accept(this));
 	}
 
-	@Override
-	public OWLClassExpression visit(OWLObjectExactCardinality ce) {
-		return ce;
-	}
+
 
 	@Override
 	public OWLClassExpression visit(OWLObjectMaxCardinality ce) {
+		int cardinality = ce.getCardinality();
+		OWLObjectPropertyExpression role = ce.getProperty();
+		OWLClassExpression filler = ce.getFiller();
+		
+		if(isInverseRole(role)){
+			role = role.getInverseProperty().getSimplified();
+		}
+		
+		return factory.getOWLObjectMaxCardinality(cardinality, role, filler.accept(this));
+	}
+	
+	@Override
+	public OWLClassExpression visit(OWLObjectExactCardinality ce) {
+		int cardinality = ce.getCardinality();
+		OWLObjectPropertyExpression role = ce.getProperty();
+		OWLClassExpression filler = ce.getFiller();
+		
+		if(isInverseRole(role)){
+			role = role.getInverseProperty().getSimplified();
+		}
+		
+		
+		return factory.getOWLObjectExactCardinality(cardinality, role, filler.accept(this));
+	}
+
+	
+	
+	/* Nominals we cannot currently support them - DO Nothing */
+	@Override
+	public OWLClassExpression visit(OWLObjectHasValue ce) {
 		return ce;
 	}
 
