@@ -27,49 +27,48 @@ public class ExtractionMain {
 
 	@SuppressWarnings("unused")
 	public static void main(String[] args) {
-		
-		
 
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "moduletest/chaintest1.krss");
+
+		OWLOntology ont = OntologyLoader.loadOntology("/LOCAL/wgatens/Ontologies/Bioportal/NOTEL/Terminologies/Acyclic/Big/LiPrO-converted");
+		//OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "moduletest/cardinality.owl");
 		System.out.println("Loaded Ontology");
 
-		System.out.println(ont);
-		
+		//System.out.println(ont);
+
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
 		SigManager sigManager = new SigManager(new File(ModulePaths.getSignatureLocation() + "/insepSigs"));
-		
+
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
-		
-		
-	
-		
-			Set<OWLEntity> sig = gen.generateRandomSignature(2);
-
-			SyntacticLocalityModuleExtractor syntaxModExtractor = 
-					new SyntacticLocalityModuleExtractor(OWLManager.createOWLOntologyManager(), ont, ModuleType.STAR);
-			Set<OWLLogicalAxiom> starModule = ModuleUtils.getLogicalAxioms(syntaxModExtractor.extract(sig));
-		
-			int starSize = starModule.size();
 
 
-			Set<OWLLogicalAxiom> syntfirstExtracted = null;
-			System.out.println("|Signature|: " + sig);
 
-			try {
-				long startTime = System.currentTimeMillis();
-				SyntacticFirstModuleExtraction syntmod = new SyntacticFirstModuleExtraction(ont.getLogicalAxioms(), sig);
-				syntfirstExtracted = syntmod.extractModule();
-				System.out.println("Time taken: " + ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (QBFSolverException e) {
-				e.printStackTrace();
-			}
+		Set<OWLEntity> sig = gen.generateRandomSignature(50);
 
-			System.out.println("Star module size: " + starSize);
-			System.out.println("Synsize: " + syntfirstExtracted.size());
-			//System.out.println("QBF Checks " + InseperableChecker.getTestCount());
-			System.out.println();
+		SyntacticLocalityModuleExtractor syntaxModExtractor = 
+				new SyntacticLocalityModuleExtractor(OWLManager.createOWLOntologyManager(), ont, ModuleType.STAR);
+		Set<OWLLogicalAxiom> starModule = ModuleUtils.getLogicalAxioms(syntaxModExtractor.extract(sig));
+
+		int starSize = starModule.size();
+
+
+		Set<OWLLogicalAxiom> syntfirstExtracted = null;
+		System.out.println("|Signature|: " + sig);
+
+		try {
+			long startTime = System.currentTimeMillis();
+			SyntacticFirstModuleExtraction syntmod = new SyntacticFirstModuleExtraction(ont.getLogicalAxioms(), sig);
+			syntfirstExtracted = syntmod.extractModule();
+			System.out.println("Time taken: " + ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (QBFSolverException e) {
+			e.printStackTrace();
 		}
-	
+
+		System.out.println("Star module size: " + starSize);
+		System.out.println("Synsize: " + syntfirstExtracted.size());
+		//System.out.println("QBF Checks " + InseperableChecker.getTestCount());
+		System.out.println();
+	}
+
 }
