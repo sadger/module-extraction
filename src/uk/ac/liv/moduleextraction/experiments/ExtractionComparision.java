@@ -45,15 +45,18 @@ public class ExtractionComparision {
 	private DumpExtractionToDisk dump;
 
 	private int syntaticSize = 0;
-
+	private long timeTaken = 0;
+	
 	private File experimentLocation;
+	
+	
 
 	public ExtractionComparision(OWLOntology ontology, Set<OWLEntity> sig, File experimentLocation) {
 		AxiomExtractor extractor = new AxiomExtractor();
 		this.experimentLocation = experimentLocation;
 		this.signature = sig;
 		this.ontology = extractor.extractInclusionsAndEqualities(ontology);
-		logger.info("Extracted inclusions and equalities only ({} logical axioms)", ontology.getLogicalAxiomCount());
+
 	}
 
 
@@ -79,7 +82,7 @@ public class ExtractionComparision {
 
 			syntacticModule = getLogicalAxioms(syntacticOntology);
 
-			/* Store the size here as the semantic approach is destructive */
+			
 			this.moduleExtractor = new SyntacticFirstModuleExtraction(ontology.getLogicalAxioms(),signature);
 		
 
@@ -92,17 +95,19 @@ public class ExtractionComparision {
 				moduleExtractor.getModule(), signature);
 
 		Set<OWLLogicalAxiom> semanticModule = moduleExtractor.extractModule();
+		
+		timeTaken = System.currentTimeMillis() - startTime;
 		writeResults(semanticModule);
 
-		logger.info("Complete - Time taken {} \n",ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
+		logger.info("Complete - Time taken {} \n",ModuleUtils.getTimeAsHMS(timeTaken));
 
 	}
 
 	public void writeResults(Set<OWLLogicalAxiom> semanticModule) throws IOException{
 		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results", false));
 		
-		writer.write("#Syntactic Size\t Synt->Semantic Size\n");
-		writer.write(syntaticSize + "," +semanticModule.size() + "\n");
+		writer.write("#Syntactic Size\t Semantic Size\t Time taken (ms)\n");
+		writer.write(syntaticSize + "," + semanticModule.size() + "," + timeTaken + "\n");
 		writer.flush();
 		writer.close();
 

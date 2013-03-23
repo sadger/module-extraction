@@ -17,6 +17,7 @@ import uk.ac.liv.moduleextraction.qbf.QBFFileWriter;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
+import uk.ac.liv.ontologyutils.axioms.AxiomExtractor;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 public class ExtractionComparisonFolder {
@@ -27,6 +28,8 @@ public class ExtractionComparisonFolder {
 	private SigManager manager;
 
 	public ExtractionComparisonFolder(OWLOntology ontology, File signaturesLocation) throws IOException, OWLOntologyStorageException, OWLOntologyCreationException, QBFSolverException {
+		ontology = new AxiomExtractor().extractInclusionsAndEqualities(ontology);
+		logger.info("Extracted inclusions and equalities only ({} logical axioms)", ontology.getLogicalAxiomCount());
 		this.manager = new SigManager(signaturesLocation);
 		File[] files = signaturesLocation.listFiles();
 		Arrays.sort(files); 
@@ -44,8 +47,9 @@ public class ExtractionComparisonFolder {
 	
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
+
 		try {
-			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/chainrandom200"));
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/paper-1000random"));
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		} catch (OWLOntologyCreationException e) {
