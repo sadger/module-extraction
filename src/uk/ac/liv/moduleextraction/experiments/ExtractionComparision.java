@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import uk.ac.liv.moduleextraction.extractor.SyntacticFirstModuleExtraction;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.reloading.DumpExtractionToDisk;
+import uk.ac.liv.moduleextraction.reloading.ReloadExperimentFromDisk;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
@@ -50,6 +51,8 @@ public class ExtractionComparision {
 	private File experimentLocation;
 	
 	
+	
+	
 
 	public ExtractionComparision(OWLOntology ontology, Set<OWLEntity> sig, File experimentLocation) {
 		AxiomExtractor extractor = new AxiomExtractor();
@@ -67,6 +70,8 @@ public class ExtractionComparision {
 			return;
 		}
 
+
+		
 		long startTime = System.currentTimeMillis();
 
 		Set<OWLLogicalAxiom> syntacticModule = null;
@@ -104,6 +109,10 @@ public class ExtractionComparision {
 	}
 
 	public void writeResults(Set<OWLLogicalAxiom> semanticModule) throws IOException{
+		ReloadExperimentFromDisk reload = new ReloadExperimentFromDisk(ModulePaths.getResultLocation() + "/ruletest-old/" + experimentLocation.getName());
+		Set<OWLLogicalAxiom> module = reload.getModule();
+		logger.info("Modules are the same? {}",semanticModule.equals(module));
+		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results", false));
 		
 		writer.write("#Syntactic Size\t Semantic Size\t Time taken (ms)\n");

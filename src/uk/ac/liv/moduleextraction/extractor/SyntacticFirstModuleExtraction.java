@@ -3,24 +3,34 @@ package uk.ac.liv.moduleextraction.extractor;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.Set;
 
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.clarkparsia.owlapi.modularity.locality.LocalityClass;
+import com.clarkparsia.owlapi.modularity.locality.SyntacticLocalityEvaluator;
+
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
+import uk.ac.liv.moduleextraction.checkers.ChainAxiomCollector;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
+import uk.ac.liv.moduleextraction.checkers.NewSyntacticDependencyChecker;
 import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
 import uk.ac.liv.moduleextraction.datastructures.LinkedHashList;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.qbf.SeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.signature.SigManager;
+import uk.ac.liv.moduleextraction.util.AxiomComparator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 
@@ -30,7 +40,7 @@ public class SyntacticFirstModuleExtraction {
 
 	
 	/* Syntactic Checking */
-	private SyntacticDependencyChecker syntaxDepChecker = new SyntacticDependencyChecker();
+	private NewSyntacticDependencyChecker syntaxDepChecker = new NewSyntacticDependencyChecker();
 
 	/* Semantic Checking */
 	private LHSSigExtractor lhsExtractor = new LHSSigExtractor();
@@ -48,14 +58,14 @@ public class SyntacticFirstModuleExtraction {
 	
 	/* For writing sigs that cause inseperability */
 	SigManager sigManager = new SigManager(new File(ModulePaths.getSignatureLocation() + "/insepSigs"));
+	
 
 	public SyntacticFirstModuleExtraction(Set<OWLLogicalAxiom> terminology, Set<OWLEntity> signature) {
 		this(terminology, null, signature);
 	}
 
 	public SyntacticFirstModuleExtraction(Set<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> sig) {
-		DefinitorialDepth definitorialDepth = new DefinitorialDepth(term);
-		ArrayList<OWLLogicalAxiom> depthSortedAxioms = definitorialDepth.getDefinitorialSortedList();
+		LinkedList<OWLLogicalAxiom> depthSortedAxioms = sorting(term);
 
 		this.terminology = new LinkedHashList<OWLLogicalAxiom>(depthSortedAxioms);
 		this.signature = sig;
@@ -63,6 +73,19 @@ public class SyntacticFirstModuleExtraction {
 		
 		populateSignature();
 	}
+
+	/**
+	 * @param term
+	 * @return
+	 */
+	private LinkedList<OWLLogicalAxiom> sorting(Set<OWLLogicalAxiom> term) {	
+		DefinitorialDepth definitorialDepth = new DefinitorialDepth(term);
+		LinkedList<OWLLogicalAxiom> sortedAxioms = new LinkedList<OWLLogicalAxiom>(term);
+		Collections.sort(sortedAxioms, new AxiomComparator(definitorialDepth.getDefinitorialMap()));
+		
+		return sortedAxioms;
+	}
+
 
 	public static void printMetrics(){
 		System.out.println("Iterations: " + syntacticIterations);
@@ -105,44 +128,45 @@ public class SyntacticFirstModuleExtraction {
 
 		return module;
 	}
+	
+
 
 	private void collectSyntacticDependentAxioms() {
 		logger.debug("Collecting syntactic dependent axioms");
-		LinkedHashList<OWLLogicalAxiom> W  = new LinkedHashList<OWLLogicalAxiom>();
-		Iterator<OWLLogicalAxiom> axiomIterator = terminology.iterator();
-		ChainDependencies syntaticDependencies = new ChainDependencies();
+		ListIterator<OWLLogicalAxiom> axiomIterator = terminology.listIterator();
+		ChainDependencies syntacticDependencies = new ChainDependencies();
+		ChainAxiomCollector chainCollector = new ChainAxiomCollector();
 
 		int addedCount = 0;
 		/* Terminology is the value of T\M as we remove items and add them to the module */
-		while(!(terminology.size() == W.size())){
+		while(axiomIterator.hasNext()){
 			OWLLogicalAxiom chosenAxiom = axiomIterator.next();
 
-			W.add(chosenAxiom);
+			syntacticDependencies.updateDependenciesWith(chosenAxiom);
 			
-			syntaticDependencies.updateDependenciesWith(chosenAxiom);
-			
+			if(syntaxDepChecker.hasSyntacticSigDependency(chosenAxiom, syntacticDependencies, sigUnionSigM)){
+								
+//				module.add(chosenAxiom);
+//				sigUnionSigM.addAll(chosenAxiom.getSignature());
 
-			if(syntaxDepChecker.hasSyntacticSigDependency(W, syntaticDependencies, sigUnionSigM)){
-				syntacticIterations++;
-				Set<OWLLogicalAxiom> axiomsWithDeps = syntaxDepChecker.getAxiomsWithDependencies();
-				module.addAll(axiomsWithDeps);
+//				logger.info("Adding {}",chosenAxiom);
 				
-				int addingSize = axiomsWithDeps.size();
-				addedCount += addingSize;
+				/*Find the chain of axioms (including the one we found the initial dependency on */
+				Set<OWLLogicalAxiom> axiomChain = chainCollector.collectAxiomChain(axiomIterator, syntacticDependencies, sigUnionSigM);
+				module.addAll(axiomChain);
 				
-				maxChain = Math.max(maxChain, addingSize);
-				chainTotal += addingSize;
+//				logger.info("Chain {}",axiomChain);
+//				
+				addedCount += axiomChain.size();
 				
-				terminology.removeAll(axiomsWithDeps);
+	
+				terminology.removeAll(axiomChain);
+				sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(axiomChain));
 				
-				logger.trace("Adding {}",axiomsWithDeps);
-				logger.debug("Adding {} axiom(s)",axiomsWithDeps.size());
+				syntacticDependencies = new ChainDependencies();
 				
-				sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(axiomsWithDeps));
-
-				W.clear();
-				/* reset the iterator */
-				axiomIterator = terminology.iterator();
+				/* Reset the iterator to start of the list*/
+				axiomIterator = terminology.listIterator(0);
 			}
 		}
 		if(addedCount > 0)

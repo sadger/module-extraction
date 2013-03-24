@@ -1,10 +1,19 @@
 package uk.ac.liv.moduleextraction.datastructures;
 
 import java.util.AbstractSequentialList;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
+
+import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
+
+import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
+import uk.ac.liv.moduleextraction.util.ModulePaths;
+import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 /*
  * == Properties ==
@@ -28,11 +37,9 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 	public LinkedHashList() {
 		nodes = new HashMap<E, DoubleNode>();
 	}
-	
+
 	@Override
 	public boolean add(E item) {
-//		if(size() >= 1230 && size() <=1240)
-//			System.out.println("Adding " + item);
 		if(!nodes.containsKey(item)){
 			DoubleNode newNode = null;
 			if(listStart == null){
@@ -51,7 +58,7 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 		System.out.println("Not adding " + item);
 		return false;
 	}
-	
+
 	@Override
 	public boolean addAll(Collection<? extends E> arg0) {
 		boolean result = false;
@@ -61,11 +68,11 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 		return result;
 	}
 
-	
+
 	public E getFirst(){
 		return listStart.value;
 	}
-	
+
 	public E getLast(){
 		return listEnd.value;
 	}
@@ -75,7 +82,7 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 		listStart = null;
 		nodes.clear();
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if(o instanceof LinkedHashList<?>){
@@ -138,7 +145,7 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 	public boolean removeAll(Collection<?> c) {
 		boolean modified = false;
 		for (Iterator<?> i = c.iterator(); i.hasNext();){
-				modified |= remove(i.next());
+			modified |= remove(i.next());
 		} 
 		return modified;
 	}
@@ -158,43 +165,36 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 	public ListIterator<E> listIterator(int index) {
 		return new LinkedIterator(index);
 	}
-	
+
 
 	private class LinkedIterator implements ListIterator<E>{
 		private DoubleNode nextNode;
 		private int nextIndex;
-		
+		int size;
+
 		public LinkedIterator(int index) {
-			int size = size();
-			
-			if(index < 0 || index > size)
+			size = size();
+
+			if(index < 0 || index > size){
 				throw new IndexOutOfBoundsException("Index:" + index + ", Size:" + size);
+			}
 			
-			/* If the index is less than half way along */
-//			if (index < (size >> 1)) {
-				 nextNode = listStart;
-				 /*Start from front end to find item */
-				 for (nextIndex=0; nextIndex<index; nextIndex++){
-					 nextNode = nextNode.next;
-				 }
-//			}
-//			else{
-//				/* Otherwise start at back end */
-//				nextNode = listEnd;
-//				for (nextIndex=size; nextIndex>=index; nextIndex--){
-//					 nextNode = nextNode.previous;
-//				}
-//			}
+			nextNode = listStart;
+			
+			for (nextIndex=0; nextIndex<index; nextIndex++){
+				nextNode = nextNode.next;
+			}
+
 		}
-		
+
 		@Override
 		public boolean hasNext() {
-			return nextNode != null;
+			return nextIndex != size;
 		}
 
 		@Override
 		public boolean hasPrevious() {
-			return nextNode.previous != null;
+			return nextIndex != 0;
 		}
 
 		@Override
@@ -214,6 +214,7 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 		public E previous() {
 			nextNode = nextNode.previous;
 			E value = nextNode.value;
+			nextIndex--;
 			return value;
 		}
 
@@ -221,7 +222,7 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 		public int previousIndex() {
 			return nextIndex-1;
 		}
-		
+
 		@Override
 		public void add(E e) {
 			throw new UnsupportedOperationException();
@@ -231,17 +232,17 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 		@Override
 		public void remove() {
 			throw new UnsupportedOperationException();
-			
+
 		}
 
 		@Override
 		public void set(E e) {
 			throw new UnsupportedOperationException();
 		}
-		
+
 	}
-	
-	
+
+
 	private class DoubleNode{
 		DoubleNode previous;
 		E value;
@@ -253,7 +254,28 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 			this.next = null;
 		}
 	}
-	
+
+
+	public static void main(String[] args) {
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "moduletest/chaindeps1.krss");
+		ArrayList<OWLLogicalAxiom> unsorted = new ArrayList<OWLLogicalAxiom>(ont.getLogicalAxioms());
+
+		DefinitorialDepth definitorialDepth = new DefinitorialDepth(ont);
+		ArrayList<OWLLogicalAxiom> depthSortedAxioms = definitorialDepth.getDefinitorialSortedList();
+
+		LinkedHashList<OWLLogicalAxiom> axioms = new LinkedHashList<OWLLogicalAxiom>(depthSortedAxioms);
+		for(OWLLogicalAxiom ax : depthSortedAxioms){
+			System.out.println(ax);
+		}
+
+		System.out.println("========================");
+		ListIterator<OWLLogicalAxiom> iterator = axioms.listIterator(5);
+		while(iterator.hasPrevious()){
+			System.out.println(iterator.previousIndex());
+			System.out.println(iterator.previous());
+		}
+
+	}
 
 
 

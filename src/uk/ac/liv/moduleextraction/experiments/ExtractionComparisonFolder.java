@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
@@ -43,13 +44,16 @@ public class ExtractionComparisonFolder {
 		}
 		QBFFileWriter.printMetrics();
 		SyntacticFirstModuleExtraction.printMetrics();
+		
+
 	}  
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
+		
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-08.09d-terminology.owl");
 
 		try {
-			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/paper-1000random"));
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/ruletest"));
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		} catch (OWLOntologyCreationException e) {
