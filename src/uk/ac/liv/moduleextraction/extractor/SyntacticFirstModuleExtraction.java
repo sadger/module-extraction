@@ -3,21 +3,16 @@ package uk.ac.liv.moduleextraction.extractor;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.clarkparsia.owlapi.modularity.locality.LocalityClass;
-import com.clarkparsia.owlapi.modularity.locality.SyntacticLocalityEvaluator;
 
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
@@ -25,12 +20,9 @@ import uk.ac.liv.moduleextraction.checkers.ChainAxiomCollector;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.NewSyntacticDependencyChecker;
-import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
-import uk.ac.liv.moduleextraction.datastructures.LinkedHashList;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.qbf.SeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.signature.SigManager;
-import uk.ac.liv.moduleextraction.util.AxiomComparator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 
@@ -47,7 +39,7 @@ public class SyntacticFirstModuleExtraction {
 	private InseperableChecker insepChecker = new InseperableChecker();
 
 	/* Data Structures */
-	private LinkedHashList<OWLLogicalAxiom> terminology;
+	private LinkedList<OWLLogicalAxiom> terminology;
 	private Set<OWLLogicalAxiom> module;
 	private Set<OWLEntity> signature;
 	private HashSet<OWLEntity> sigUnionSigM;
@@ -65,25 +57,14 @@ public class SyntacticFirstModuleExtraction {
 	}
 
 	public SyntacticFirstModuleExtraction(Set<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> sig) {
-		LinkedList<OWLLogicalAxiom> depthSortedAxioms = sorting(term);
+		DefinitorialDepth definitorialDepth = new DefinitorialDepth(term);
+		ArrayList<OWLLogicalAxiom> depthSortedAxioms = definitorialDepth.getDefinitorialSortedList();
 
-		this.terminology = new LinkedHashList<OWLLogicalAxiom>(depthSortedAxioms);
+		this.terminology = new LinkedList<OWLLogicalAxiom>(depthSortedAxioms);
 		this.signature = sig;
 		this.module = (existingModule == null) ? new HashSet<OWLLogicalAxiom>() : existingModule;
 		
 		populateSignature();
-	}
-
-	/**
-	 * @param term
-	 * @return
-	 */
-	private LinkedList<OWLLogicalAxiom> sorting(Set<OWLLogicalAxiom> term) {	
-		DefinitorialDepth definitorialDepth = new DefinitorialDepth(term);
-		LinkedList<OWLLogicalAxiom> sortedAxioms = new LinkedList<OWLLogicalAxiom>(term);
-		Collections.sort(sortedAxioms, new AxiomComparator(definitorialDepth.getDefinitorialMap()));
-		
-		return sortedAxioms;
 	}
 
 
@@ -93,7 +74,7 @@ public class SyntacticFirstModuleExtraction {
 		System.out.println("Average chain: " + (double) chainTotal/syntacticIterations);
 	}
 	
-	public LinkedHashList<OWLLogicalAxiom> getTerminology() {
+	public List<OWLLogicalAxiom> getTerminology() {
 		return terminology;
 	}
 
@@ -145,25 +126,18 @@ public class SyntacticFirstModuleExtraction {
 			syntacticDependencies.updateDependenciesWith(chosenAxiom);
 			
 			if(syntaxDepChecker.hasSyntacticSigDependency(chosenAxiom, syntacticDependencies, sigUnionSigM)){
-								
-//				module.add(chosenAxiom);
-//				sigUnionSigM.addAll(chosenAxiom.getSignature());
-
-//				logger.info("Adding {}",chosenAxiom);
-				
+												
 				/*Find the chain of axioms (including the one we found the initial dependency on */
 				Set<OWLLogicalAxiom> axiomChain = chainCollector.collectAxiomChain(axiomIterator, syntacticDependencies, sigUnionSigM);
 				module.addAll(axiomChain);
-				
-//				logger.info("Chain {}",axiomChain);
-//				
+							
 				addedCount += axiomChain.size();
 				
 	
 				terminology.removeAll(axiomChain);
 				sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(axiomChain));
 				
-				syntacticDependencies = new ChainDependencies();
+				syntacticDependencies.clear();
 				
 				/* Reset the iterator to start of the list*/
 				axiomIterator = terminology.listIterator(0);

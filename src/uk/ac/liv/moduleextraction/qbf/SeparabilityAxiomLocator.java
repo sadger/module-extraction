@@ -1,6 +1,8 @@
 package uk.ac.liv.moduleextraction.qbf;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLEntity;
@@ -11,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
-import uk.ac.liv.moduleextraction.datastructures.LinkedHashList;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 
 public class SeparabilityAxiomLocator {
@@ -23,12 +24,12 @@ public class SeparabilityAxiomLocator {
 	private InseperableChecker insepChecker = new InseperableChecker();
 	
 	/* Data structures */
-	private LinkedHashList<OWLLogicalAxiom> terminology;
+	private List<OWLLogicalAxiom> terminology;
 	private Set<OWLLogicalAxiom> module;
 	private Set<OWLEntity> sigUnionSigM;
 	
 	
-	public SeparabilityAxiomLocator(LinkedHashList<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> mod, Set<OWLEntity> sig) throws IOException, QBFSolverException{
+	public SeparabilityAxiomLocator(List<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> mod, Set<OWLEntity> sig) throws IOException, QBFSolverException{
 		this.terminology = term;
 		this.module = mod;
 		
@@ -40,10 +41,10 @@ public class SeparabilityAxiomLocator {
 		/* Represents the last axioms added or removed from the split test */
 		
 		logger.debug("Finding separability causing axiom");
-		LinkedHashList<OWLLogicalAxiom> lastAdded = getTopHalf(terminology);
-		LinkedHashList<OWLLogicalAxiom> lastRemoved = getBottomHalf(terminology);
+		List<OWLLogicalAxiom> lastAdded = getTopHalf(terminology);
+		List<OWLLogicalAxiom> lastRemoved = getBottomHalf(terminology);
 		
-		LinkedHashList<OWLLogicalAxiom> W = lastAdded;
+		List<OWLLogicalAxiom> W = lastAdded;
 
 		while(lastAdded.size() > 0){
 			
@@ -76,22 +77,22 @@ public class SeparabilityAxiomLocator {
 
 
 	
-	private LinkedHashList<OWLLogicalAxiom> getTopHalf(LinkedHashList<OWLLogicalAxiom> axiomList){
+	private List<OWLLogicalAxiom> getTopHalf(List<OWLLogicalAxiom> axiomList){
 		int fromIndex = 0;
 		int toIndex = (int) Math.floor(axiomList.size()/2);
 		
-		LinkedHashList<OWLLogicalAxiom> topHalf =
-				new LinkedHashList<OWLLogicalAxiom>(axiomList.subList(fromIndex, toIndex));
+		List<OWLLogicalAxiom> topHalf =
+				new ArrayList<OWLLogicalAxiom>(axiomList.subList(fromIndex, toIndex));
 		return topHalf;
 
 	}
 	
-	private LinkedHashList<OWLLogicalAxiom> getBottomHalf(LinkedHashList<OWLLogicalAxiom> axiomList){
+	private List<OWLLogicalAxiom> getBottomHalf(List<OWLLogicalAxiom> axiomList){
 		int fromIndex = (int) Math.floor(axiomList.size()/2);
 		int toIndex = axiomList.size();
 			
-		LinkedHashList<OWLLogicalAxiom> bottomHalf =
-				new LinkedHashList<OWLLogicalAxiom>(axiomList.subList(fromIndex, toIndex));
+		List<OWLLogicalAxiom> bottomHalf =
+				new ArrayList<OWLLogicalAxiom>(axiomList.subList(fromIndex, toIndex));
 		return bottomHalf;
 
 	}

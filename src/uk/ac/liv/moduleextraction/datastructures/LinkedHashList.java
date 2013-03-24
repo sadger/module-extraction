@@ -180,10 +180,11 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 			}
 			
 			nextNode = listStart;
-			
 			for (nextIndex=0; nextIndex<index; nextIndex++){
 				nextNode = nextNode.next;
 			}
+			
+	
 
 		}
 
@@ -257,7 +258,7 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 
 
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "moduletest/chaindeps1.krss");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "moduletest/chaintest1.krss");
 		ArrayList<OWLLogicalAxiom> unsorted = new ArrayList<OWLLogicalAxiom>(ont.getLogicalAxioms());
 
 		DefinitorialDepth definitorialDepth = new DefinitorialDepth(ont);
@@ -269,10 +270,12 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 		}
 
 		System.out.println("========================");
-		ListIterator<OWLLogicalAxiom> iterator = axioms.listIterator(5);
+		ListIterator<OWLLogicalAxiom> iterator = depthSortedAxioms.listIterator(4);
+
+		
 		while(iterator.hasPrevious()){
-			System.out.println(iterator.previousIndex());
-			System.out.println(iterator.previous());
+			System.out.println(iterator.previousIndex() + ":" + iterator.previous());
+			System.out.println();
 		}
 
 	}
