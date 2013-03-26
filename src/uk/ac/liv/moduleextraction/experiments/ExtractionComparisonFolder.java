@@ -42,18 +42,14 @@ public class ExtractionComparisonFolder {
 				compare.compareExtractionApproaches();
 			}
 		}
-		QBFFileWriter.printMetrics();
-		SyntacticFirstModuleExtraction.printMetrics();
-		
-
 	}  
 	
 	public static void main(String[] args) {
 		
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-08.09d-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
 
 		try {
-			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/ruletest"));
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/insepSigs"));
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		} catch (OWLOntologyCreationException e) {

@@ -46,6 +46,9 @@ public class ExtractionMain {
 		signature.add(a);
 		signature.add(b);
 		
+		//sigManager.readFile()
+		
+		
 		Set<OWLEntity> sig = signature;
 
 		SyntacticLocalityModuleExtractor syntaxModExtractor = 

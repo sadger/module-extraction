@@ -184,7 +184,7 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 				nextNode = nextNode.next;
 			}
 			
-	
+		
 
 		}
 
@@ -213,7 +213,12 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 
 		@Override
 		public E previous() {
-			nextNode = nextNode.previous;
+			if(nextIndex == size){
+				nextNode = listEnd;
+			}
+			else{
+				nextNode = nextNode.previous;
+			}
 			E value = nextNode.value;
 			nextIndex--;
 			return value;
@@ -270,7 +275,7 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 		}
 
 		System.out.println("========================");
-		ListIterator<OWLLogicalAxiom> iterator = depthSortedAxioms.listIterator(4);
+		ListIterator<OWLLogicalAxiom> iterator = axioms.listIterator(4);
 
 		
 		while(iterator.hasPrevious()){

@@ -52,7 +52,7 @@ public class DumpExtractionToDisk implements Runnable {
 		writeSignature();
 		writeSetToOntology(module, MOD_FILE);
 		
-		logger.debug("Dumped to: {} at {}",directory.getAbsolutePath(),new Date());
+		logger.trace("Dumped to: {} at {}",directory.getAbsolutePath(),new Date());
 		
 	}
 	
@@ -72,7 +72,7 @@ public class DumpExtractionToDisk implements Runnable {
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		}
-		logger.debug("Written {} ({})",file, ontology.size());
+		logger.trace("Written {} ({})",file, ontology.size());
 	}
 	
 	private void writeSignature(){
