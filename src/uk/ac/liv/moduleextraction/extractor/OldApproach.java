@@ -35,6 +35,8 @@ public class OldApproach {
 	private Set<OWLLogicalAxiom> module;
 	private Set<OWLEntity> signature;
 	private HashSet<OWLEntity> sigUnionSigM;
+	
+	private long checks = 0;
 
 	
 	public OldApproach(Set<OWLLogicalAxiom> term, Set<OWLEntity> sig) {
@@ -60,9 +62,9 @@ public class OldApproach {
 			
 			syntaticDependencies.updateDependenciesWith(chosenAxiom);
 			
-			LHSSigExtractor lhs = new LHSSigExtractor();
+			checks++;
 			if(syntaxDepChecker.hasSyntacticSigDependency(W, syntaticDependencies, sigUnionSigM) || 
-					insepChecker.isSeperableFromEmptySet(lhs.getLHSSigAxioms(W, sigUnionSigM, syntaticDependencies), sigUnionSigM)){
+					insepChecker.isSeperableFromEmptySet(lhsExtractor.getLHSSigAxioms(W, sigUnionSigM, syntaticDependencies), sigUnionSigM)){
 
 				module.add(chosenAxiom);
 				terminology.remove(chosenAxiom);
@@ -85,6 +87,10 @@ public class OldApproach {
 		sigUnionSigM.addAll(signature);
 	}
 	
+	public long getChecks() {
+		return checks;
+	}
+	
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntology("/LOCAL/wgatens/Ontologies/Bioportal/NOTEL/Terminologies/Acyclic/Big/LiPrO-converted");
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
@@ -92,14 +98,17 @@ public class OldApproach {
 		
 		Set<OWLLogicalAxiom> syntfirstExtracted = null;
 		Set<OWLLogicalAxiom> oldExtracted = null;
+		
+		SyntacticFirstModuleExtraction syntmod = null;
+		OldApproach oldMod = null;
 		try {
 			long startTime = System.currentTimeMillis();
-			SyntacticFirstModuleExtraction syntmod = new SyntacticFirstModuleExtraction(ont.getLogicalAxioms(), sig);
+			syntmod = new SyntacticFirstModuleExtraction(ont.getLogicalAxioms(), sig);
 			syntfirstExtracted = syntmod.extractModule();
 			System.out.println("Time taken: " + ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
 			
 			startTime = System.currentTimeMillis();
-			OldApproach oldMod = new OldApproach(ont.getLogicalAxioms(), sig);
+			oldMod = new OldApproach(ont.getLogicalAxioms(), sig);
 			oldExtracted = oldMod.extractModule();
 			System.out.println("Time taken: " + ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
 			
@@ -112,5 +121,7 @@ public class OldApproach {
 		System.out.println("New approach " + syntfirstExtracted.size());
 		System.out.println("Old approach " + oldExtracted.size());
 		System.out.println("Modules same? " + syntfirstExtracted.equals(oldExtracted));
+		System.out.println("Old checks" + oldMod.getChecks());
+		System.out.println("New metrics " + syntmod.getMetrics());
 	}
 }

@@ -29,8 +29,8 @@ public class ExtractionMain {
 	public static void main(String[] args) {
 
 
-		OWLOntology ont = OntologyLoader.loadOntology("/LOCAL/wgatens/Ontologies/Bioportal/NOTEL/Terminologies/Acyclic/Big/LiPrO-converted");
-		//OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "moduletest/cardinality.owl");
+		//OWLOntology ont = OntologyLoader.loadOntology("/LOCAL/wgatens/Ontologies/Bioportal/NOTEL/Terminologies/Acyclic/Big/LiPrO-converted");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "moduletest/chaintest1.krss");
 		System.out.println("Loaded Ontology");
 
 		//System.out.println(ont);
@@ -39,10 +39,17 @@ public class ExtractionMain {
 		SigManager sigManager = new SigManager(new File(ModulePaths.getSignatureLocation() + "/insepSigs"));
 
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
+		OWLClass a = f.getOWLClass(IRI.create(ont.getOntologyID() + "#A"));
+		OWLClass b = f.getOWLClass(IRI.create(ont.getOntologyID() + "#B"));
 
-
-
-		Set<OWLEntity> sig = gen.generateRandomSignature(50);
+		Set<OWLEntity> signature = new HashSet<OWLEntity>();
+		signature.add(a);
+		signature.add(b);
+		
+		//sigManager.readFile()
+		
+		
+		Set<OWLEntity> sig = signature;
 
 		SyntacticLocalityModuleExtractor syntaxModExtractor = 
 				new SyntacticLocalityModuleExtractor(OWLManager.createOWLOntologyManager(), ont, ModuleType.STAR);

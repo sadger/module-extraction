@@ -27,6 +27,12 @@ public class ChainDependencies extends HashMap<OWLClass, DependencySet>{
 		}	
 	}
 	
+	public void updateDependenciesWith(OWLLogicalAxiom[] axiomArray){
+		for(OWLLogicalAxiom ax : axiomArray){
+			updateDependenciesWith(ax);
+		}
+	}
+	
 	public void updateDependenciesWith(OWLLogicalAxiom axiom){
 		OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
 		OWLClassExpression definition = AxiomSplitter.getDefinitionofAxiom(axiom);

@@ -24,7 +24,10 @@ public class Dependency {
 			Dependency d = (Dependency) obj;
 			return d.getValue().equals(value);
 		}
-		return value.equals(obj);
+		else{
+			return false;
+		}
+		
 	}
 	
 	@Override

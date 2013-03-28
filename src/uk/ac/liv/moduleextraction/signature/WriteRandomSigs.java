@@ -32,11 +32,12 @@ public class WriteRandomSigs {
 				e.printStackTrace();
 			}
 		}
+		System.out.println("Written " + numberOfTests + " signatures");
 	}
 	
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
-		WriteRandomSigs writer = new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "/paper-1000random"));
-		writer.writeSignature(1000, 1000);
+		WriteRandomSigs writer = new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "/qbfmetric"));
+		writer.writeSignature(100, 100);
 	}
 }

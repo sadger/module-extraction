@@ -5,8 +5,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
 import org.semanticweb.owlapi.model.IRI;
@@ -24,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import uk.ac.liv.moduleextraction.extractor.SyntacticFirstModuleExtraction;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.reloading.DumpExtractionToDisk;
+import uk.ac.liv.moduleextraction.reloading.ReloadExperimentFromDisk;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
@@ -50,15 +55,12 @@ public class ExtractionComparision {
 	private File experimentLocation;
 	
 	
-
 	public ExtractionComparision(OWLOntology ontology, Set<OWLEntity> sig, File experimentLocation) {
 		AxiomExtractor extractor = new AxiomExtractor();
 		this.experimentLocation = experimentLocation;
 		this.signature = sig;
 		this.ontology = extractor.extractInclusionsAndEqualities(ontology);
-
 	}
-
 
 	public void compareExtractionApproaches() throws IOException, QBFSolverException, OWLOntologyStorageException, OWLOntologyCreationException{	
 		File experimentResultFile = new File(experimentLocation + "/" + "experiment-results");
@@ -67,7 +69,6 @@ public class ExtractionComparision {
 			return;
 		}
 
-		long startTime = System.currentTimeMillis();
 
 		Set<OWLLogicalAxiom> syntacticModule = null;
 			manager = OWLManager.createOWLOntologyManager();
@@ -82,12 +83,11 @@ public class ExtractionComparision {
 
 			syntacticModule = getLogicalAxioms(syntacticOntology);
 
-			
+			long startTime = System.currentTimeMillis();
 			this.moduleExtractor = new SyntacticFirstModuleExtraction(ontology.getLogicalAxioms(),signature);
 		
 
 		syntaticSize = syntacticModule.size();
-		System.out.println("Syntsize: " + syntaticSize);
 
 
 		this.dump = new DumpExtractionToDisk(
@@ -97,24 +97,62 @@ public class ExtractionComparision {
 		Set<OWLLogicalAxiom> semanticModule = moduleExtractor.extractModule();
 		
 		timeTaken = System.currentTimeMillis() - startTime;
+
 		writeResults(semanticModule);
+		writeMetrics();
+		writeQBFMetrics();
+		
+		logger.debug("{}",moduleExtractor.getMetrics());
+		logger.debug("{}",moduleExtractor.getQBFMetrics());
+		logger.info("Semantic module size {}",semanticModule.size());
 
 		logger.info("Complete - Time taken {} \n",ModuleUtils.getTimeAsHMS(timeTaken));
 
 	}
 
 	public void writeResults(Set<OWLLogicalAxiom> semanticModule) throws IOException{
+//		ReloadExperimentFromDisk reload = new ReloadExperimentFromDisk(ModulePaths.getResultLocation() + "/ruletest-old/" + experimentLocation.getName());
+//		Set<OWLLogicalAxiom> module = reload.getModule();
+//		logger.info("Modules are the same? {}",semanticModule.equals(module));
+		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results", false));
 		
-		writer.write("#Syntactic Size\t Semantic Size\t Time taken (ms)\n");
-		writer.write(syntaticSize + "," + semanticModule.size() + "," + timeTaken + "\n");
+		writer.write("#Syntactic Size,Semantic Size");
+		writer.write(syntaticSize + "," + semanticModule.size());
 		writer.flush();
 		writer.close();
 
-		/* Dump the results one last time before finishing */
+		/* Dump the results before finishing */
 		new Thread(dump).start();
 	}
 
+	public void writeMetrics() throws IOException{
+		LinkedHashMap<String, Long> metrics = moduleExtractor.getMetrics();
+		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "metrics", false));
+		
+		writer.write("#" + metrics.keySet() + "\n");
+		Object[] keysetArray = metrics.keySet().toArray();
+		for (int i = 0; i < keysetArray.length-1; i++) {
+			writer.write(metrics.get(keysetArray[i]) + ",");
+		}
+		writer.write(metrics.get(keysetArray[keysetArray.length-1]) + "\n");
+		writer.flush();
+		writer.close();
+	}
+	
+	public void writeQBFMetrics() throws IOException{
+		LinkedHashMap<String, Long> metrics = moduleExtractor.getQBFMetrics();
+		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "qbf-metrics", false));
+		
+		writer.write("#" + metrics.keySet() + "\n");
+		Object[] keysetArray = metrics.keySet().toArray();
+		for (int i = 0; i < keysetArray.length-1; i++) {
+			writer.write(metrics.get(keysetArray[i]) + ",");
+		}
+		writer.write(metrics.get(keysetArray[keysetArray.length-1]) + "\n");
+		writer.flush();
+		writer.close();
+	}
 
 	public Set<OWLLogicalAxiom> getLogicalAxioms(Set<OWLAxiom> axioms){
 		HashSet<OWLLogicalAxiom> result = new HashSet<OWLLogicalAxiom>();

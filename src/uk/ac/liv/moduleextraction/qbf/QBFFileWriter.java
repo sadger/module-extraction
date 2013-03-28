@@ -51,11 +51,9 @@ public class QBFFileWriter {
 	private NumberMap numberMap;
 	private IVec<IVecInt> clauses;
 	
-	private static int clauseTotal = 0;
-	private static int varTotal = 0;
-	private static int maxClause = 0;
-	private static int maxVar = 0;
-	private static int checkTotal = 0;
+	private int variableCount;
+	private int clauseCount;
+	private static long checkCount;
 
 	public QBFFileWriter(Set<OWLLogicalAxiom> ontology, Set<OWLEntity> signatureAndSigM) {
 		FILE_TO_WRITE =  ModulePaths.getQBFSolverLocation() + "Files/qbf" + System.currentTimeMillis() + ".qdimacs";
@@ -67,18 +65,15 @@ public class QBFFileWriter {
 		convertOntologyToQBFClauses();
 		populateSignatures();
 		
-		checkTotal++;
 	}
 	
-	public static void printMetrics(){
-		System.out.println("== Variables ==");
-		System.out.println("Max " + maxVar);
-		System.out.println("Average " + (double) varTotal/checkTotal);
-		System.out.println("== Clauses ==");
-		System.out.println("Max " + maxClause);
-		System.out.println("Average " + (double) clauseTotal/checkTotal);
-		
-	} 
+	public int getClauseCount(){
+		return clauseCount;
+	}
+	
+	public int getVariableCount(){
+		return variableCount;
+	}
 
 	private void convertOntologyToQBFClauses(){
 		this.ontologyAsClauseSet = ontologyConvertor.convertOntology(ontology);
@@ -105,15 +100,9 @@ public class QBFFileWriter {
 	}
 
 	private void writeHeaders() {
-		int variableCount = ontologyAsClauseSet.getVariables().size();
-		int clauseCount = ontologyAsClauseSet.getClauses().size();
-		toWrite.add("p cnf " + variableCount + " " + clauseCount + "\n");
-		
-		clauseTotal += clauseCount;
-		varTotal += variableCount;
-		maxClause = Math.max(maxClause, clauseCount);
-		maxVar = Math.max(maxVar, variableCount);
-		
+		variableCount = ontologyAsClauseSet.getVariables().size();
+		clauseCount = ontologyAsClauseSet.getClauses().size();
+		toWrite.add("p cnf " + variableCount + " " + clauseCount + "\n");		
 	}
 
 	private List<String> createStringsToWrite(){
@@ -201,6 +190,8 @@ public class QBFFileWriter {
 			toWrite.add("0" + "\n");
 		}
 	}
+
+
 
 
 

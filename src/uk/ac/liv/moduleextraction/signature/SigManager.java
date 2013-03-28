@@ -16,10 +16,14 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import uk.ac.liv.moduleextraction.experiments.ExtractionComparisonFolder;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 
 public class SigManager {
-
+	Logger logger = LoggerFactory.getLogger(SigManager.class);
 	private File directory;
 
 	public SigManager(File directory) {
@@ -72,7 +76,7 @@ public class SigManager {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("Written signature \"" + name + "\"");
+		logger.debug("Written signature \"{}\"",name);
 	}
 	
 
