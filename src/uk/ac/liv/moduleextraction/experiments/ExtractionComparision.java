@@ -130,8 +130,14 @@ public class ExtractionComparision {
 		LinkedHashMap<String, Long> metrics = moduleExtractor.getMetrics();
 		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "metrics", false));
 		
-		writer.write("#" + metrics.keySet() + "\n");
+
 		Object[] keysetArray = metrics.keySet().toArray();
+		/*Write header - the keyset values */
+		for (int i = 0; i < keysetArray.length-1; i++) {
+			writer.write(keysetArray[i] + ",");
+		}
+		writer.write(keysetArray[keysetArray.length-1] + "\n");
+		
 		for (int i = 0; i < keysetArray.length-1; i++) {
 			writer.write(metrics.get(keysetArray[i]) + ",");
 		}
@@ -143,9 +149,16 @@ public class ExtractionComparision {
 	public void writeQBFMetrics() throws IOException{
 		LinkedHashMap<String, Long> metrics = moduleExtractor.getQBFMetrics();
 		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "qbf-metrics", false));
-		
-		writer.write("#" + metrics.keySet() + "\n");
+			
 		Object[] keysetArray = metrics.keySet().toArray();
+		
+		/*Write header - the keyset values */
+		for (int i = 0; i < keysetArray.length-1; i++) {
+			writer.write(keysetArray[i] + ",");
+		}
+		writer.write(keysetArray[keysetArray.length-1] + "\n");
+		
+		/*Write content*/
 		for (int i = 0; i < keysetArray.length-1; i++) {
 			writer.write(metrics.get(keysetArray[i]) + ",");
 		}

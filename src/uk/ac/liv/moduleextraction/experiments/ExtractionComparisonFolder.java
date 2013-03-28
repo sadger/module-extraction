@@ -49,7 +49,7 @@ public class ExtractionComparisonFolder {
 		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
 
 		try {
-			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/insepSigs"));
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/metrictest"));
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		} catch (OWLOntologyCreationException e) {
