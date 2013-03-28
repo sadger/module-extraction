@@ -47,6 +47,8 @@ public class SyntacticFirstModuleExtraction {
 	private Set<OWLLogicalAxiom> module;
 	private Set<OWLEntity> signature;
 	private HashSet<OWLEntity> sigUnionSigM;
+	
+	private ChainDependencies terminologyDependencies;
 
 	private long maxChain = 0;
 	private long chainCount = 0;
@@ -71,6 +73,9 @@ public class SyntacticFirstModuleExtraction {
 		this.signature = sig;
 		this.module = (existingModule == null) ? new HashSet<OWLLogicalAxiom>() : existingModule;
 		
+		this.terminologyDependencies = new ChainDependencies();
+		terminologyDependencies.updateDependenciesWith(terminology);
+		
 		populateSignature();
 		
 		long setupTime = System.currentTimeMillis() - startSetup;
@@ -94,15 +99,15 @@ public class SyntacticFirstModuleExtraction {
 	public Set<OWLLogicalAxiom> extractModule() throws IOException, QBFSolverException{
 		long extractStart = System.currentTimeMillis();
 		collectSyntacticDependentAxioms();
+		timeTaken += System.currentTimeMillis() - extractStart;
 
-		ChainDependencies tminusMDependencies = new ChainDependencies();
-		tminusMDependencies.updateDependenciesWith(terminology);
-		HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(terminology,sigUnionSigM,tminusMDependencies);
+		HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(terminology,sigUnionSigM,terminologyDependencies);
 
 		qbfChecks++;
+		extractStart = System.currentTimeMillis();
 		if(insepChecker.isSeperableFromEmptySet(lhsSigT, sigUnionSigM)){
 			logger.debug("Collecting semantic dependent axioms");
-			SeparabilityAxiomLocator search = new SeparabilityAxiomLocator(terminology, module, signature);
+			SeparabilityAxiomLocator search = new SeparabilityAxiomLocator(terminology, module, signature, terminologyDependencies);
 			OWLLogicalAxiom insepAxiom = search.getInseperableAxiom();
 			logger.trace("Adding {}",insepAxiom);
 			logger.info("Adding 1 axiom through semantic check");
@@ -110,14 +115,10 @@ public class SyntacticFirstModuleExtraction {
 			sigUnionSigM.addAll(insepAxiom.getSignature());
 			terminology.remove(insepAxiom);
 			qbfChecks += search.getCheckCount();
+			timeTaken += System.currentTimeMillis() - extractStart;
 			extractModule();
 		}
 		
-		long extractEnd = System.currentTimeMillis() - extractStart;
-		timeTaken += extractEnd;	
-		
-
-
 		return module;
 	}
 	
@@ -141,7 +142,6 @@ public class SyntacticFirstModuleExtraction {
 	private void collectSyntacticDependentAxioms() {
 		logger.debug("Collecting syntactic dependent axioms");
 		ListIterator<OWLLogicalAxiom> axiomIterator = terminology.listIterator();
-		ChainDependencies syntacticDependencies = new ChainDependencies();
 		ChainAxiomCollector chainCollector = new ChainAxiomCollector();
 
 		int addedCount = 0;
@@ -149,13 +149,11 @@ public class SyntacticFirstModuleExtraction {
 		while(axiomIterator.hasNext()){
 			syntacticChecks++;
 			OWLLogicalAxiom chosenAxiom = axiomIterator.next();
-
-			syntacticDependencies.updateDependenciesWith(chosenAxiom);
 			
-			if(syntaxDepChecker.hasSyntacticSigDependency(chosenAxiom, syntacticDependencies, sigUnionSigM)){
+			if(syntaxDepChecker.hasSyntacticSigDependency(chosenAxiom, terminologyDependencies, sigUnionSigM)){
 												
 				/*Find the chain of axioms and remove them from ontology (including the one we found the initial dependency on */
-				Set<OWLLogicalAxiom> axiomChain = chainCollector.collectAxiomChain(axiomIterator, syntacticDependencies, sigUnionSigM);
+				Set<OWLLogicalAxiom> axiomChain = chainCollector.collectAxiomChain(axiomIterator, terminologyDependencies, sigUnionSigM);
 				module.addAll(axiomChain);
 							
 				addedCount += axiomChain.size();
@@ -166,8 +164,7 @@ public class SyntacticFirstModuleExtraction {
 				sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(axiomChain));
 				
 				terminology.removeAll(axiomChain);
-				syntacticDependencies.clear();
-				
+
 				/* Reset the iterator to start of the list*/
 				axiomIterator = terminology.listIterator(0);
 			}

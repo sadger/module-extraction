@@ -84,6 +84,7 @@ public class ExtractionComparision {
 			syntacticModule = getLogicalAxioms(syntacticOntology);
 
 			long startTime = System.currentTimeMillis();
+			
 			this.moduleExtractor = new SyntacticFirstModuleExtraction(ontology.getLogicalAxioms(),signature);
 		
 
@@ -107,11 +108,12 @@ public class ExtractionComparision {
 		logger.info("Semantic module size {}",semanticModule.size());
 
 		logger.info("Complete - Time taken {} \n",ModuleUtils.getTimeAsHMS(timeTaken));
+		System.out.println("time ms:" + timeTaken);
 
 	}
 
 	public void writeResults(Set<OWLLogicalAxiom> semanticModule) throws IOException{
-//		ReloadExperimentFromDisk reload = new ReloadExperimentFromDisk(ModulePaths.getResultLocation() + "/ruletest-old/" + experimentLocation.getName());
+//		ReloadExperimentFromDisk reload = new ReloadExperimentFromDisk(ModulePaths.getResultLocation() + "//" + experimentLocation.getName());
 //		Set<OWLLogicalAxiom> module = reload.getModule();
 //		logger.info("Modules are the same? {}",semanticModule.equals(module));
 		

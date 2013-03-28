@@ -36,11 +36,16 @@ public class SeparabilityAxiomLocator {
 
 	private OWLLogicalAxiom[] axiomList;
 
-	public SeparabilityAxiomLocator(List<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> mod, Set<OWLEntity> sig) throws IOException, QBFSolverException{
+	private ChainDependencies termDependencies; 
+	
+	public SeparabilityAxiomLocator(List<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> mod, Set<OWLEntity> sig, 
+			ChainDependencies dependencies) throws IOException, QBFSolverException{
 		this.module = mod;
 		this.axiomList = term.toArray(new OWLLogicalAxiom[0]);
 
 		this.sigUnionSigM = sig;
+		
+		this.termDependencies = dependencies;
 		sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(module));
 	}
 
@@ -55,15 +60,12 @@ public class SeparabilityAxiomLocator {
 
 		while(lastAdded.length > 0){
 
-			ChainDependencies Wdeps = new ChainDependencies();
-			Wdeps.updateDependenciesWith(W);
-
 			ArrayList<OWLLogicalAxiom> toCheck = new ArrayList<OWLLogicalAxiom>();
 			for (int i = 0; i < W.length; i++) {
 				toCheck.add(W[i]);
 			}
 
-			Set<OWLLogicalAxiom> lhsW = lhsExtractor.getLHSSigAxioms(toCheck, sigUnionSigM, Wdeps);
+			Set<OWLLogicalAxiom> lhsW = lhsExtractor.getLHSSigAxioms(toCheck, sigUnionSigM, termDependencies);
 
 			checkCount++;
 
@@ -121,21 +123,6 @@ public class SeparabilityAxiomLocator {
 
 		return Arrays.copyOfRange(axiomList, fromIndex,toIndex);
 
-	}
-
-	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "Bioportal/NOTEL/Terminologies/Acyclic/Big/LiPrO-converted");
-		System.out.println(ont.getLogicalAxiomCount());
-		try {
-			SeparabilityAxiomLocator locator = new SeparabilityAxiomLocator(new ArrayList<OWLLogicalAxiom>(ont.getLogicalAxioms()), new HashSet<OWLLogicalAxiom>(), new HashSet<OWLEntity>());
-			System.out.println(locator.getInseperableAxiom());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (QBFSolverException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 
