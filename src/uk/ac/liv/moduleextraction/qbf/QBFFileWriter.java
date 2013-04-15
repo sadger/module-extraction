@@ -16,11 +16,16 @@ import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.IteratorInt;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
+
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
+import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.propositional.convertors.ALCtoPropositionalConvertor;
 import uk.ac.liv.propositional.convertors.ClauseSettoSATClauses;
 import uk.ac.liv.propositional.convertors.OWLOntologyToClauseSet;
@@ -53,7 +58,6 @@ public class QBFFileWriter {
 	
 	private int variableCount;
 	private int clauseCount;
-	private static long checkCount;
 
 	public QBFFileWriter(Set<OWLLogicalAxiom> ontology, Set<OWLEntity> signatureAndSigM) {
 		FILE_TO_WRITE =  ModulePaths.getQBFSolverLocation() + "Files/qbf" + System.currentTimeMillis() + ".qdimacs";
@@ -65,6 +69,10 @@ public class QBFFileWriter {
 		convertOntologyToQBFClauses();
 		populateSignatures();
 		
+	}
+	
+	public boolean convertedClauseSetIsEmpty() {
+		return ontologyAsClauseSet.isEmpty();
 	}
 	
 	public int getClauseCount(){
@@ -81,6 +89,8 @@ public class QBFFileWriter {
 		this.numberMap = clauseSetConvertor.getNumberMap();
 		this.clauses = new ClauseSettoSATClauses(ontologyAsClauseSet).convert();
 	}
+	
+	
 
 	private void populateSignatures() {
 		Set<OWLEntity> ontologyEntities = ModuleUtils.getClassAndRoleNamesInSet(ontology);
@@ -140,7 +150,7 @@ public class QBFFileWriter {
 				writer.write(s);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			e.printStackTrace();System.out.println(clauses);
 		} finally{
 			try{
 				fileWriter.flush();
@@ -190,6 +200,33 @@ public class QBFFileWriter {
 			toWrite.add("0" + "\n");
 		}
 	}
+
+
+	
+//	public static void main(String[] args) {
+//		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "moduletest/top.owl");
+//
+//		OWLDataFactory f = OWLManager.getOWLDataFactory();
+//		OWLClass a = f.getOWLClass(IRI.create(ont.getOntologyID() + "#A"));
+//		OWLClass b = f.getOWLClass(IRI.create(ont.getOntologyID() + "#B"));
+//		Set<OWLEntity> signature = new HashSet<OWLEntity>();
+//		signature.add(a);
+//		signature.add(b);
+//		
+//		QBFFileWriter write = new QBFFileWriter(ont.getLogicalAxioms(), signature);
+//		
+//
+//			try {
+//				File problem = write.generateQBFProblem();
+//				QBFSolver solver = new QBFSolver();
+//				System.out.println(solver.isSatisfiable(problem));
+//			} catch (QBFSolverException e) {
+//				e.printStackTrace();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		
+//	}
 
 
 

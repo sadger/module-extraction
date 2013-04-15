@@ -58,6 +58,9 @@ public class ExtractionComparision {
 	public ExtractionComparision(OWLOntology ontology, Set<OWLEntity> sig, File experimentLocation) {
 		AxiomExtractor extractor = new AxiomExtractor();
 		this.experimentLocation = experimentLocation;
+		if(!experimentLocation.exists()){
+			experimentLocation.mkdirs();
+		}
 		this.signature = sig;
 		this.ontology = extractor.extractInclusionsAndEqualities(ontology);
 	}
@@ -77,9 +80,9 @@ public class ExtractionComparision {
 
 			Set<OWLAxiom> syntacticOntology = syntaxModExtractor.extract(signature);
 
-			OWLXMLOntologyFormat owlFormat = new OWLXMLOntologyFormat();
-			manager.saveOntology(manager.createOntology(syntacticOntology),owlFormat, 
-					IRI.create(new File(experimentLocation + "/" + "syntacticModule.owl")));
+//			OWLXMLOntologyFormat owlFormat = new OWLXMLOntologyFormat();
+//			manager.saveOntology(manager.createOntology(syntacticOntology),owlFormat, 
+//					IRI.create(new File(experimentLocation + "/" + "syntacticModule.owl")));
 
 			syntacticModule = getLogicalAxioms(syntacticOntology);
 
@@ -108,7 +111,7 @@ public class ExtractionComparision {
 		logger.info("Semantic module size {}",semanticModule.size());
 
 		logger.info("Complete - Time taken {} \n",ModuleUtils.getTimeAsHMS(timeTaken));
-		System.out.println("time ms:" + timeTaken);
+
 
 	}
 
@@ -119,8 +122,8 @@ public class ExtractionComparision {
 		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results", false));
 		
-		writer.write("#Syntactic Size,Semantic Size");
-		writer.write(syntaticSize + "," + semanticModule.size());
+		writer.write("Syntactic Size,Semantic Size" + "\n");
+		writer.write(syntaticSize + "," + semanticModule.size() + "\n");
 		writer.flush();
 		writer.close();
 

@@ -30,7 +30,7 @@ public class ExtractionMain {
 
 
 		//OWLOntology ont = OntologyLoader.loadOntology("/LOCAL/wgatens/Ontologies/Bioportal/NOTEL/Terminologies/Acyclic/Big/LiPrO-converted");
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "moduletest/chaintest1.krss");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "moduletest/top.owl");
 		System.out.println("Loaded Ontology");
 
 		//System.out.println(ont);
@@ -40,11 +40,13 @@ public class ExtractionMain {
 
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
 		OWLClass a = f.getOWLClass(IRI.create(ont.getOntologyID() + "#A"));
-		OWLClass b = f.getOWLClass(IRI.create(ont.getOntologyID() + "#B"));
-
+		OWLClass b = f.getOWLClass(IRI.create(ont.getOntologyID() + "#A1"));
+		OWLClass c = f.getOWLClass(IRI.create(ont.getOntologyID() + "#A2"));
+		
 		Set<OWLEntity> signature = new HashSet<OWLEntity>();
 		signature.add(a);
 		signature.add(b);
+		signature.add(c);
 		
 		//sigManager.readFile()
 		

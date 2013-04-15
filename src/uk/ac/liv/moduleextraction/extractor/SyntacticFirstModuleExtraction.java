@@ -109,7 +109,7 @@ public class SyntacticFirstModuleExtraction {
 			logger.debug("Collecting semantic dependent axioms");
 			SeparabilityAxiomLocator search = new SeparabilityAxiomLocator(terminology, module, signature, terminologyDependencies);
 			OWLLogicalAxiom insepAxiom = search.getInseperableAxiom();
-			logger.trace("Adding {}",insepAxiom);
+			logger.debug("Adding {}",insepAxiom);
 			logger.info("Adding 1 axiom through semantic check");
 			module.add(insepAxiom);
 			sigUnionSigM.addAll(insepAxiom.getSignature());
@@ -155,6 +155,8 @@ public class SyntacticFirstModuleExtraction {
 				/*Find the chain of axioms and remove them from ontology (including the one we found the initial dependency on */
 				Set<OWLLogicalAxiom> axiomChain = chainCollector.collectAxiomChain(axiomIterator, terminologyDependencies, sigUnionSigM);
 				module.addAll(axiomChain);
+				
+				logger.trace("Adding chain {}",axiomChain);
 							
 				addedCount += axiomChain.size();
 				

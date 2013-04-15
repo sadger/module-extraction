@@ -1,9 +1,12 @@
 package uk.ac.liv.moduleextraction.extractor;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLEntity;
@@ -18,6 +21,7 @@ import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
 import uk.ac.liv.moduleextraction.datastructures.LinkedHashList;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
+import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
@@ -37,6 +41,7 @@ public class OldApproach {
 	private HashSet<OWLEntity> sigUnionSigM;
 	
 	private long checks = 0;
+	private long timeTaken = 0;
 
 	
 	public OldApproach(Set<OWLLogicalAxiom> term, Set<OWLEntity> sig) {
@@ -54,6 +59,7 @@ public class OldApproach {
 		Iterator<OWLLogicalAxiom> axiomIterator = terminology.iterator();
 		ChainDependencies syntaticDependencies = new ChainDependencies();
 
+		long startTime = System.currentTimeMillis();
 		/* Terminology is the value of T\M as we remove items and add them to the module */
 		while(!(terminology.size() == W.size())){
 			OWLLogicalAxiom chosenAxiom = axiomIterator.next();
@@ -79,6 +85,8 @@ public class OldApproach {
 			}
 		}
 		
+		timeTaken = System.currentTimeMillis() - startTime;
+		System.out.println("Time taken: " + ModuleUtils.getTimeAsHMS(timeTaken));
 		return module;
 	}
 	
@@ -91,10 +99,19 @@ public class OldApproach {
 		return checks;
 	}
 	
+	public LinkedHashMap<String, Long> getMetrics(){
+		LinkedHashMap<String, Long> metrics = new LinkedHashMap<String, Long>();
+		metrics.put("Check total", checks);
+		metrics.put("Time taken", timeTaken);
+		metrics.put("QBF Checks", insepChecker.getTestCount());
+		return metrics;
+	}
+	
+	
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntology("/LOCAL/wgatens/Ontologies/Bioportal/NOTEL/Terminologies/Acyclic/Big/LiPrO-converted");
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		Set<OWLEntity> sig = gen.generateRandomSignature(20);
+		Set<OWLEntity> sig = gen.generateRandomSignature(10);
 		
 		Set<OWLLogicalAxiom> syntfirstExtracted = null;
 		Set<OWLLogicalAxiom> oldExtracted = null;
@@ -121,7 +138,7 @@ public class OldApproach {
 		System.out.println("New approach " + syntfirstExtracted.size());
 		System.out.println("Old approach " + oldExtracted.size());
 		System.out.println("Modules same? " + syntfirstExtracted.equals(oldExtracted));
-		System.out.println("Old checks" + oldMod.getChecks());
+		System.out.println("Old checks" + oldMod.getMetrics());
 		System.out.println("New metrics " + syntmod.getMetrics());
 	}
 }

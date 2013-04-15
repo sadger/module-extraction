@@ -32,29 +32,43 @@ public class InseperableChecker {
 
 		/* If W is empty it IS the empty set so cannot be separable from itself */
 		if(!w.isEmpty()){
-		
-			
 			InverseRolePropertyReplacer replacer = new InverseRolePropertyReplacer();
 			//Remove inverse roles from the QBF problem
 			QBFFileWriter writer = new QBFFileWriter(replacer.convert(w),signatureAndSigM);
-			QBFSolver solver =  new QBFSolver();
 			
-			File qbfProblem = writer.generateQBFProblem();
-			isInseperable = solver.isSatisfiable(qbfProblem);
+			/* An empty clause set need not be checked - in fact the QBF solver complains about
+			 * and empty problem*/
+			if(writer.convertedClauseSetIsEmpty()){
+				isInseperable = true;
+			}
+			else{
+				testCount++;
+				QBFSolver solver =  new QBFSolver();
+				File qbfProblem = writer.generateQBFProblem();
+				isInseperable = solver.isSatisfiable(qbfProblem);
 
-			if(!isInseperable){
-				logger.debug("Separable from ∅?: {}",!isInseperable);
+				if(!isInseperable){
+					logger.trace("Separable from ∅?: {}",!isInseperable);
+				}
+				
+				totalClause += writer.getClauseCount();
+				totalVar += writer.getVariableCount();
+				maxClause = Math.max(maxClause, writer.getClauseCount());
+				maxVar = Math.max(maxVar, writer.getVariableCount());
 			}
 			
-			totalClause += writer.getClauseCount();
-			totalVar += writer.getVariableCount();
-			maxClause = Math.max(maxClause, writer.getClauseCount());
-			maxVar = Math.max(maxVar, writer.getVariableCount());
+	
+			
+	
 		
 		}
 
 		//We test for inseparablity and return the negation
 		return !isInseperable;
+	}
+	
+	public long getTestCount(){
+		return testCount;
 	}
 	
 	public LinkedHashMap<String,Long> getQBFMetrics(){

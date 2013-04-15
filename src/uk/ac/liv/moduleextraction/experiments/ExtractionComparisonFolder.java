@@ -13,8 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-import uk.ac.liv.moduleextraction.extractor.SyntacticFirstModuleExtraction;
-import uk.ac.liv.moduleextraction.qbf.QBFFileWriter;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
@@ -49,7 +47,12 @@ public class ExtractionComparisonFolder {
 		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
 
 		try {
-			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/insepSigs"));
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/sig-250random"));
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/sig-500random"));
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/sig-750random"));
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/sig-1000random"));
+
+
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		} catch (OWLOntologyCreationException e) {

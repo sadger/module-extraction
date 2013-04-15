@@ -16,6 +16,7 @@ public class QBFSolver {
 	public boolean isSatisfiable (File dimacsLocation) throws QBFSolverException{
 
 		this.qbfFile = dimacsLocation;
+
 		solverText = "";
 		
 		ProcessBuilder pb = new ProcessBuilder("./sKizzo", dimacsLocation.getAbsolutePath());
@@ -72,6 +73,9 @@ public class QBFSolver {
 		}
 		catch(IllegalThreadStateException t){
 			t.printStackTrace();
+		}
+		finally{
+			proc.destroy();
 		}
 	
 

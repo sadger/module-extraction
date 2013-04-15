@@ -96,6 +96,7 @@ public class SeparabilityAxiomLocator {
 			}
 
 		}
+		
 		return  axiomList[W.length];
 	}
 

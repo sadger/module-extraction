@@ -50,7 +50,7 @@ public class DumpExtractionToDisk implements Runnable {
 			directory.mkdir();
 		
 		writeSignature();
-		writeSetToOntology(module, MOD_FILE);
+		//writeSetToOntology(module, MOD_FILE);
 		
 		logger.trace("Dumped to: {} at {}",directory.getAbsolutePath(),new Date());
 		
