@@ -1,6 +1,7 @@
 package uk.ac.liv.moduleextraction.signature;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLEntity;
@@ -20,6 +21,28 @@ public class WriteRandomSigs {
 		this.ontology = ont;
 	}
 	
+	
+	/* Writes signatures of size "sigSize" + |all roles in ont| */
+	public void writeSignatureWithSigs(int sigSize, int numberOfTests){
+		SigManager sigManager = new SigManager(location);
+		SignatureGenerator sigGen = new  SignatureGenerator(ontology.getLogicalAxioms());
+		
+		for(int i=1; i<=numberOfTests; i++){
+			Set<OWLEntity> signature = new HashSet<OWLEntity>();
+			signature.addAll(sigGen.generateRandomClassSignature(sigSize));	
+			signature.addAll(ontology.getObjectPropertiesInSignature());
+					
+			try {
+				sigManager.writeFile(signature, "random" + sigSize + "-"+i);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println("Written " + numberOfTests + " signatures");
+	}
+	
+	
+	
 	public void writeSignature(int sigSize, int numberOfTests){
 		SigManager sigManager = new SigManager(location);
 		SignatureGenerator sigGen = new  SignatureGenerator(ontology.getLogicalAxioms());
@@ -37,7 +60,9 @@ public class WriteRandomSigs {
 	
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
-		WriteRandomSigs writer = new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "/qbfmetric"));
-		writer.writeSignature(100, 100);
+
+//		OWLOntology ont = OntologyLoader.loadOntology("/LOCAL/wgatens/Ontologies/Bioportal/NOTEL/Terminologies/Acyclic/Big/LiPrO-converted");
+		WriteRandomSigs writer = new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "/sig-1000random"));
+		writer.writeSignatureWithSigs(1000, 1000);
 	}
 }

@@ -57,6 +57,7 @@ public class ChainDependencies extends HashMap<OWLClass, DependencySet>{
 			if(clsDependencies != null)
 				axiomDeps.addAll(clsDependencies);
 		}
+
 	}
  
 }
