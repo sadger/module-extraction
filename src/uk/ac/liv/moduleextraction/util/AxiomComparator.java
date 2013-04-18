@@ -19,12 +19,13 @@ public class AxiomComparator implements Comparator<OWLLogicalAxiom>{
 	public int compare(OWLLogicalAxiom axiom1, OWLLogicalAxiom axiom2) {
 		OWLClass name1 = (OWLClass) AxiomSplitter.getNameofAxiom(axiom1);
 		OWLClass name2 = (OWLClass) AxiomSplitter.getNameofAxiom(axiom2);
+		
 		if(base.get(name1) < base.get(name2)) 
 			return -1;
-		else if(name1 == name2) 
-			return 0;
-		else 
+		else if	(base.get(name1) > base.get(name2)) 
 			return 1;
+		else 
+			return 0;
 	}
 
 }
