@@ -62,11 +62,13 @@ public class DifferenceComparison {
 				OWLOntology moduleAsOnt = ontManager.createOntology(new HashSet<OWLAxiom>(module));
 				
 				SyntacticLocalityModuleExtractor syntactic = new SyntacticLocalityModuleExtractor
-						(OWLManager.createOWLOntologyManager(), moduleAsOnt, ModuleType.STAR);
+						(ontManager, moduleAsOnt, ModuleType.STAR);
 				
 				
 				Set<OWLLogicalAxiom> syntModule = getLogicalAxioms(syntactic.extract(signature));
 				
+				
+				ontManager.removeOntology(moduleAsOnt);
 				
 				boolean modsEqual = syntModule.equals(module);
 				logger.info("Modules equal? {}",modsEqual);
@@ -81,7 +83,7 @@ public class DifferenceComparison {
 				
 			}
 		}
-		logger.info("Difference axioms {}" + diffAxioms.size());
+		logger.info("Difference axioms {}",diffAxioms.size());
 	}  
 	
 	public Set<OWLLogicalAxiom> getLogicalAxioms(Set<OWLAxiom> axioms){
@@ -96,9 +98,9 @@ public class DifferenceComparison {
 	
 	public static void main(String[] args) {
 		
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "NCI/nci-08.09d-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
 		try {
-			DifferenceComparison diff = new DifferenceComparison(ont, new File(ModulePaths.getSignatureLocation() + "/sig-100random"));
+			DifferenceComparison diff = new DifferenceComparison(ont, new File(ModulePaths.getSignatureLocation() + "/sig-250random"));
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
 		} catch (OWLOntologyCreationException e) {

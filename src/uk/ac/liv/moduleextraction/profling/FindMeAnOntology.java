@@ -39,7 +39,7 @@ public class FindMeAnOntology {
 				System.out.println(f.getName());
 				OWLOntology ont = OntologyLoader.loadOntology(f.getAbsolutePath());
 
-	
+				System.out.println(ont.getAxiomCount());
 				//System.out.println(ont);
 				
 				profileOntology(f.getAbsolutePath(),ont);
@@ -74,13 +74,15 @@ public class FindMeAnOntology {
 		
 		System.out.println("Class in sig: " + ont.getClassesInSignature().size());
 		System.out.println("Roles in sig: " + ont.getObjectPropertiesInSignature().size());
+		System.out.println("Sig size: " + ont.getSignature().size());
+		System.out.println("");
 
 ////				System.out.println("Is EL?: " + elvalidator.isELOntology(ont));
 ////				System.out.println("Is ALC?: " + validator.isALCOntology(ont));
 //				AcyclicChecker acyclic = new AcyclicChecker(ont);
 //				System.out.println("Is acyclic: " + acyclic.isAcyclic());
-//				DLExpressivityChecker checker = new DLExpressivityChecker(Collections.singleton(ont));
-//				System.out.println("Expressivity: " + checker.getDescriptionLogicName());
+		DLExpressivityChecker checker = new DLExpressivityChecker(Collections.singleton(ont));
+		System.out.println("Expressivity: " + checker.getDescriptionLogicName());
 //				boolean isTerm = termChecker.isTerminology(ont);
 ////
 //				if(!isTerm)
@@ -91,7 +93,7 @@ public class FindMeAnOntology {
 	}
 
 	public static void main(String[] args) {
-		FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "Bioportal/NOTEL/Terminologies/Acyclic/Big"));
+		FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/papertest"));
 	//FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "Acyclic/Broken"));
 		find.profileOntologies();
 	}
