@@ -102,7 +102,7 @@ public class ExtractionComparision {
 		
 		timeTaken = System.currentTimeMillis() - startTime;
 
-		writeResults(semanticModule);
+		writeResults(semanticModule,syntacticModule);
 		writeMetrics();
 		writeQBFMetrics();
 		
@@ -115,15 +115,16 @@ public class ExtractionComparision {
 
 	}
 
-	public void writeResults(Set<OWLLogicalAxiom> semanticModule) throws IOException{
+	public void writeResults(Set<OWLLogicalAxiom> semanticModule, Set<OWLLogicalAxiom> syntacticModule) throws IOException{
 //		ReloadExperimentFromDisk reload = new ReloadExperimentFromDisk(ModulePaths.getResultLocation() + "//" + experimentLocation.getName());
 //		Set<OWLLogicalAxiom> module = reload.getModule();
 //		logger.info("Modules are the same? {}",semanticModule.equals(module));
 		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results", false));
 		
-		writer.write("Syntactic Size,Semantic Size" + "\n");
-		writer.write(syntaticSize + "," + semanticModule.size() + "\n");
+		writer.write("Syntactic Size,Semantic Size, ModulesSame, SemSubsetOfStar, StarSubsetSem" + "\n");
+		writer.write(syntacticModule.size() + "," + semanticModule.size() + "," 
+		+ semanticModule.equals(syntacticModule) + "," + syntacticModule.containsAll(semanticModule) + "," + semanticModule.containsAll(syntacticModule) + "," + "\n");
 		writer.flush();
 		writer.close();
 
