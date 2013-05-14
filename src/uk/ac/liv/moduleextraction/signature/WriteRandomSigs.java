@@ -23,7 +23,7 @@ public class WriteRandomSigs {
 	
 	
 	/* Writes signatures of size "sigSize" + |all roles in ont| */
-	public void writeSignatureWithSigs(int sigSize, int numberOfTests){
+	public void writeSignatureWithRoles(int sigSize, int numberOfTests){
 		SigManager sigManager = new SigManager(location);
 		SignatureGenerator sigGen = new  SignatureGenerator(ontology.getLogicalAxioms());
 		
@@ -59,10 +59,11 @@ public class WriteRandomSigs {
 	}
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl-sub");
+//		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl-sub");
 
-//		OWLOntology ont = OntologyLoader.loadOntology("/LOCAL/wgatens/Ontologies/Bioportal/NOTEL/Terminologies/Acyclic/Big/LiPrO-converted");
-		WriteRandomSigs writer = new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "/nci-sub-100"));
-		writer.writeSignatureWithSigs(100, 1000);
+		OWLOntology ont = OntologyLoader.loadOntology("/LOCAL/wgatens/Ontologies/Bioportal/NOTEL/Terminologies/Acyclic/Big/NatPrO-converted");
+		int sigSize = 500;
+		WriteRandomSigs writer = new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "/natpro-" + sigSize));
+		writer.writeSignatureWithRoles(sigSize, 1000);
 	}
 }

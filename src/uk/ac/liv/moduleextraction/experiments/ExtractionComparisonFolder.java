@@ -44,15 +44,16 @@ public class ExtractionComparisonFolder {
 	
 	public static void main(String[] args) {
 		
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl-sub");
+		//OWLOntology natpro = OntologyLoader.loadOntology("/LOCAL/wgatens/Ontologies/Bioportal/NOTEL/Terminologies/Acyclic/Big/NatPrO-converted");
+		//OWLOntology lipro= OntologyLoader.loadOntology("/LOCAL/wgatens/Ontologies/Bioportal/NOTEL/Terminologies/Acyclic/Big/LiPrO-converted");
 
-		
+
 
 		try {
-
-			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/sig-100random"));
-
-
+	
+			new ExtractionComparisonFolder(ont, new File(ModulePaths.getSignatureLocation() + "/nci-sub-300"));
+	
 
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();

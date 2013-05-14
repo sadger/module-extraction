@@ -156,7 +156,7 @@ public class SyntacticFirstModuleExtraction {
 				Set<OWLLogicalAxiom> axiomChain = chainCollector.collectAxiomChain(axiomIterator, terminologyDependencies, sigUnionSigM);
 				module.addAll(axiomChain);
 				
-				logger.trace("Adding chain {}",axiomChain);
+				logger.debug("Adding chain {}",axiomChain);
 							
 				addedCount += axiomChain.size();
 				

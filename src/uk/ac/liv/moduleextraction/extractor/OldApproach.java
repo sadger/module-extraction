@@ -17,7 +17,7 @@ import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
-import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
+import uk.ac.liv.moduleextraction.checkers.OLDSyntacticDependencyChecker;
 import uk.ac.liv.moduleextraction.datastructures.LinkedHashList;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
@@ -28,7 +28,7 @@ import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 public class OldApproach {
 	
 	/* Syntactic Checking */
-	private SyntacticDependencyChecker syntaxDepChecker = new SyntacticDependencyChecker();
+	private OLDSyntacticDependencyChecker syntaxDepChecker = new OLDSyntacticDependencyChecker();
 
 	/* Semantic Checking */
 	private LHSSigExtractor lhsExtractor = new LHSSigExtractor();

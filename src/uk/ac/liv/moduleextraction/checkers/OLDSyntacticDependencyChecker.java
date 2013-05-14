@@ -12,7 +12,7 @@ import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.datastructures.LinkedHashList;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 
-public class SyntacticDependencyChecker {
+public class OLDSyntacticDependencyChecker {
 	
 	Set<OWLLogicalAxiom> axiomsWithDeps;
 

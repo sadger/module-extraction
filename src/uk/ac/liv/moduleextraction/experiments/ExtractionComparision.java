@@ -29,6 +29,7 @@ import uk.ac.liv.moduleextraction.extractor.SyntacticFirstModuleExtraction;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.reloading.DumpExtractionToDisk;
 import uk.ac.liv.moduleextraction.reloading.ReloadExperimentFromDisk;
+import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
@@ -67,10 +68,10 @@ public class ExtractionComparision {
 
 	public void compareExtractionApproaches() throws IOException, QBFSolverException, OWLOntologyStorageException, OWLOntologyCreationException{	
 		File experimentResultFile = new File(experimentLocation + "/" + "experiment-results");
-		if(experimentResultFile.exists()){
-			logger.info("Already complete" + "\n");
-			return;
-		}
+//		if(experimentResultFile.exists()){
+//			logger.info("Already complete" + "\n");
+//			return;
+//		}
 
 
 		Set<OWLLogicalAxiom> syntacticModule = null;
@@ -124,7 +125,14 @@ public class ExtractionComparision {
 		
 		writer.write("Syntactic Size,Semantic Size, ModulesSame, SemSubsetOfStar, StarSubsetSem" + "\n");
 		writer.write(syntacticModule.size() + "," + semanticModule.size() + "," 
-		+ semanticModule.equals(syntacticModule) + "," + syntacticModule.containsAll(semanticModule) + "," + semanticModule.containsAll(syntacticModule) + "," + "\n");
+		+ semanticModule.equals(syntacticModule) + "," + syntacticModule.containsAll(semanticModule) + "," + semanticModule.containsAll(syntacticModule) + "\n");
+		if(!syntacticModule.containsAll(semanticModule)){
+			System.out.println("Semantic size: " + semanticModule.size());
+			System.out.println("Syntactic size: " + syntacticModule.size());
+			semanticModule.removeAll(syntacticModule);
+			System.out.println("Difference: " +  semanticModule.size());
+			System.out.println(semanticModule);
+		}
 		writer.flush();
 		writer.close();
 
@@ -180,6 +188,36 @@ public class ExtractionComparision {
 				result.add((OWLLogicalAxiom) ax);
 		}
 		return result;
+	}
+	
+	public static void main(String[] args) {
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl-sub");
+		SigManager sigManager = new SigManager(new File(ModulePaths.getSignatureLocation() + "/nci-sub-300"));
+		
+		Set<OWLEntity> sig = null;
+		try {
+			sig = sigManager.readFile("random300-116");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		
+		try {
+			new ExtractionComparision(ont, sig, new File(ModulePaths.getResultLocation()+ "/superfuntesting")).compareExtractionApproaches();
+		} catch (OWLOntologyStorageException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (OWLOntologyCreationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (QBFSolverException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 

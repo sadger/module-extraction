@@ -12,6 +12,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.chaindependencies.Dependency;
 import uk.ac.liv.moduleextraction.chaindependencies.DependencySet;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
+import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 public class AcyclicChecker {
 	
@@ -35,7 +36,15 @@ public class AcyclicChecker {
 				axiomDeps.add(new Dependency(e));
 		}
 		
-		immediateDependencies.put(name, axiomDeps);
+		DependencySet nameDependencies = immediateDependencies.get(name);
+		if(nameDependencies == null){
+			immediateDependencies.put(name, axiomDeps);
+		}
+		else{
+			nameDependencies.addAll(axiomDeps);
+			immediateDependencies.put(name, nameDependencies);
+		}
+		
 		
 		
 	}
@@ -86,6 +95,11 @@ public class AcyclicChecker {
 		
 	}
 	
+	
+	public static void main(String[] args) {
+		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/Bioportal/NOTEL/BRIDG");
+		System.out.println(ont.getLogicalAxiomCount());
+	}
 	
 	
 	
