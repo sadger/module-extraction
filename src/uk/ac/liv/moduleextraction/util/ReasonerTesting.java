@@ -1,6 +1,6 @@
 package uk.ac.liv.moduleextraction.util;
 
-import org.semanticweb.HermiT.Reasoner;
+
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.ToStringRenderer;
 import org.semanticweb.owlapi.model.IRI;
@@ -31,7 +31,11 @@ public class ReasonerTesting {
 		stringRender.setRenderer(renderer);
 
 		this.ont = ont;
-		OWLReasonerFactory reasonerFactory = new Reasoner.ReasonerFactory();
+		//Use Hermit 
+		//OWLReasonerFactory reasonerFactory = new Reasoner.ReasonerFactory(); 
+		
+		//Use structural reasoner
+		OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
 		this.reasoner = reasonerFactory.createReasoner(ont);
 	}
 	
