@@ -33,7 +33,7 @@ public class FindMeAnOntology {
 	public void profileOntologies(){
 
 		File[] ontologyFiles = ontologyDirectory.listFiles();
-		Arrays.sort(ontologyFiles);
+	Collections.sort(Arrays.asList(ontologyFiles));
 		for(File f: ontologyFiles){
 			if(f.isFile()){
 				System.out.println(f.getName());
@@ -47,6 +47,7 @@ public class FindMeAnOntology {
 
 				//System.out.println(ont);
 				
+	
 				profileOntology(f.getAbsolutePath(),ont);
 //				
 			
@@ -88,8 +89,8 @@ public class FindMeAnOntology {
 //				System.out.println("Is ALC?: " + validator.isALCOntology(ont));
 				AcyclicChecker acyclic = new AcyclicChecker(ont);
 				System.out.println("Is acyclic: " + acyclic.isAcyclic());
-//		DLExpressivityChecker checker = new DLExpressivityChecker(Collections.singleton(ont));
-//		System.out.println("Expressivity: " + checker.getDescriptionLogicName());
+		DLExpressivityChecker checker = new DLExpressivityChecker(Collections.singleton(ont));
+		System.out.println("Expressivity: " + checker.getDescriptionLogicName());
 //			boolean isTerm = termChecker.isTerminology(ont);
 //////
 //				if(!isTerm)
@@ -100,7 +101,7 @@ public class FindMeAnOntology {
 	}
 
 	public static void main(String[] args) {
-		FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/All"));
+		FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/Genuine-All/NONEL"));
 	//FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "Acyclic/Broken"));
 		find.profileOntologies();
 	}
