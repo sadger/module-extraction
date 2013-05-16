@@ -31,8 +31,8 @@ public class EquivalentToTerminologyProcessor {
 	private HashMap<OWLClass, HashSet<OWLLogicalAxiom>> repeatedAxioms;
 	private HashMap<OWLClass, OWLClass> renamingMap;
 	private HashSet<OWLLogicalAxiom> newAxioms = new HashSet<OWLLogicalAxiom>();
-	OWLOntologyManager manager;
-	OWLDataFactory factory;
+	private OWLOntologyManager manager;
+	private OWLDataFactory factory;
 	
 	public EquivalentToTerminologyProcessor(OWLOntology ontology) throws NotEquivalentToTerminologyException {
 		AxiomExtractor extractor = new AxiomExtractor();
@@ -48,11 +48,34 @@ public class EquivalentToTerminologyProcessor {
 		manager = equivalentToTerminology.getOWLOntologyManager();
 		factory = manager.getOWLDataFactory();
 		
+	}
+	
+	public void preProcessOntology(){
 		collectRepeatedAxioms();
 		renameAxioms();
+	}
+	
+	public Set<OWLLogicalAxiom> postProcessModule(Set<OWLLogicalAxiom> module){
+		HashSet<OWLLogicalAxiom> revertedAxioms = new HashSet<OWLLogicalAxiom>();
+		for(OWLLogicalAxiom axiom : module){
+			//Don't add the newly made axioms
+			if(!newAxioms.contains(axiom)){
+				OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
+				OWLClassExpression definition = AxiomSplitter.getDefinitionofAxiom(axiom);
+				
+				if(renamingMap.keySet().contains(name)){
+					OWLSubClassOfAxiom revertedSubclass =
+							factory.getOWLSubClassOfAxiom(renamingMap.get(name), definition);
+					revertedAxioms.add(revertedSubclass);
+					
+				}
+				else{
+					revertedAxioms.add(axiom);
+				}
+			}
+		}
 		
-		System.out.println(revertAxioms(equivalentToTerminology.getLogicalAxioms()));
-
+		return revertedAxioms;
 	}
 	
 	public void collectRepeatedAxioms(){
@@ -71,8 +94,6 @@ public class EquivalentToTerminologyProcessor {
 	}
 	
 	public void renameAxioms(){
-		
-	
 		renamingMap = new HashMap<OWLClass, OWLClass>();
 		ArrayList<OWLOntologyChange> ontologyChanges = new ArrayList<OWLOntologyChange>();
 		
@@ -107,47 +128,11 @@ public class EquivalentToTerminologyProcessor {
 			}
 		}
 		
-		manager.applyChanges(ontologyChanges);
-		
-		System.out.println(equivalentToTerminology.getLogicalAxioms());
-		System.out.println(renamingMap);
-		System.out.println(newAxioms);
-
-		
+		manager.applyChanges(ontologyChanges);		
 	}
 	
-	public Set<OWLLogicalAxiom> revertAxioms(Set<OWLLogicalAxiom> axioms) {
-		HashSet<OWLLogicalAxiom> revertedAxioms = new HashSet<OWLLogicalAxiom>();
-		for(OWLLogicalAxiom axiom : axioms){
-			//Don't add the newly made axioms
-			if(!newAxioms.contains(axiom)){
-				OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
-				OWLClassExpression definition = AxiomSplitter.getDefinitionofAxiom(axiom);
-				
-				if(renamingMap.keySet().contains(name)){
-					OWLSubClassOfAxiom revertedSubclass =
-							factory.getOWLSubClassOfAxiom(renamingMap.get(name), definition);
-					revertedAxioms.add(revertedSubclass);
-					
-				}
-				else{
-					revertedAxioms.add(axiom);
-				}
-			}
-		}
-		
-		return revertedAxioms;
-	}
-	
-	private class NotEquivalentToTerminologyException extends Exception{
-		
-		private static final long serialVersionUID = -4211072461164166268L;
 
-		@Override
-		public String toString() {
-			return "Ontology not logically equivalent to terminology - cannot extract module";
-		}
-	}
+
 	
 	
 	public static void main(String[] args) {
