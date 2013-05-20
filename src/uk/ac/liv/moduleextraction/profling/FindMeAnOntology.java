@@ -39,7 +39,7 @@ public class FindMeAnOntology {
 				System.out.println(f.getName());
 				OWLOntology ont = OntologyLoader.loadOntology(f.getAbsolutePath());
 
-				System.out.println(ont.getAxiomCount());
+				//System.out.println(ont.getAxiomCount());
 				
 				
 	
@@ -47,7 +47,7 @@ public class FindMeAnOntology {
 
 				//System.out.println(ont);
 				
-	
+			
 				profileOntology(f.getAbsolutePath(),ont);
 //				
 			
@@ -63,7 +63,7 @@ public class FindMeAnOntology {
 //						e.printStackTrace();
 //					}
 //				}
-//				
+			
 				
 				
 				System.out.println();
@@ -101,8 +101,8 @@ public class FindMeAnOntology {
 	}
 
 	public static void main(String[] args) {
-		FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/Genuine-All/NONEL"));
-	//FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "Acyclic/Broken"));
+	//FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/Genuine-All/NONEL"));
+	FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "Bioportal/NOTEL/Big"));
 		find.profileOntologies();
 	}
 
