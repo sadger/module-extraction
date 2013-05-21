@@ -6,9 +6,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 
 public class SignatureGenerator {
@@ -60,6 +66,22 @@ public class SignatureGenerator {
 		return result;
 	}
 	
+	public OWLOntology randomAxioms(int size) throws OWLOntologyCreationException{
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		Set<OWLAxiom> newAxioms = new HashSet<OWLAxiom>();
+		
+		if(logicalAxioms.size() <= size){
+			newAxioms.addAll(logicalAxioms);
+		}
+		else{
+			ArrayList<OWLLogicalAxiom> axioms = new ArrayList<OWLLogicalAxiom>(logicalAxioms);
+			Collections.shuffle(axioms);
+			newAxioms.addAll(axioms.subList(0, size));
+		}
+		
+		return manager.createOntology(newAxioms);
+		
+	}
 
 
 

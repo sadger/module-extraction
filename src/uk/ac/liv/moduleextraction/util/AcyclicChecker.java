@@ -1,16 +1,26 @@
 package uk.ac.liv.moduleextraction.util;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.OWLFunctionalSyntaxOntologyFormat;
+import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 import uk.ac.liv.moduleextraction.chaindependencies.Dependency;
 import uk.ac.liv.moduleextraction.chaindependencies.DependencySet;
+import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
@@ -28,6 +38,7 @@ public class AcyclicChecker {
 		for(OWLLogicalAxiom axiom : ontology.getLogicalAxioms()){
 			addImmediateDependencies(axiom);
 		}		
+		
 	}
 	
 	private void addImmediateDependencies(OWLLogicalAxiom axiom) {
@@ -37,6 +48,8 @@ public class AcyclicChecker {
 		DependencySet axiomDeps = createAxiomDependencySet(definition);
 		
 		populateImmediateDependency(name, axiomDeps);
+		
+		
 	}
 	
 	private DependencySet createAxiomDependencySet(OWLClassExpression definition) {
@@ -63,14 +76,23 @@ public class AcyclicChecker {
 
 
 	public boolean isAcyclic(){
-//		int axiomCount = 0;
+		int axiomCount = 0;
 		boolean result = true ;
+
 		for(OWLLogicalAxiom axiom : ontology.getLogicalAxioms()){
-//			axiomCount++;
-//			System.out.println("Checking axiom " + axiomCount + "/" + ontology.getLogicalAxiomCount());
-//			System.out.println(axiom);
-			result = result && !causesCycle(axiom);			
+			axiomCount++;
+			System.out.println("Checking axiom " + axiomCount + "/" + ontology.getLogicalAxiomCount());
+			System.out.println(axiom);
+//			
+			boolean causedCycle = causesCycle(axiom);
+//			if(causedCycle){
+//				System.out.println(axiom);
+//			}
+			result = result && !causedCycle;
+			
 		}
+
+		
 		return result;
 	}
 	
@@ -88,6 +110,8 @@ public class AcyclicChecker {
 			int doesNotDepend = lhsSize - cycleCausingNames.size() - cyclicDefinitions.size();
 			System.out.println("Does not depend on cycle: " + doesNotDepend + " (" + Math.round(((double) doesNotDepend/lhsSize)*100) + "%)");
 
+			
+			System.out.println(cycleCausingNames);
 		}
 
 	}
@@ -98,15 +122,15 @@ public class AcyclicChecker {
 	private boolean causesCycle(OWLLogicalAxiom axiom) {
 		OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
 		
+
 		/* All the names seen on the LHS of an axiom */
 		HashSet<OWLClass> names = new HashSet<OWLClass>();
 		
 		/*Contains the immediate dependencies for last names added */
 		DependencySet toCheck = immediateDependencies.get(name);
 		
-		boolean axiomCausesCycle = false;
-		
 		while(!toCheck.isEmpty()){
+			
 			names.add(name);
 			
 			/* If we see an axiom on the RHS which has appeared on
@@ -121,10 +145,32 @@ public class AcyclicChecker {
 			}
 
 			toCheck = updateToCheckAndNames(toCheck, names);
+		
 		}
 
-		return axiomCausesCycle;
+		return false;
 		
+	}
+	
+	public void writeCycley(){
+		HashSet<OWLAxiom> cycley = new HashSet<OWLAxiom>();
+		
+		for(OWLLogicalAxiom ax : ontology.getLogicalAxioms()){
+			OWLClass axName = (OWLClass) AxiomSplitter.getNameofAxiom(ax);
+			if(cycleCausingNames.contains(axName)){
+				cycley.add(ax);
+			}
+		}
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		OWLFunctionalSyntaxOntologyFormat owlxmlFormat = new OWLFunctionalSyntaxOntologyFormat();
+		try {
+			manager.saveOntology(manager.createOntology(cycley), owlxmlFormat,IRI.create(new File(ModulePaths.getOntologyLocation()+ "/cycley2")));
+		} catch (OWLOntologyCreationException e) {
+			e.printStackTrace();
+		} catch (OWLOntologyStorageException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private DependencySet updateToCheckAndNames(DependencySet toCheck,
@@ -132,12 +178,6 @@ public class AcyclicChecker {
 		DependencySet newDependencies = new DependencySet();
 
 		for(Dependency d : toCheck){
-			
-			// Update the names
-			if(d.getValue() instanceof OWLClass){
-				names.add((OWLClass) d.getValue());
-			}
-
 			// Set toCheck as the immediate dependencies of these names
 			DependencySet depSet = immediateDependencies.get(d.getValue());
 			if(depSet != null){
@@ -150,14 +190,21 @@ public class AcyclicChecker {
 	
 	
 	public static void main(String[] args) {
-		//OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/moduletest/acyclic.krss");
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
-		AcyclicChecker checker = new AcyclicChecker(ont);
-		//System.out.println(ont);
-		System.out.println("Logical axioms: " + ont.getLogicalAxiomCount());
-		System.out.println("Is acyclic: " + checker.isAcyclic());
-		checker.printMetrics();
-		
+	OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/moduletest/acyclic.krss");
+	//	OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
+	//	OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_08.09d.OWL");
+	// OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/Bioportal/NatPrO");
+	//OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/smallcycley");
+	
+	//System.out.println(ont);
+	
+	AcyclicChecker checker = new AcyclicChecker(ont);
+
+	System.out.println("Logical axioms: " + ont.getLogicalAxiomCount());
+	System.out.println("Is acyclic: " + checker.isAcyclic());
+	checker.printMetrics();
+
+
 
 		
 	} 
