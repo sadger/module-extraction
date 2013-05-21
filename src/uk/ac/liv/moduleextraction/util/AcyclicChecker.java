@@ -1,36 +1,24 @@
 package uk.ac.liv.moduleextraction.util;
 
-import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.OWLFunctionalSyntaxOntologyFormat;
-import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
-
-import uk.ac.liv.moduleextraction.chaindependencies.Dependency;
-import uk.ac.liv.moduleextraction.chaindependencies.DependencySet;
-import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 public class AcyclicChecker {
 	
-	private HashMap<OWLClass, DependencySet> immediateDependencies = new HashMap<OWLClass, DependencySet>();
+	private HashMap<OWLClass, Set<OWLClass>> classDependencies = new HashMap<OWLClass, Set<OWLClass>>();
 	private OWLOntology ontology;
 
-	private HashSet<OWLClass> cyclicDefinitions = new HashSet<OWLClass>();
-	private HashSet<OWLClass> cycleCausingNames = new HashSet<OWLClass>();
+	private HashSet<OWLClass> dependsOnCycle = new HashSet<OWLClass>();
+	private HashSet<OWLClass> causesCycle = new HashSet<OWLClass>();
 	
 	
 	public AcyclicChecker(OWLOntology ontology) {
@@ -41,36 +29,56 @@ public class AcyclicChecker {
 		
 	}
 	
+	public void printMetrics(){
+		System.out.println();
+		boolean acyclic = isAcyclic();
+		System.out.println("Is acyclic " + acyclic);
+		if(!acyclic){
+			System.out.println("Concepts in sig: " + ontology.getClassesInSignature().size());
+			int lhsSize = classDependencies.keySet().size();
+			System.out.println("LHS size: " + lhsSize);
+			System.out.println("Cycle causing: " + causesCycle.size() + " (" + Math.round(((double) causesCycle.size()/lhsSize)*100) + "%)");
+			dependsOnCycle.removeAll(causesCycle);
+			System.out.println("Depends on cycle: " + dependsOnCycle.size() + " (" + Math.round(((double) dependsOnCycle.size()/lhsSize)*100) + "%)");
+			int doesNotDepend = lhsSize - causesCycle.size() - dependsOnCycle.size();
+			System.out.println("Does not depend on cycle: " + doesNotDepend + " (" + Math.round(((double) doesNotDepend/lhsSize)*100) + "%)");
+
+			
+			System.out.println(causesCycle);
+		}
+
+	}
+	
 	private void addImmediateDependencies(OWLLogicalAxiom axiom) {
 		OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
 		OWLClassExpression definition = AxiomSplitter.getDefinitionofAxiom(axiom);
 		
-		DependencySet axiomDeps = createAxiomDependencySet(definition);
+		Set<OWLClass> axiomDeps = createAxiomDependencySet(definition);
 		
 		populateImmediateDependency(name, axiomDeps);
 		
 		
 	}
 	
-	private DependencySet createAxiomDependencySet(OWLClassExpression definition) {
-		DependencySet axiomDeps = new DependencySet();
-		for(OWLEntity e : definition.getClassesInSignature()){
-			if(!e.isTopEntity() && !e.isBottomEntity()){
-				axiomDeps.add(new Dependency(e));
+	private Set<OWLClass> createAxiomDependencySet(OWLClassExpression definition) {
+		HashSet<OWLClass> axiomDeps = new HashSet<OWLClass>();
+		for(OWLClass cls : definition.getClassesInSignature()){
+			if(!cls.isTopEntity() && !cls.isBottomEntity()){
+				axiomDeps.add(cls);
 			}
 		}
 		return axiomDeps;
 	}
 	
-	private void populateImmediateDependency(OWLClass name, DependencySet axiomDeps) {
-		DependencySet nameDependencies = immediateDependencies.get(name);
+	private void populateImmediateDependency(OWLClass name, Set<OWLClass> axiomDeps) {
+		Set<OWLClass> nameDependencies = classDependencies.get(name);
 		if(nameDependencies == null){
-			immediateDependencies.put(name, axiomDeps);
+			classDependencies.put(name, axiomDeps);
 		}
 		else{
 			// Respect names with multiple definitions
 			nameDependencies.addAll(axiomDeps);
-			immediateDependencies.put(name, nameDependencies);
+			classDependencies.put(name, nameDependencies);
 		}
 	}
 
@@ -83,12 +91,10 @@ public class AcyclicChecker {
 			axiomCount++;
 			System.out.println("Checking axiom " + axiomCount + "/" + ontology.getLogicalAxiomCount());
 			System.out.println(axiom);
-//			
-			boolean causedCycle = causesCycle(axiom);
-//			if(causedCycle){
-//				System.out.println(axiom);
-//			}
-			result = result && !causedCycle;
+			
+			boolean noCycle = doesNotContainCycle(axiom);
+			System.out.println("Cycley?: " + !noCycle);
+			result = result && noCycle;
 			
 		}
 
@@ -96,113 +102,75 @@ public class AcyclicChecker {
 		return result;
 	}
 	
-	public void printMetrics(){
-		System.out.println();
-		boolean acyclic = isAcyclic();
-		System.out.println("Is acyclic " + acyclic);
-		if(!acyclic){
-			System.out.println("Concepts in sig: " + ontology.getClassesInSignature().size());
-			int lhsSize = immediateDependencies.keySet().size();
-			System.out.println("LHS size: " + lhsSize);
-			System.out.println("Cycle causing: " + cycleCausingNames.size() + " (" + Math.round(((double) cycleCausingNames.size()/lhsSize)*100) + "%)");
-			cyclicDefinitions.removeAll(cycleCausingNames);
-			System.out.println("Depends on cycle: " + cyclicDefinitions.size() + " (" + Math.round(((double) cyclicDefinitions.size()/lhsSize)*100) + "%)");
-			int doesNotDepend = lhsSize - cycleCausingNames.size() - cyclicDefinitions.size();
-			System.out.println("Does not depend on cycle: " + doesNotDepend + " (" + Math.round(((double) doesNotDepend/lhsSize)*100) + "%)");
-
-			
-			System.out.println(cycleCausingNames);
-		}
-
-	}
-
-	/* Follow the definition of the axioms see if you find 
-	 * any name on the LHS of its unfolding on the RHS
-	 */
-	private boolean causesCycle(OWLLogicalAxiom axiom) {
+	public boolean doesNotContainCycle(OWLLogicalAxiom axiom){
+		
 		OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
 		
-
-		/* All the names seen on the LHS of an axiom */
-		HashSet<OWLClass> names = new HashSet<OWLClass>();
+		boolean containsNoCycle = 
+				noCycleExistsInAxiom(new HashSet<OWLClass>(Collections.singleton(name)), classDependencies.get(name));
 		
-		/*Contains the immediate dependencies for last names added */
-		DependencySet toCheck = immediateDependencies.get(name);
+		if(!containsNoCycle){
+			dependsOnCycle.add(name);
+		}
 		
-		while(!toCheck.isEmpty()){
-			
-			names.add(name);
-			
-			/* If we see an axiom on the RHS which has appeared on
-			 * the LHS we have a cycle
-			 */
+		return containsNoCycle;
+	}
+	
+	
+	public boolean noCycleExistsInAxiom(Set<OWLClass> names, Set<OWLClass> toCheck){
+		
+		//System.out.println(names + "|" + toCheck);
+		if(toCheck.isEmpty()){
+			return true;
+		}
+		else{
 			for(OWLClass cls : names){
-				if(toCheck.contains(new Dependency(cls))){
-					cyclicDefinitions.add(name);
-					cycleCausingNames.add(cls);
-					return true;
+				if(toCheck.contains(cls)){
+					return false;
 				}
 			}
-
-			toCheck = updateToCheckAndNames(toCheck, names);
-		
-		}
-
-		return false;
-		
-	}
-	
-	public void writeCycley(){
-		HashSet<OWLAxiom> cycley = new HashSet<OWLAxiom>();
-		
-		for(OWLLogicalAxiom ax : ontology.getLogicalAxioms()){
-			OWLClass axName = (OWLClass) AxiomSplitter.getNameofAxiom(ax);
-			if(cycleCausingNames.contains(axName)){
-				cycley.add(ax);
+			
+			boolean result = true;
+			
+			for(OWLClass check : toCheck){
+				HashSet<OWLClass> newNames = new HashSet<OWLClass>();
+				newNames.addAll(names);
+				newNames.add(check);
+				
+				HashSet<OWLClass> newCheck = new HashSet<OWLClass>();
+				
+				Set<OWLClass> checkDepends = classDependencies.get(check);
+				
+				if(checkDepends != null){
+					newCheck.addAll(checkDepends);
+				}
+				
+				boolean p = noCycleExistsInAxiom(newNames, newCheck);
+				result = result && p;
 			}
-		}
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLFunctionalSyntaxOntologyFormat owlxmlFormat = new OWLFunctionalSyntaxOntologyFormat();
-		try {
-			manager.saveOntology(manager.createOntology(cycley), owlxmlFormat,IRI.create(new File(ModulePaths.getOntologyLocation()+ "/cycley2")));
-		} catch (OWLOntologyCreationException e) {
-			e.printStackTrace();
-		} catch (OWLOntologyStorageException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			return result;
 		}
 	}
 
-	private DependencySet updateToCheckAndNames(DependencySet toCheck,
-			HashSet<OWLClass> names) {
-		DependencySet newDependencies = new DependencySet();
-
-		for(Dependency d : toCheck){
-			// Set toCheck as the immediate dependencies of these names
-			DependencySet depSet = immediateDependencies.get(d.getValue());
-			if(depSet != null){
-				newDependencies.addAll(depSet);
-			}
-		}
-
-		return newDependencies;
-	}
 	
+
+
 	
 	public static void main(String[] args) {
 	OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/moduletest/acyclic.krss");
 	//	OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
 	//	OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_08.09d.OWL");
-	// OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/Bioportal/NatPrO");
+	//OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/Bioportal/NatPrO");
 	//OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/smallcycley");
 	
 	//System.out.println(ont);
-	
+		System.out.println("Logical axioms: " + ont.getLogicalAxiomCount());
 	AcyclicChecker checker = new AcyclicChecker(ont);
 
-	System.out.println("Logical axioms: " + ont.getLogicalAxiomCount());
+
 	System.out.println("Is acyclic: " + checker.isAcyclic());
-	checker.printMetrics();
+//	checker.printMetrics();
 
 
 
