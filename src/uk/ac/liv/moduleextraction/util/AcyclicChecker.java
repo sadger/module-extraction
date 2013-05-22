@@ -9,10 +9,15 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import uk.ac.liv.moduleextraction.extractor.SyntacticFirstModuleExtraction;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 public class AcyclicChecker {
+	Logger logger = LoggerFactory.getLogger(AcyclicChecker.class);
 	
 	private HashMap<OWLClass, Set<OWLClass>> classDependencies = new HashMap<OWLClass, Set<OWLClass>>();
 	private OWLOntology ontology;
@@ -20,9 +25,19 @@ public class AcyclicChecker {
 	private HashSet<OWLClass> dependsOnCycle = new HashSet<OWLClass>();
 	private HashSet<OWLClass> causesCycle = new HashSet<OWLClass>();
 	
+	private boolean collectingMetrics = false;
+	private boolean metricsHaveBeenCollected = false;
+	private boolean isAcyclic = false;
 	
-	public AcyclicChecker(OWLOntology ontology) {
+	/**
+	 * Initialse an ontology for acyclic checking - preprocessing
+	 * @param ontology
+	 * @param collectMetrics - searches all paths for cycles to collected information
+	 * about the structure of the ontology - much less efficent when this flag is set.
+	 */
+	public AcyclicChecker(OWLOntology ontology, boolean collectMetrics) {
 		this.ontology = ontology;
+		this.collectingMetrics = collectMetrics;
 		for(OWLLogicalAxiom axiom : ontology.getLogicalAxioms()){
 			addImmediateDependencies(axiom);
 		}		
@@ -30,23 +45,39 @@ public class AcyclicChecker {
 	}
 	
 	public void printMetrics(){
-		System.out.println();
-		boolean acyclic = isAcyclic();
-		System.out.println("Is acyclic " + acyclic);
-		if(!acyclic){
-			System.out.println("Concepts in sig: " + ontology.getClassesInSignature().size());
-			int lhsSize = classDependencies.keySet().size();
-			System.out.println("LHS size: " + lhsSize);
-			System.out.println("Cycle causing: " + causesCycle.size() + " (" + Math.round(((double) causesCycle.size()/lhsSize)*100) + "%)");
-			dependsOnCycle.removeAll(causesCycle);
-			System.out.println("Depends on cycle: " + dependsOnCycle.size() + " (" + Math.round(((double) dependsOnCycle.size()/lhsSize)*100) + "%)");
-			int doesNotDepend = lhsSize - causesCycle.size() - dependsOnCycle.size();
-			System.out.println("Does not depend on cycle: " + doesNotDepend + " (" + Math.round(((double) doesNotDepend/lhsSize)*100) + "%)");
-
-			
-			System.out.println(causesCycle);
+		if(metricsHaveBeenCollected){
+			boolean acyclic = isAcyclic;
+			System.out.println("Is acyclic: " + acyclic);
+			if(!acyclic){
+				System.out.println("Concepts in sig: " + ontology.getClassesInSignature().size());
+				int lhsSize = classDependencies.keySet().size();
+				System.out.println("LHS size: " + lhsSize);
+				System.out.println("Cycle causing: " + getPercentageMetric(lhsSize, causesCycle.size()));
+				dependsOnCycle.removeAll(causesCycle);
+				System.out.println("Depends on cycle: " + getPercentageMetric(lhsSize, dependsOnCycle.size()));
+				int doesNotDepend = lhsSize - causesCycle.size() - dependsOnCycle.size();
+				System.out.println("Does not depend on cycle: " + getPercentageMetric(lhsSize, doesNotDepend));
+//				
+//				System.out.println("Causes: " + causesCycle);
+//				System.out.println("Depends " + dependsOnCycle);
+			}
+		}
+		else{
+			System.out.println("No metrics have been collected - run acyclic checker with flag set");
 		}
 
+
+	}
+	
+	private String getPercentageMetric(int lhsSize, int comparisonMetric){
+		long result = Math.round(((double) comparisonMetric/lhsSize)*100);
+		if(result == 0){
+			return comparisonMetric + " (<1%)";
+		}		
+		else if(result == 100 && comparisonMetric != lhsSize){
+			return comparisonMetric + " (>99%)";
+		}
+		return comparisonMetric + " (" + result + "%)";
 	}
 	
 	private void addImmediateDependencies(OWLLogicalAxiom axiom) {
@@ -89,17 +120,28 @@ public class AcyclicChecker {
 
 		for(OWLLogicalAxiom axiom : ontology.getLogicalAxioms()){
 			axiomCount++;
-			System.out.println("Checking axiom " + axiomCount + "/" + ontology.getLogicalAxiomCount());
-			System.out.println(axiom);
-			
-			boolean noCycle = doesNotContainCycle(axiom);
-			System.out.println("Cycley?: " + !noCycle);
-			result = result && noCycle;
+			logger.debug("Checking axiom {}/{}: {}",axiomCount,ontology.getLogicalAxiomCount(), axiom);
+
+			/* Allow short circuting of conditional if not 
+			 * collecting metrics - so do not check every axiom
+			 */
+			if(collectingMetrics){
+				boolean noCycle = doesNotContainCycle(axiom);
+				result = result && noCycle;
+			}
+			else{
+				result = result && doesNotContainCycle(axiom);
+			}
+
 			
 		}
-
 		
-		return result;
+		if(collectingMetrics){
+			metricsHaveBeenCollected = true;
+		}
+
+		this.isAcyclic = result;
+		return isAcyclic;
 	}
 	
 	public boolean doesNotContainCycle(OWLLogicalAxiom axiom){
@@ -124,10 +166,25 @@ public class AcyclicChecker {
 			return true;
 		}
 		else{
+			boolean cycleCauseFound = false;
+			
 			for(OWLClass cls : names){
-				if(toCheck.contains(cls)){
-					return false;
+				if(collectingMetrics){
+					if(toCheck.contains(cls)){
+						causesCycle.add(cls);
+						cycleCauseFound = cycleCauseFound || true;
+					}
+				}			
+				else{
+					if(toCheck.contains(cls)){
+						return false;
+					}
 				}
+			}
+	
+			
+			if(cycleCauseFound){
+				return false;
 			}
 			
 			boolean result = true;
@@ -145,8 +202,17 @@ public class AcyclicChecker {
 					newCheck.addAll(checkDepends);
 				}
 				
-				boolean p = noCycleExistsInAxiom(newNames, newCheck);
-				result = result && p;
+				/* Check all paths if collecting metrics otherwise
+				 * allow short circuting of conditional
+				 */
+				if(collectingMetrics){
+					boolean noCycle = noCycleExistsInAxiom(newNames, newCheck);
+					result = result && noCycle;
+				}
+				else{
+					result = result && noCycleExistsInAxiom(newNames, newCheck);
+				}
+	
 			}
 			
 			return result;
@@ -158,19 +224,19 @@ public class AcyclicChecker {
 
 	
 	public static void main(String[] args) {
-	OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/moduletest/acyclic.krss");
+	//OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/moduletest/acyclic2.krss");
 	//	OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
-	//	OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_08.09d.OWL");
-	//OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/Bioportal/NatPrO");
+	OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_08.09d.OWL");
+	//OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/Bioportal/NOTEL/Big/CL");
 	//OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/smallcycley");
 	
-	//System.out.println(ont);
+	System.out.println(ont);
 		System.out.println("Logical axioms: " + ont.getLogicalAxiomCount());
-	AcyclicChecker checker = new AcyclicChecker(ont);
+	AcyclicChecker checker = new AcyclicChecker(ont, false);
 
 
 	System.out.println("Is acyclic: " + checker.isAcyclic());
-//	checker.printMetrics();
+	checker.printMetrics();
 
 
 
