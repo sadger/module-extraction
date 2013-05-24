@@ -147,9 +147,10 @@ public class AcyclicChecker {
 	public boolean doesNotContainCycle(OWLLogicalAxiom axiom){
 		
 		OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
+		OWLClassExpression definition = AxiomSplitter.getDefinitionofAxiom(axiom);
 		
 		boolean containsNoCycle = 
-				noCycleExistsInAxiom(new HashSet<OWLClass>(Collections.singleton(name)), classDependencies.get(name));
+				noCycleExistsInAxiom(new HashSet<OWLClass>(Collections.singleton(name)), definition.getClassesInSignature());
 		
 		if(!containsNoCycle){
 			dependsOnCycle.add(name);
@@ -161,7 +162,8 @@ public class AcyclicChecker {
 	
 	public boolean noCycleExistsInAxiom(Set<OWLClass> names, Set<OWLClass> toCheck){
 		
-		//System.out.println(names + "|" + toCheck);
+		logger.trace("{}|{}",names,toCheck);
+		
 		if(toCheck.isEmpty()){
 			return true;
 		}
@@ -224,19 +226,20 @@ public class AcyclicChecker {
 
 	
 	public static void main(String[] args) {
-	//OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/moduletest/acyclic2.krss");
+	//OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "moduletest/acyclic2.krss");
 	//	OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
-	OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_08.09d.OWL");
-	//OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/Bioportal/NOTEL/Big/CL");
+	//OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_08.09d.OWL");
+	OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Bioportal/NOTEL/Big/Acyclic/CL");
 	//OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/smallcycley");
 	
 	System.out.println(ont);
 		System.out.println("Logical axioms: " + ont.getLogicalAxiomCount());
-	AcyclicChecker checker = new AcyclicChecker(ont, false);
+	AcyclicChecker checker = new AcyclicChecker(ont, true);
 
 
 	System.out.println("Is acyclic: " + checker.isAcyclic());
 	checker.printMetrics();
+
 
 
 
