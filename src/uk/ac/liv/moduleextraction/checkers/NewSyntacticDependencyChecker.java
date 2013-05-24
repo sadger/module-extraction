@@ -28,25 +28,10 @@ public class NewSyntacticDependencyChecker {
 			return result;
 		}
 		else{
-		
-	
-			OWLDataFactory factory = OWLManager.getOWLDataFactory();
-			OWLClass conceptToFind = 
-					factory.getOWLClass(IRI.create("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#Neoplasm"));
-	
-			if(axiomName.equals(conceptToFind)){
-				System.out.println(signatureAndSigM);
-
-			}
-
 			HashSet<OWLEntity> intersect = new HashSet<OWLEntity>(dependsW.get(axiomName).asOWLEntities());
 			intersect.retainAll(signatureAndSigM);
 			
 			if(!intersect.isEmpty()){
-				if(axiomName.equals(conceptToFind)){
-					System.out.println(axiomName + ":" + intersect);
-				}
-
 				result = true;
 			}
 			return result;

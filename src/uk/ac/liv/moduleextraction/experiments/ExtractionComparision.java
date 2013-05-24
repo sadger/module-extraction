@@ -50,7 +50,6 @@ public class ExtractionComparision {
 	private Set<OWLEntity> signature;
 	private DumpExtractionToDisk dump;
 
-	private int syntaticSize = 0;
 	private long timeTaken = 0;
 	
 	private File experimentLocation;
@@ -68,10 +67,10 @@ public class ExtractionComparision {
 
 	public void compareExtractionApproaches() throws IOException, QBFSolverException, OWLOntologyStorageException, OWLOntologyCreationException{	
 		File experimentResultFile = new File(experimentLocation + "/" + "experiment-results");
-//		if(experimentResultFile.exists()){
-//			logger.info("Already complete" + "\n");
-//			return;
-//		}
+		if(experimentResultFile.exists()){
+			logger.info("Already complete" + "\n");
+			return;
+		}
 
 
 		Set<OWLLogicalAxiom> syntacticModule = null;
@@ -81,10 +80,6 @@ public class ExtractionComparision {
 
 			Set<OWLAxiom> syntacticOntology = syntaxModExtractor.extract(signature);
 
-//			OWLXMLOntologyFormat owlFormat = new OWLXMLOntologyFormat();
-//			manager.saveOntology(manager.createOntology(syntacticOntology),owlFormat, 
-//					IRI.create(new File(experimentLocation + "/" + "syntacticModule.owl")));
-
 			syntacticModule = getLogicalAxioms(syntacticOntology);
 
 			long startTime = System.currentTimeMillis();
@@ -92,7 +87,7 @@ public class ExtractionComparision {
 			this.moduleExtractor = new SyntacticFirstModuleExtraction(ontology.getLogicalAxioms(),signature);
 		
 
-		syntaticSize = syntacticModule.size();
+	
 
 
 		this.dump = new DumpExtractionToDisk(
@@ -191,7 +186,7 @@ public class ExtractionComparision {
 	}
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl-sub");
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl-sub");
 		SigManager sigManager = new SigManager(new File(ModulePaths.getSignatureLocation() + "/nci-sub-300"));
 		
 		Set<OWLEntity> sig = null;

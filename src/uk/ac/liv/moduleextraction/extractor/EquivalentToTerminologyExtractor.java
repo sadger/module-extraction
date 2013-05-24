@@ -17,6 +17,7 @@ public class EquivalentToTerminologyExtractor {
 
 	private OWLOntology equivToTerm;
 	private EquivalentToTerminologyProcessor processor;
+	private Set<OWLLogicalAxiom> module;
 	
 	public EquivalentToTerminologyExtractor(OWLOntology equivalentToTerm) throws NotEquivalentToTerminologyException {
 		this.equivToTerm = equivalentToTerm;
@@ -31,13 +32,13 @@ public class EquivalentToTerminologyExtractor {
 		
 		Set<OWLLogicalAxiom> module = moduleExtractor.extractModule();
 		
-		return processor.postProcessModule(module);
-
+		module = processor.postProcessModule(module);
+		return module;
 		
 	}
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/moduletest/equiv.krss");
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/moduletest/equiv.krss");
 		try {
 			EquivalentToTerminologyExtractor extract = new EquivalentToTerminologyExtractor(ont);
 			SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
@@ -54,6 +55,10 @@ public class EquivalentToTerminologyExtractor {
 			e.printStackTrace();
 		}
 		
+	}
+
+	public Set<OWLLogicalAxiom> getModule() {
+		return module;
 	}
 	
 }

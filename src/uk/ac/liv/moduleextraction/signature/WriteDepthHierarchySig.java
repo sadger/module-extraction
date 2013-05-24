@@ -57,7 +57,7 @@ public class WriteDepthHierarchySig {
 
 	public static void main(String[] args) {
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
 		DependencyHierarchy hier = new DependencyHierarchy(ont.getLogicalAxioms());
 		OWLClass cls = factory.getOWLClass(IRI.create("http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#Intermediate_Fibrocytic_Neoplasm"));
 		new WriteDepthHierarchySig(hier, cls).writeSignatures();

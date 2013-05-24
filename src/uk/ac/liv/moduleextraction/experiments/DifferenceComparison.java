@@ -98,7 +98,7 @@ public class DifferenceComparison {
 	
 	public static void main(String[] args) {
 		
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
 		try {
 			DifferenceComparison diff = new DifferenceComparison(ont, new File(ModulePaths.getSignatureLocation() + "/sig-250random"));
 		} catch (OWLOntologyStorageException e) {

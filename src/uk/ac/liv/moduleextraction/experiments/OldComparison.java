@@ -100,7 +100,7 @@ public class OldComparison {
 	}
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology("/LOCAL/wgatens/Ontologies/Bioportal/NOTEL/Terminologies/Acyclic/Big/LiPrO-converted");
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities("/LOCAL/wgatens/Ontologies/Bioportal/NOTEL/Terminologies/Acyclic/Big/LiPrO-converted");
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
 		Set<OWLEntity> sig = gen.generateRandomSignature(1);
 		

@@ -263,7 +263,7 @@ public class LinkedHashList<E> extends AbstractSequentialList<E> {
 
 
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "moduletest/chaintest1.krss");
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "moduletest/chaintest1.krss");
 		ArrayList<OWLLogicalAxiom> unsorted = new ArrayList<OWLLogicalAxiom>(ont.getLogicalAxioms());
 
 		DefinitorialDepth definitorialDepth = new DefinitorialDepth(ont);

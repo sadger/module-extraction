@@ -90,7 +90,7 @@ public class EquivalentToTerminologyProcessor {
 				namedAxioms.add(axiom);
 			}
 		}
-		System.out.println(repeatedAxioms);
+
 	}
 	
 	public void renameAxioms(){
@@ -136,7 +136,7 @@ public class EquivalentToTerminologyProcessor {
 	
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "/moduletest/equiv.krss");
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/moduletest/equiv.krss");
 		System.out.println(ont.getLogicalAxioms());
 		try {
 			EquivalentToTerminologyProcessor extractor = new EquivalentToTerminologyProcessor(ont);

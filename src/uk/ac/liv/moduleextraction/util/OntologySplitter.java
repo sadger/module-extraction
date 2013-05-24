@@ -34,7 +34,7 @@ public class OntologySplitter {
 	 */
 	public void splitOntology(File ontLocation) throws OWLOntologyCreationException, OWLOntologyStorageException{
 		
-		OWLOntology ont = OntologyLoader.loadOntology(ontLocation.getAbsolutePath());
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ontLocation.getAbsolutePath());
 		
 		HashSet<OWLAxiom> subClassAxioms = new HashSet<OWLAxiom>();
 		subClassAxioms.addAll(ont.getAxioms(AxiomType.SUBCLASS_OF));

@@ -116,7 +116,7 @@ public class DefinitorialDepth {
 
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "interp/diff2.krss");
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "interp/diff2.krss");
 		DefinitorialDepth d = new DefinitorialDepth(ont);
 		for(OWLLogicalAxiom ax : d.getDefinitorialSortedList()){
 			OWLClass cls = (OWLClass) AxiomSplitter.getNameofAxiom(ax);

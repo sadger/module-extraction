@@ -61,7 +61,7 @@ public class WriteRandomSigs {
 	public static void main(String[] args) {
 //		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl-sub");
 
-		OWLOntology ont = OntologyLoader.loadOntology("/LOCAL/wgatens/Ontologies/Bioportal/NOTEL/Terminologies/Acyclic/Big/NatPrO-converted");
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities("/LOCAL/wgatens/Ontologies/Bioportal/NOTEL/Terminologies/Acyclic/Big/NatPrO-converted");
 		int sigSize = 500;
 		WriteRandomSigs writer = new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "/natpro-" + sigSize));
 		writer.writeSignatureWithRoles(sigSize, 1000);
