@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
@@ -21,6 +22,7 @@ public class WriteAxiomSignatures {
 		this.ontology = ontology;
 		this.saveLocation = saveLocation;
 	}
+	
 	
 	public void writeAxiomSignatures(){
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
