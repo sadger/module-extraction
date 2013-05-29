@@ -73,11 +73,10 @@ public class ExtractionComparision {
 		}
 
 
-		Set<OWLLogicalAxiom> syntacticModule = null;
 			manager = OWLManager.createOWLOntologyManager();
 			syntaxModExtractor = new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.STAR);
 			
-
+			Set<OWLLogicalAxiom> syntacticModule = null;
 			Set<OWLAxiom> syntacticOntology = syntaxModExtractor.extract(signature);
 
 			syntacticModule = getLogicalAxioms(syntacticOntology);
