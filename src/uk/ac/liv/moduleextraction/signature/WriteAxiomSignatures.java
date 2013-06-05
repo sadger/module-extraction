@@ -45,9 +45,9 @@ public class WriteAxiomSignatures {
 	}
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Bioportal/BDO");
-		System.out.println(ont);
-//		WriteAxiomSignatures writer = new WriteAxiomSignatures(ont, new File(ModulePaths.getSignatureLocation() + "/BDO-axioms"));
-//		writer.writeAxiomSignatures();
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Bioportal/LiPrO-converted");
+		//System.out.println(ont);
+		WriteAxiomSignatures writer = new WriteAxiomSignatures(ont, new File(ModulePaths.getSignatureLocation() + "/liprozor"));
+		writer.writeAxiomSignatures();
 	}
 }

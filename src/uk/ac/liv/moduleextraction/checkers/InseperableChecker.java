@@ -2,7 +2,6 @@ package uk.ac.liv.moduleextraction.checkers;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
@@ -11,8 +10,6 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.liv.moduleextraction.datastructures.LinkedHashList;
-import uk.ac.liv.moduleextraction.experiments.ExtractionComparision;
 import uk.ac.liv.moduleextraction.qbf.QBFFileWriter;
 import uk.ac.liv.moduleextraction.qbf.QBFSolver;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;

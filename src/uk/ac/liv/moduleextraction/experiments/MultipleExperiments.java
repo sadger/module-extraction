@@ -63,7 +63,7 @@ public class MultipleExperiments {
 				
 				//Save the signature with the experiment
 				SigManager managerWriter = new SigManager(experimentLocation);
-				managerWriter.writeFile(sig, "sig\nature");
+				managerWriter.writeFile(sig, "signature");
 				
 				//Write any metrics
 				experiment.writeMetrics(experimentLocation);
@@ -73,9 +73,16 @@ public class MultipleExperiments {
 	
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + 
-				"/Bioportal/NOTEL/Terminologies/LiPrO-converted");		
+				"/Bioportal/LiPrO-converted");		
 		try {
+			new MultipleExperiments().runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/LiPro-25"), 
+					ExperimentType.OLD_NEW);
 			new MultipleExperiments().runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/LiPro-50"), 
+					ExperimentType.OLD_NEW);
+			new MultipleExperiments().runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/LiPro-75"), 
+					ExperimentType.OLD_NEW);
+			
+			new MultipleExperiments().runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/LiPro-100"), 
 					ExperimentType.OLD_NEW);
 		} catch (IOException e) {
 			e.printStackTrace();

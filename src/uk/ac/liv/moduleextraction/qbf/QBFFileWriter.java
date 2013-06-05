@@ -67,8 +67,7 @@ public class QBFFileWriter {
 		this.classesNotInSignature = new HashSet<OWLEntity>();
 
 		convertOntologyToQBFClauses();
-		populateSignatures();
-		
+		populateSignatures();		
 	}
 	
 	public boolean convertedClauseSetIsEmpty() {
@@ -99,10 +98,11 @@ public class QBFFileWriter {
 	
 		classesNotInSignature.addAll(ontologyEntities);
 		classesNotInSignature.removeAll(signature);
-
+		
 		/* Remove Top and Bottom classes */
 		classesNotInSignature.remove(factory.getOWLThing());
 		classesNotInSignature.remove(factory.getOWLNothing());
+		
 	}
 
 	public File generateQBFProblem() throws IOException{
@@ -172,7 +172,14 @@ public class QBFFileWriter {
 			toWrite.add("a ");
 			for(OWLEntity ent : signature){
 				PropositionalFormula clsAsVar = convertor.convert(ent);
-				toWrite.add(numberMap.get(clsAsVar) + " ");
+				Integer associatedNumber = numberMap.get(clsAsVar);
+				/* 
+				 * If there is no mapping for the entity it no longer
+				 * appears in the ontology converted to CNF
+				 */
+				if(!(associatedNumber == null)){
+					toWrite.add(numberMap.get(clsAsVar) + " ");
+				}
 			}
 			toWrite.add("0\n");
 		}
@@ -183,7 +190,16 @@ public class QBFFileWriter {
 			toWrite.add("e ");
 			for(OWLEntity ent : classesNotInSignature){
 				PropositionalFormula clsAsVar = convertor.convert(ent);
-				toWrite.add(numberMap.get(clsAsVar) + " ");
+				
+				/* 
+				 * If there is no mapping for the entity it no longer
+				 * appears in the ontology converted to CNF
+				 */
+				Integer associatedNumber = numberMap.get(clsAsVar);
+				if(!(associatedNumber == null)){
+					toWrite.add(numberMap.get(clsAsVar) + " ");
+				}
+				
 			}
 			toWrite.add("0\n");
 		}
@@ -203,30 +219,6 @@ public class QBFFileWriter {
 
 
 	
-//	public static void main(String[] args) {
-//		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "moduletest/top.owl");
-//
-//		OWLDataFactory f = OWLManager.getOWLDataFactory();
-//		OWLClass a = f.getOWLClass(IRI.create(ont.getOntologyID() + "#A"));
-//		OWLClass b = f.getOWLClass(IRI.create(ont.getOntologyID() + "#B"));
-//		Set<OWLEntity> signature = new HashSet<OWLEntity>();
-//		signature.add(a);
-//		signature.add(b);
-//		
-//		QBFFileWriter write = new QBFFileWriter(ont.getLogicalAxioms(), signature);
-//		
-//
-//			try {
-//				File problem = write.generateQBFProblem();
-//				QBFSolver solver = new QBFSolver();
-//				System.out.println(solver.isSatisfiable(problem));
-//			} catch (QBFSolverException e) {
-//				e.printStackTrace();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		
-//	}
 
 
 

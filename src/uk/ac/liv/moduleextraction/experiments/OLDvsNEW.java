@@ -16,6 +16,9 @@ import uk.ac.liv.moduleextraction.extractor.OldApproach;
 import uk.ac.liv.moduleextraction.extractor.SyntacticFirstModuleExtraction;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.reloading.DumpExtractionToDisk;
+import uk.ac.liv.moduleextraction.signature.SigManager;
+import uk.ac.liv.moduleextraction.util.ModulePaths;
+import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 public class OLDvsNEW implements Experiment {
 	
@@ -27,23 +30,29 @@ public class OLDvsNEW implements Experiment {
 	@Override
 	public void performExperiment(OWLOntology ontology, Set<OWLEntity> signature) {
 		
-		oldModuleExtractor = new OldApproach(ontology.getLogicalAxioms(), signature);
+		Set<OWLLogicalAxiom> newModule = null;
+		moduleExtractor = new SyntacticFirstModuleExtraction(ontology.getLogicalAxioms(), signature);
 		try {
-			Set<OWLLogicalAxiom> oldModule = oldModuleExtractor.extractModule();
+			newModule = moduleExtractor.extractModule();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (QBFSolverException e) {
 			e.printStackTrace();
 		}
 		
-		moduleExtractor = new SyntacticFirstModuleExtraction(ontology.getLogicalAxioms(), signature);
+		Set<OWLLogicalAxiom> oldModule = null;
+		oldModuleExtractor = new OldApproach(ontology.getLogicalAxioms(), signature);
 		try {
-			Set<OWLLogicalAxiom> newModule = moduleExtractor.extractModule();
+			oldModule = oldModuleExtractor.extractModule();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (QBFSolverException e) {
 			e.printStackTrace();
 		}
+		
+
+//		
+		System.out.println("Modules are the same?: " + oldModule.equals(newModule));
 
 	}
 
@@ -75,6 +84,27 @@ public class OLDvsNEW implements Experiment {
 		writer.flush();
 		writer.close();
 		
+	}
+
+	public static void main(String[] args) {
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + 
+				"/Bioportal/LiPro");
+		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "/liprozor"));
+	
+		OLDvsNEW oldy = new OLDvsNEW();
+		
+//		axiom-1155411590
+//		axiom-1156522798
+//		axiom-1152840815
+//      axiom-2030996411
+//		axiom-533378530
+//		axiom-572455712
+		try {
+			oldy.performExperiment(ont, man.readFile("axiom-1155411590"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
