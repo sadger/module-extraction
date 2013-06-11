@@ -49,6 +49,13 @@ public class SeparabilityAxiomLocator {
 		sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(module));
 	}
 
+	public SeparabilityAxiomLocator(OWLLogicalAxiom[] subsetAsArray,
+			Set<OWLEntity> sigUnionSigM2, ChainDependencies dependT) {
+		this.axiomList = subsetAsArray;
+		this.sigUnionSigM = sigUnionSigM2;
+		this.termDependencies = dependT;
+	}
+
 	public OWLLogicalAxiom getInseperableAxiom() throws IOException, QBFSolverException{	
 		/* Represents the last axioms added or removed from the split test */
 
