@@ -61,11 +61,10 @@ public class WriteRandomSigs {
 	public static void main(String[] args) {
 //		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl-sub");
 		
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + 
-				"/Bioportal/LiPrO-converted");
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Bioportal/NatPrO");
 
 		int sigSize = 50;
-		WriteRandomSigs writer = new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "/LiPro-" + sigSize));
+		WriteRandomSigs writer = new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "skizzobreak"));
 		writer.writeSignature(sigSize, 100);
 	}
 }

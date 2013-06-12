@@ -50,9 +50,10 @@ public class EquivalentToTerminologyProcessor {
 		
 	}
 	
-	public void preProcessOntology(){
+	public OWLOntology preProcessOntology(){
 		collectRepeatedAxioms();
 		renameAxioms();
+		return equivalentToTerminology;
 	}
 	
 	public Set<OWLLogicalAxiom> postProcessModule(Set<OWLLogicalAxiom> module){

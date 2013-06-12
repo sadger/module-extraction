@@ -1,5 +1,6 @@
 package uk.ac.liv.moduleextraction.extractor;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,8 +18,10 @@ import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.NewSyntacticDependencyChecker;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.qbf.SeparabilityAxiomLocator;
+import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
+import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 public class SemanticRuleExtractor implements Extractor{
@@ -78,6 +81,15 @@ public class SemanticRuleExtractor implements Extractor{
 			return newArray;
 		}
 
+		public List<OWLLogicalAxiom> getSubsetAsList(boolean[] subset){
+			ArrayList<OWLLogicalAxiom> newSet = new ArrayList<OWLLogicalAxiom>();
+			for (int i = 0; i < subset.length; i++) {
+				if(subset[i]){
+					newSet.add(axioms[i]);
+				}
+			}
+			return newSet;
+		}
 
 		/* Worse case linear time - can improve this with binary search probably */
 		public void removeAxiom(boolean[] subset, OWLLogicalAxiom axiom){
@@ -124,8 +136,7 @@ public class SemanticRuleExtractor implements Extractor{
 	private void applyRules(boolean[] terminology) throws IOException, QBFSolverException{
 		applySyntacticRule(terminology);
 		
-		HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(terminology,axiomStore,sigUnionSigM,dependT);
-		
+		HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(axiomStore.getSubsetAsList(terminology),sigUnionSigM,dependT);
 		if(inseperableChecker.isSeperableFromEmptySet(lhsSigT, sigUnionSigM)){
 			OWLLogicalAxiom insepAxiom = findSeparableAxiom(terminology);
 			module.add(insepAxiom);
@@ -169,18 +180,22 @@ public class SemanticRuleExtractor implements Extractor{
 	}
 
 	
-	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Bioportal/LiPrO-converted");
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		SemanticRuleExtractor extractor = new SemanticRuleExtractor(ont);
-		
-		for (int i = 0; i < 1000; i++) {
-			Set<OWLEntity> sig = gen.generateRandomSignature(20);
-			
-			Set<OWLLogicalAxiom> newMod = extractor.extractModule(sig);
-			System.out.println(newMod.size());
-			
-		}
+	public static void main(String[] args) throws IOException {
+	//	OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
+		OWLOntology ont2 = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Bioportal/NOTEL/Terminologies/NatPrO-converted");
+		SemanticRuleExtractor extractor = new SemanticRuleExtractor(ont2);
+		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "/skizzobreak"));
+
+		long startTime = System.currentTimeMillis();
+		Set<OWLEntity> sig3 = man.readFile("random50-" + 3);
+		Set<OWLEntity> sig4 = man.readFile("random50-" + 4);
+
+		System.out.println(extractor.extractModule(sig4).size());
+		System.out.println(extractor.extractModule(sig3).size());
+
+	
+		long timeTaken = System.currentTimeMillis() - startTime;
+		System.out.println("Time taken: " + ModuleUtils.getTimeAsHMS(timeTaken));
 	
 	
 	}
