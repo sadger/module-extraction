@@ -182,7 +182,7 @@ public class SemanticRuleExtractor implements Extractor{
 	
 	public static void main(String[] args) throws IOException {
 	//	OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
-		OWLOntology ont2 = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Bioportal/NOTEL/Terminologies/NatPrO-converted");
+		OWLOntology ont2 = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/skizzobreak.owl");
 		SemanticRuleExtractor extractor = new SemanticRuleExtractor(ont2);
 		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "/skizzobreak"));
 
@@ -190,8 +190,8 @@ public class SemanticRuleExtractor implements Extractor{
 		Set<OWLEntity> sig3 = man.readFile("random50-" + 3);
 		Set<OWLEntity> sig4 = man.readFile("random50-" + 4);
 
-		System.out.println(extractor.extractModule(sig4).size());
 		System.out.println(extractor.extractModule(sig3).size());
+		System.out.println(extractor.extractModule(sig4).size());
 
 	
 		long timeTaken = System.currentTimeMillis() - startTime;

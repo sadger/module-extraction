@@ -4,16 +4,24 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
+import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
+import uk.ac.liv.ontologyutils.terminology.TerminologyChecker;
 
 
 public class EquivalentToTerminologyExtractor {
@@ -21,22 +29,20 @@ public class EquivalentToTerminologyExtractor {
 	private EquivalentToTerminologyProcessor processor;
 	private Set<OWLLogicalAxiom> module;
 	private SemanticRuleExtractor extractor;
-	OWLOntology equiv;
 	
-	public EquivalentToTerminologyExtractor(OWLOntology equivalentToTerm) throws NotEquivalentToTerminologyException {
+	public EquivalentToTerminologyExtractor(OWLOntology equivalentToTerm) throws NotEquivalentToTerminologyException, OWLOntologyCreationException {
 		processor = new EquivalentToTerminologyProcessor(equivalentToTerm);
-		//equiv = processor.preProcessOntology();
-		extractor = new SemanticRuleExtractor(equivalentToTerm);
-		
+		OWLOntology newOnt = processor.getConvertedOntology();
+		extractor = new SemanticRuleExtractor(newOnt);
 	}
 
-	public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) {
+	public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) throws IOException, QBFSolverException {
 		
 		//System.out.println("S:" + equiv.getLogicalAxiomCount());
 		long startTime = System.currentTimeMillis();
 		
-		Set<OWLLogicalAxiom> module =  extractor.extractModule(signature);		
-		//module = processor.postProcessModule(module);
+		Set<OWLLogicalAxiom> module =  extractor.extractModule(signature);
+		module = processor.postProcessModule(module);
 		
 		long endTime = System.currentTimeMillis() - startTime;
 		
@@ -50,19 +56,23 @@ public class EquivalentToTerminologyExtractor {
 		return module;
 	}
 	
-	public static void main(String[] args) throws IOException, NotEquivalentToTerminologyException {
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Bioportal/NOTEL/Terminologies/NatPrO-converted");
-		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "/skizzobreak"));
+	public static void main(String[] args) throws IOException, NotEquivalentToTerminologyException, OWLOntologyCreationException, QBFSolverException {
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/NCI/nci-08.09d.owl");
+		
+		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
 		EquivalentToTerminologyExtractor extractor = new EquivalentToTerminologyExtractor(ont);
-
-		Set<OWLEntity> sig3 = man.readFile("random50-" + 3);
+		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "/skizzobreak"));
+		Set<OWLEntity> sig3 = man.readFile("random50-" + 3); 
 		Set<OWLEntity> sig4 = man.readFile("random50-" + 4);
 
-		for (int i = 0; i < 50; i++) {
-			System.out.println(extractor.extractModule(sig3).size());
-			System.out.println(extractor.extractModule(sig4).size());
-				
+		for (int i = 0; i < 1000; i++) {
+			System.out.println(extractor.extractModule(gen.generateRandomSignature(1000)).size());
+						
 		}
+		
+		
+
+		
 
 		
 		

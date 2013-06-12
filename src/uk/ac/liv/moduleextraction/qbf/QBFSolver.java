@@ -69,7 +69,7 @@ public class QBFSolver {
 		try{
 			exitValue = proc.exitValue();
 			/* Delete the qbf file */
-			//qbfFile.delete();
+			qbfFile.delete();
 		}
 		catch(IllegalThreadStateException t){
 			t.printStackTrace();
