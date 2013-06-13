@@ -9,4 +9,6 @@ public interface Extractor {
 
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature);
 	
+	public Set<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature);
+	
 }

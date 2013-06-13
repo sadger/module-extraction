@@ -34,7 +34,7 @@ public class FindMeAnOntology {
 	public void profileOntologies(){
 
 		File[] ontologyFiles = ontologyDirectory.listFiles();
-	Collections.sort(Arrays.asList(ontologyFiles));
+		Collections.sort(Arrays.asList(ontologyFiles));
 		for(File f: ontologyFiles){
 			if(f.isFile()){
 				System.out.println(f.getName());

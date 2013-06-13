@@ -118,10 +118,16 @@ public class SemanticRuleExtractor implements Extractor{
 
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) {
-		//Clone of all axioms as boolean
+		return extractModule(new HashSet<OWLLogicalAxiom>(), signature);
+	}
+	
+	@Override
+	public Set<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature) {
 		boolean[] terminology = axiomStore.allAxiomsAsBoolean();
-		module = new HashSet<OWLLogicalAxiom>();
-		sigUnionSigM = signature;
+		module = existingModule;
+		sigUnionSigM = ModuleUtils.getClassAndRoleNamesInSet(existingModule);
+		sigUnionSigM.addAll(signature);
+		
 		try {
 			applyRules(terminology);
 		} catch (IOException e) {
@@ -129,9 +135,9 @@ public class SemanticRuleExtractor implements Extractor{
 		} catch (QBFSolverException e) {
 			e.printStackTrace();
 		}
-		
 		return module;
 	}
+	
 	
 	private void applyRules(boolean[] terminology) throws IOException, QBFSolverException{
 		applySyntacticRule(terminology);
@@ -199,5 +205,8 @@ public class SemanticRuleExtractor implements Extractor{
 	
 	
 	}
+
+
+
 
 }

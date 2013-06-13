@@ -2,6 +2,7 @@ package uk.ac.liv.moduleextraction.extractor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -24,51 +25,55 @@ import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.terminology.TerminologyChecker;
 
 
-public class EquivalentToTerminologyExtractor {
+public class EquivalentToTerminologyExtractor implements Extractor {
 
 	private EquivalentToTerminologyProcessor processor;
 	private Set<OWLLogicalAxiom> module;
 	private SemanticRuleExtractor extractor;
 	
-	public EquivalentToTerminologyExtractor(OWLOntology equivalentToTerm) throws NotEquivalentToTerminologyException, OWLOntologyCreationException {
-		processor = new EquivalentToTerminologyProcessor(equivalentToTerm);
-		OWLOntology newOnt = processor.getConvertedOntology();
-		extractor = new SemanticRuleExtractor(newOnt);
+	public EquivalentToTerminologyExtractor(OWLOntology equivalentToTerm) {
+		try {
+			processor = new EquivalentToTerminologyProcessor(equivalentToTerm);
+			OWLOntology newOnt = processor.getConvertedOntology();
+			extractor = new SemanticRuleExtractor(newOnt);
+		} catch (OWLOntologyCreationException e) {
+			e.printStackTrace();
+		} catch (NotEquivalentToTerminologyException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public Set<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature) {		
+		Set<OWLLogicalAxiom> module =  extractor.extractModule(existingModule,signature);
+		module = processor.postProcessModule(module);
+		return module;
 	}
 
-	public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) throws IOException, QBFSolverException {
-		
-		//System.out.println("S:" + equiv.getLogicalAxiomCount());
-		long startTime = System.currentTimeMillis();
-		
-		Set<OWLLogicalAxiom> module =  extractor.extractModule(signature);
-		module = processor.postProcessModule(module);
-		
-		long endTime = System.currentTimeMillis() - startTime;
-		
-		System.out.println("Time taken: " + ModuleUtils.getTimeAsHMS(endTime));
-		return module;
-		
+	public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) {
+		return extractModule(new HashSet<OWLLogicalAxiom>(), signature);
 	}
-	
+
 	
 	public Set<OWLLogicalAxiom> getModule() {
+		
 		return module;
+		
+		
 	}
 	
 	public static void main(String[] args) throws IOException, NotEquivalentToTerminologyException, OWLOntologyCreationException, QBFSolverException {
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/NCI/nci-08.09d.owl");
-		
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Bioportal/NatPrO");
+		OWLOntology ont2 = OntologyLoader.loadOntologyInclusionsAndEqualities("/LOCAL/wgatens/Ontologies/moduletest/repeated.krss");
+		SignatureGenerator gen = new SignatureGenerator(ont2.getLogicalAxioms());
 		EquivalentToTerminologyExtractor extractor = new EquivalentToTerminologyExtractor(ont);
 		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "/skizzobreak"));
 		Set<OWLEntity> sig3 = man.readFile("random50-" + 3); 
 		Set<OWLEntity> sig4 = man.readFile("random50-" + 4);
 
-		for (int i = 0; i < 1000; i++) {
-			System.out.println(extractor.extractModule(gen.generateRandomSignature(1000)).size());
-						
-		}
+		Set<OWLLogicalAxiom> newy = gen.randomAxioms(5).getLogicalAxioms();
+		
+		System.out.println(extractor.extractModule(newy,sig4));
 		
 		
 
@@ -77,4 +82,6 @@ public class EquivalentToTerminologyExtractor {
 		
 		
 	}
+
+
 }
