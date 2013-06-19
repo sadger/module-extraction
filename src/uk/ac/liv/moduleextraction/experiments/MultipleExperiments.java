@@ -64,21 +64,23 @@ public class MultipleExperiments {
 		
 		
 		try {
-			int[] testSizes = {100,250,500,750,1000};
+			int[] testSizes = {750,1000};
 			
 			
 			for (int i = 0; i < testSizes.length; i++) {
-				new MultipleExperiments().
-				runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-0"), new AMEXvsSTAR(ont));
-				new MultipleExperiments().
-				runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-25"), new AMEXvsSTAR(ont));
+				if(testSizes[i] == 1000){
+					new MultipleExperiments().
+					runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-0"), new AMEXvsSTAR(ont));
+					new MultipleExperiments().
+					runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-25"), new AMEXvsSTAR(ont));
+				}
 				new MultipleExperiments().
 				runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-50"), new AMEXvsSTAR(ont));
 				new MultipleExperiments().
 				runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-75"), new AMEXvsSTAR(ont));
 				new MultipleExperiments().
 				runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-100"), new AMEXvsSTAR(ont));
-		
+		 
 			}
 
 			

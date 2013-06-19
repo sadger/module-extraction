@@ -67,8 +67,9 @@ public class ModuleUtils {
 				e1.printStackTrace();
 			}
 			for(OWLEntity e : axiomStore.getSignature()){
-				if(e.isOWLClass() || e.isOWLObjectProperty())
+				if(e.isOWLClass() || e.isOWLObjectProperty()){
 					entities.add(e);
+				}
 			}
 		}
 		removeTopAndBottomConcept(entities);
