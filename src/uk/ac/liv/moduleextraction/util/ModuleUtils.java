@@ -15,6 +15,7 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.util.OWLEntityRenamer;
@@ -74,6 +75,15 @@ public class ModuleUtils {
 		return entities;
 	}
 	
+	public static Set<OWLObjectProperty> getRolesInSet(Set<OWLLogicalAxiom> axioms){
+		Set<OWLObjectProperty> result = new HashSet<OWLObjectProperty>();
+		
+		for(OWLLogicalAxiom axiom : axioms){
+			result.addAll(axiom.getObjectPropertiesInSignature());
+		}
+		
+		return result;
+	}
 
 	public static Set<OWLClass> getNamedClassesInSignature(OWLClassExpression cls){
 		Set<OWLClass> classes = cls.getClassesInSignature();

@@ -15,6 +15,8 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
+import uk.ac.liv.moduleextraction.extractor.EquivalentToTerminologyExtractor;
+import uk.ac.liv.moduleextraction.extractor.SemanticRuleExtractor;
 import uk.ac.liv.moduleextraction.extractor.SyntacticFirstModuleExtraction;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
@@ -24,50 +26,59 @@ public class AMEXvsSTAR implements Experiment {
 
 	OWLOntologyManager manager;
 	OWLOntology ontology;
-	SyntacticFirstModuleExtraction moduleExtractor;
+	EquivalentToTerminologyExtractor semanticExtractor;
 	SyntacticLocalityModuleExtractor syntaxModExtractor;
 	Set<OWLLogicalAxiom> syntacticModule = null;
 	Set<OWLLogicalAxiom> semanticModule = null;
 	
+
+	public AMEXvsSTAR(OWLOntology ontology) {
+		this.manager = ontology.getOWLOntologyManager();
+		this.syntaxModExtractor = new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.STAR);
+		this.semanticExtractor = new EquivalentToTerminologyExtractor(ontology);
+	}
+	
 	@Override
-	public void performExperiment(OWLOntology ontology, Set<OWLEntity> signature) {
+	public void performExperiment(Set<OWLEntity> signature) {
 		manager = OWLManager.createOWLOntologyManager();
-		syntaxModExtractor = new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.STAR);
 		
 		Set<OWLAxiom> syntacticOntology = syntaxModExtractor.extract(signature);
 		
 		syntacticModule = getLogicalAxioms(syntacticOntology);
- 
-		moduleExtractor = new SyntacticFirstModuleExtraction(ontology.getLogicalAxioms(),signature);
-		
-		try {
-			semanticModule = moduleExtractor.extractModule();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (QBFSolverException e) {
-			e.printStackTrace();
-		}
+		semanticModule = semanticExtractor.extractModule(signature);
+	
 	}
 
 	@Override
 	public void writeMetrics(File experimentLocation) throws IOException {
 		writeResults(experimentLocation);
-		writeExtractorMetrics(experimentLocation);
-		writeQBFMetrics(experimentLocation);
+		writeMetricsToFile(experimentLocation, semanticExtractor.getMetrics(), "metrics");
+		writeMetricsToFile(experimentLocation, semanticExtractor.getQBFMetrics(), "qbf-metrics");
 	}
 	
 	public void writeResults(File experimentLocation) throws IOException{		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results", false));
-		writer.write("Syntactic Size,Semantic Size, ModulesSame, SemSubsetOfStar, StarSubsetSem" + "\n");
+		writer.write("Syntactic Size,Semantic Size, ModulesSame, SemSubsetOfStar, StarSubsetSem, InSemButNotStar, InStarButNotSem" + "\n");
+		
+		
 		writer.write(syntacticModule.size() + "," + semanticModule.size() + "," 
-		+ semanticModule.equals(syntacticModule) + "," + syntacticModule.containsAll(semanticModule) + "," + semanticModule.containsAll(syntacticModule) + "\n");
+		+ semanticModule.equals(syntacticModule) + "," + syntacticModule.containsAll(semanticModule) + "," + semanticModule.containsAll(syntacticModule) + ",");
+		
+		Set<OWLLogicalAxiom> semanticDifference = new HashSet<OWLLogicalAxiom>(semanticModule);
+		semanticDifference.removeAll(syntacticModule);
+		
+		Set<OWLLogicalAxiom> syntacticDifference = new HashSet<OWLLogicalAxiom>(syntacticModule);
+		syntacticDifference.removeAll(semanticModule);
+		
+		writer.write(semanticDifference.size() + "," + syntacticDifference.size() + "\n");
+		
 		writer.flush();
 		writer.close();
 	}
 	
-	private void writeExtractorMetrics(File experimentLocation) throws IOException{
-		LinkedHashMap<String, Long> metrics = moduleExtractor.getMetrics();
-		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "metrics", false));
+
+	public void writeMetricsToFile(File experimentLocation, LinkedHashMap<String, Long> metrics, String fileName) throws IOException{
+		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + fileName, false));
 		
 		Object[] keysetArray = metrics.keySet().toArray();
 		/*Write header - the keyset values */
@@ -82,29 +93,8 @@ public class AMEXvsSTAR implements Experiment {
 		writer.write(metrics.get(keysetArray[keysetArray.length-1]) + "\n");
 		writer.flush();
 		writer.close();
-	}
-	
-	private void writeQBFMetrics(File experimentLocation) throws IOException{
-		LinkedHashMap<String, Long> metrics = moduleExtractor.getQBFMetrics();
-		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "qbf-metrics", false));
-			
-		Object[] keysetArray = metrics.keySet().toArray();
 		
-		/*Write header - the keyset values */
-		for (int i = 0; i < keysetArray.length-1; i++) {
-			writer.write(keysetArray[i] + ",");
-		}
-		writer.write(keysetArray[keysetArray.length-1] + "\n");
-		
-		/*Write content*/
-		for (int i = 0; i < keysetArray.length-1; i++) {
-			writer.write(metrics.get(keysetArray[i]) + ",");
-		}
-		writer.write(metrics.get(keysetArray[keysetArray.length-1]) + "\n");
-		writer.flush();
-		writer.close();
 	}
-	
 	
 	private Set<OWLLogicalAxiom> getLogicalAxioms(Set<OWLAxiom> axioms){
 		HashSet<OWLLogicalAxiom> result = new HashSet<OWLLogicalAxiom>();

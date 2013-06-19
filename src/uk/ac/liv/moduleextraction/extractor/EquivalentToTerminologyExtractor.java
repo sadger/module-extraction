@@ -3,26 +3,19 @@ package uk.ac.liv.moduleextraction.extractor;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
-
-import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.terminology.TerminologyChecker;
 
 
 public class EquivalentToTerminologyExtractor implements Extractor {
@@ -30,6 +23,8 @@ public class EquivalentToTerminologyExtractor implements Extractor {
 	private EquivalentToTerminologyProcessor processor;
 	private Set<OWLLogicalAxiom> module;
 	private SemanticRuleExtractor extractor;
+	
+	private long timeTaken = 0;
 	
 	public EquivalentToTerminologyExtractor(OWLOntology equivalentToTerm) {
 		try {
@@ -45,8 +40,12 @@ public class EquivalentToTerminologyExtractor implements Extractor {
 	
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature) {		
-		Set<OWLLogicalAxiom> module =  extractor.extractModule(existingModule,signature);
+		timeTaken = 0;
+		
+		long startTime = System.currentTimeMillis();
+		module =  extractor.extractModule(existingModule,signature);
 		module = processor.postProcessModule(module);
+		timeTaken = System.currentTimeMillis() - startTime;
 		return module;
 	}
 
@@ -55,33 +54,40 @@ public class EquivalentToTerminologyExtractor implements Extractor {
 	}
 
 	
-	public Set<OWLLogicalAxiom> getModule() {
+	public LinkedHashMap<String, Long> getMetrics() {
+		LinkedHashMap<String, Long> metrics = new LinkedHashMap<String, Long>();
+		LinkedHashMap<String, Long> extractorMetrics = extractor.getMetrics();
 		
-		return module;
+		metrics.put("Module size", (long) module.size());
+		metrics.put("Time taken", timeTaken);
+		metrics.put("Syntactic Checks", extractorMetrics.get("Syntactic Checks"));
+		metrics.put("QBF Checks", extractorMetrics.get("QBF Checks"));
 		
-		
+		return metrics;
+	}
+
+	public LinkedHashMap<String, Long> getQBFMetrics() {
+		return extractor.getQBFMetrics();
 	}
 	
+
 	public static void main(String[] args) throws IOException, NotEquivalentToTerminologyException, OWLOntologyCreationException, QBFSolverException {
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Bioportal/NatPrO");
-		OWLOntology ont2 = OntologyLoader.loadOntologyInclusionsAndEqualities("/LOCAL/wgatens/Ontologies/moduletest/repeated.krss");
-		SignatureGenerator gen = new SignatureGenerator(ont2.getLogicalAxioms());
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Thesaurus_08.09d.OWL");
+	
+		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "/chaintest"));
+		
+		
 		EquivalentToTerminologyExtractor extractor = new EquivalentToTerminologyExtractor(ont);
-		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "/skizzobreak"));
-		Set<OWLEntity> sig3 = man.readFile("random50-" + 3); 
-		Set<OWLEntity> sig4 = man.readFile("random50-" + 4);
 
-		Set<OWLLogicalAxiom> newy = gen.randomAxioms(5).getLogicalAxioms();
-		
-		System.out.println(extractor.extractModule(newy,sig4));
-		
-		
-
-		
-
-		
+	
+		for (int i = 1; i <= 100; i++) {
+			System.out.println(extractor.extractModule(man.readFile("random1000-"+ i)).size());
+		}
 		
 	}
+
+
 
 
 }

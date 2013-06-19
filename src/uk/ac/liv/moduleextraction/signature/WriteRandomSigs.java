@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.liv.moduleextraction.util.ModulePaths;
@@ -22,25 +23,27 @@ public class WriteRandomSigs {
 	}
 	
 	
-	/* Writes signatures of size "sigSize" + |all roles in ont| */
-	public void writeSignatureWithRoles(int sigSize, int numberOfTests){
+	public void writeSignatureWithRoles(int sigSize, double rolePercentage, int numberOfTests){
 		SigManager sigManager = new SigManager(location);
 		SignatureGenerator sigGen = new  SignatureGenerator(ontology.getLogicalAxioms());
 		
 		for(int i=1; i<=numberOfTests; i++){
 			Set<OWLEntity> signature = new HashSet<OWLEntity>();
 			signature.addAll(sigGen.generateRandomClassSignature(sigSize));	
-			signature.addAll(ontology.getObjectPropertiesInSignature());
-					
+			
+			int roleCount = ontology.getObjectPropertiesInSignature().size();
+			int numberOfRoles = (int) Math.floor(((double) roleCount / 100 ) * rolePercentage);
+			
+			signature.addAll(sigGen.generateRandomRoles(numberOfRoles));
+			
 			try {
-				sigManager.writeFile(signature, "random" + sigSize + "-"+i);
+				sigManager.writeFile(signature, "random" + "_" + sigSize + "_" + ((int) rolePercentage) + "-" + i);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		System.out.println("Written " + numberOfTests + " signatures");
 	}
-	
 	
 	
 	public void writeSignature(int sigSize, int numberOfTests){
@@ -59,12 +62,28 @@ public class WriteRandomSigs {
 	}
 	
 	public static void main(String[] args) {
-//		OWLOntology ont = OntologyLoader.loadOntology(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl-sub");
-		
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Bioportal/NatPrO");
 
-		int sigSize = 50;
-		WriteRandomSigs writer = new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "skizzobreak"));
-		writer.writeSignature(sigSize, 100);
+		String ontName = "NCI-08.09d";
+		
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/" + ontName);
+
+		int[] sigSizes = {100,250,500,750,1000};
+		double[] rolePercentages = {0,25,50,75,100};
+		int numberOfTests = 1000;
+
+		for (int i = 0; i < sigSizes.length; i++) {
+				
+			for (int j = 0; j < sigSizes.length; j++) {
+				
+				WriteRandomSigs writer = 
+						new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + ontName + "-" + sigSizes[i] + "-" + ((int) rolePercentages[j])));
+				writer.writeSignatureWithRoles(sigSizes[i], rolePercentages[j],numberOfTests);
+			}
+//			
+			
+		}		
+		
+		
+	
 	}
 }

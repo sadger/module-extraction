@@ -1,9 +1,9 @@
 package uk.ac.liv.moduleextraction.extractor;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -18,11 +18,7 @@ import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.NewSyntacticDependencyChecker;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.qbf.SeparabilityAxiomLocator;
-import uk.ac.liv.moduleextraction.signature.SigManager;
-import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
-import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 public class SemanticRuleExtractor implements Extractor{
 
@@ -33,6 +29,11 @@ public class SemanticRuleExtractor implements Extractor{
 	DefinitorialAxiomStore axiomStore;
 	LHSSigExtractor lhsExtractor;
 	InseperableChecker inseperableChecker;
+	
+	long syntacticChecks = 0; // A syntactic iteration (total checks = this + qbfchecks)
+	long timeTaken = 0; //Time taken to setup and extract the module (ms)
+	long qbfChecks = 0;
+	
 	
 	public static class DefinitorialAxiomStore{
 		final OWLLogicalAxiom[] axioms;
@@ -123,6 +124,13 @@ public class SemanticRuleExtractor implements Extractor{
 	
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature) {
+		/* Reset all the metrics for new extraction */
+		syntacticChecks = 0; 
+		timeTaken = 0; 
+		qbfChecks = 0;
+		inseperableChecker.resetMetrics();
+		
+		long startTime = System.currentTimeMillis();
 		boolean[] terminology = axiomStore.allAxiomsAsBoolean();
 		module = existingModule;
 		sigUnionSigM = ModuleUtils.getClassAndRoleNamesInSet(existingModule);
@@ -135,14 +143,32 @@ public class SemanticRuleExtractor implements Extractor{
 		} catch (QBFSolverException e) {
 			e.printStackTrace();
 		}
+		
+		timeTaken = System.currentTimeMillis() - startTime;
 		return module;
 	}
+	
+	public LinkedHashMap<String, Long> getMetrics() {
+		LinkedHashMap<String, Long> metrics = new LinkedHashMap<String, Long>();
+		metrics.put("Module size", (long) module.size());
+		metrics.put("Time taken", timeTaken);
+		metrics.put("Syntactic Checks", syntacticChecks);
+		metrics.put("QBF Checks", qbfChecks);
+		return metrics;
+	}
+
+
+	public LinkedHashMap<String, Long> getQBFMetrics() {
+		return inseperableChecker.getQBFMetrics();
+	}
+
 	
 	
 	private void applyRules(boolean[] terminology) throws IOException, QBFSolverException{
 		applySyntacticRule(terminology);
 		
 		HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(axiomStore.getSubsetAsList(terminology),sigUnionSigM,dependT);
+		qbfChecks++;
 		if(inseperableChecker.isSeperableFromEmptySet(lhsSigT, sigUnionSigM)){
 			OWLLogicalAxiom insepAxiom = findSeparableAxiom(terminology);
 			module.add(insepAxiom);
@@ -158,6 +184,7 @@ public class SemanticRuleExtractor implements Extractor{
 		System.err.println("Removing inseparability cause");
 		SeparabilityAxiomLocator search = new SeparabilityAxiomLocator(axiomStore.getSubsetAsArray(terminology),sigUnionSigM,dependT);
 		OWLLogicalAxiom insepAxiom = search.getInseperableAxiom();
+		qbfChecks += search.getCheckCount();
 		return insepAxiom;
 	}
 
@@ -172,12 +199,15 @@ public class SemanticRuleExtractor implements Extractor{
 				if(terminology[i]){
 					
 					OWLLogicalAxiom chosenAxiom = axiomStore.getAxiom(i);
-	
+					syntacticChecks++;
 					if(syntacticDependencyChecker.hasSyntacticSigDependency(chosenAxiom, dependT, sigUnionSigM)){
+						
 						change = true;
+						
 						module.add(chosenAxiom);
 						terminology[i] = false;
 						sigUnionSigM.addAll(chosenAxiom.getSignature());
+						
 					}
 				}
 			}
@@ -185,27 +215,9 @@ public class SemanticRuleExtractor implements Extractor{
 	
 	}
 
-	
-	public static void main(String[] args) throws IOException {
-	//	OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/nci-08.09d-terminology.owl");
-		OWLOntology ont2 = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/skizzobreak.owl");
-		SemanticRuleExtractor extractor = new SemanticRuleExtractor(ont2);
-		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "/skizzobreak"));
 
-		long startTime = System.currentTimeMillis();
-		Set<OWLEntity> sig3 = man.readFile("random50-" + 3);
-		Set<OWLEntity> sig4 = man.readFile("random50-" + 4);
-
-		System.out.println(extractor.extractModule(sig3).size());
-		System.out.println(extractor.extractModule(sig4).size());
 
 	
-		long timeTaken = System.currentTimeMillis() - startTime;
-		System.out.println("Time taken: " + ModuleUtils.getTimeAsHMS(timeTaken));
-	
-	
-	}
-
 
 
 

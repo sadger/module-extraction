@@ -28,7 +28,7 @@ public class OLDvsNEW implements Experiment {
 	OldApproach oldModuleExtractor;
 
 	@Override
-	public void performExperiment(OWLOntology ontology, Set<OWLEntity> signature) {
+	public void performExperiment(Set<OWLEntity> signature) {
 		
 		Set<OWLLogicalAxiom> newModule = null;
 		moduleExtractor = new SyntacticFirstModuleExtraction(ontology.getLogicalAxioms(), signature);
@@ -86,25 +86,5 @@ public class OLDvsNEW implements Experiment {
 		
 	}
 
-	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + 
-				"/Bioportal/LiPro");
-		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "/liprozor"));
-	
-		OLDvsNEW oldy = new OLDvsNEW();
-		
-//		axiom-1155411590
-//		axiom-1156522798
-//		axiom-1152840815
-//      axiom-2030996411
-//		axiom-533378530
-//		axiom-572455712
-		try {
-			oldy.performExperiment(ont, man.readFile("axiom-1155411590"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 
 }

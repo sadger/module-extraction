@@ -19,30 +19,17 @@ import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
 public class MultipleExperiments {
 	
-	public enum ExperimentType{
-		ONTOLOGY_SUITABILITY(new OntologySuitability()),
-		AMEX_STAR(new AMEXvsSTAR()),
-		OLD_NEW(new OLDvsNEW());
-		
-		private Experiment experiment;
-		ExperimentType(Experiment expr){
-			this.experiment = expr;
-		}
-		
-		public Experiment getExperiment(){
-			return experiment;
-		}
-	}
 	
-	public void runExperiments(OWLOntology ontology, File signaturesLocation, ExperimentType experimentType) throws IOException{
-		Experiment experiment = experimentType.getExperiment();
+	
+	public void runExperiments(OWLOntology ontology, File signaturesLocation, Experiment experimentType) throws IOException{
+		Experiment experiment = experimentType;
 		SigManager sigManager = new SigManager(signaturesLocation);
 		File[] files = signaturesLocation.listFiles();
 		Arrays.sort(files); 
 		
 		/* Create new folder in result location with same name as signature
 		folder */
-		File newResultFolder = new File(ModulePaths.getResultLocation() + "/" + signaturesLocation.getName() + "-" + experimentType.name());
+		File newResultFolder = new File(ModulePaths.getResultLocation() + "/" + signaturesLocation.getName());
 		if(!newResultFolder.exists()){
 			System.out.println("Making new directory " + newResultFolder.getAbsolutePath());
 			newResultFolder.mkdir();
@@ -53,7 +40,7 @@ public class MultipleExperiments {
 			if(f.isFile()){
 				System.out.println("Checking " + f.getName());
 				Set<OWLEntity> sig = sigManager.readFile(f.getName());
-				experiment.performExperiment(ontology, sig);
+				experiment.performExperiment(sig);
 				
 				//New folder in result location - same name as sig file
 				File experimentLocation = new File(newResultFolder.getAbsoluteFile() + "/" + f.getName());
@@ -72,18 +59,29 @@ public class MultipleExperiments {
 	}
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + 
-				"/Bioportal/LiPrO-converted");		
+		String ontName = "NCI-08.09d";
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/" + ontName);
+		
+		
 		try {
-			new MultipleExperiments().runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/LiPro-25"), 
-					ExperimentType.OLD_NEW);
-			new MultipleExperiments().runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/LiPro-50"), 
-					ExperimentType.OLD_NEW);
-			new MultipleExperiments().runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/LiPro-75"), 
-					ExperimentType.OLD_NEW);
+			int[] testSizes = {100,250,500,750,1000};
 			
-			new MultipleExperiments().runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/LiPro-100"), 
-					ExperimentType.OLD_NEW);
+			
+			for (int i = 0; i < testSizes.length; i++) {
+				new MultipleExperiments().
+				runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-0"), new AMEXvsSTAR(ont));
+				new MultipleExperiments().
+				runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-25"), new AMEXvsSTAR(ont));
+				new MultipleExperiments().
+				runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-50"), new AMEXvsSTAR(ont));
+				new MultipleExperiments().
+				runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-75"), new AMEXvsSTAR(ont));
+				new MultipleExperiments().
+				runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-100"), new AMEXvsSTAR(ont));
+		
+			}
+
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

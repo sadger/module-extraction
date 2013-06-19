@@ -28,7 +28,7 @@ public class OntologySuitability implements Experiment {
 	private OWLOntology ontology;
 	
 	@Override
-	public void performExperiment(OWLOntology ontology, Set<OWLEntity> signature) {
+	public void performExperiment(Set<OWLEntity> signature) {
 		this.ontology = ontology;
 		OWLOntology moduleAsOnt = extractStarModuleAsOntology(ontology,signature);
 		AcyclicChecker acylicChecker = new AcyclicChecker(moduleAsOnt, false);

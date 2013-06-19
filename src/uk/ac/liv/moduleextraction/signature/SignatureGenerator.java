@@ -11,6 +11,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -23,11 +24,13 @@ public class SignatureGenerator {
 	
 	private Set<OWLClass> axiomsClasses;
 	private Set<OWLEntity> axiomsSignature;
+	private Set<OWLObjectProperty> axiomsRoles;
 
 	public SignatureGenerator(Set<OWLLogicalAxiom> axioms) {
 		this.logicalAxioms = axioms;
 		this.axiomsClasses =  ModuleUtils.getClassesInSet(logicalAxioms);
 		this.axiomsSignature = ModuleUtils.getClassAndRoleNamesInSet(logicalAxioms);
+		this.axiomsRoles = ModuleUtils.getRolesInSet(logicalAxioms);
 	}
 
 	
@@ -48,6 +51,23 @@ public class SignatureGenerator {
 			Collections.shuffle(listOfNames);
 			result = new HashSet<OWLClass>(listOfNames.subList(0, desiredSize));
 		}
+		
+		return result;
+	}
+	
+	public Set<OWLObjectProperty> generateRandomRoles(int desiredSize) {
+		
+		Set<OWLObjectProperty> result = null;
+		
+		if(desiredSize >= axiomsRoles.size()){
+			result = axiomsRoles;
+		}
+		else{
+			ArrayList<OWLObjectProperty> listOfRoles = new ArrayList<OWLObjectProperty>(axiomsRoles);
+			Collections.shuffle(listOfRoles);
+			result = new HashSet<OWLObjectProperty>(listOfRoles.subList(0, desiredSize));
+		}
+		
 		
 		return result;
 	}

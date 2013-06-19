@@ -9,7 +9,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 
 public interface Experiment {
 	
-	public void performExperiment(OWLOntology ontology, Set<OWLEntity> signature);
+	public void performExperiment(Set<OWLEntity> signature);
 	
 	public void writeMetrics(File experimentLocation) throws IOException;
 }

@@ -68,6 +68,14 @@ public class InseperableChecker {
 		return testCount;
 	}
 	
+	public void resetMetrics(){
+		testCount = 0;
+		maxClause = 0;
+		maxVar= 0;
+		totalClause = 0;
+		totalVar = 0;
+	}
+	
 	public LinkedHashMap<String,Long> getQBFMetrics(){
 		LinkedHashMap<String, Long> metrics = new LinkedHashMap<String, Long>();
 		metrics.put("Total clause", totalClause);
