@@ -60,28 +60,20 @@ public class WriteRandomSigs {
 		}
 		System.out.println("Written " + numberOfTests + " signatures");
 	}
-	
+       
 	public static void main(String[] args) {
 
-		String ontName = "NCI-08.09d";
 		
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/" + ontName);
-
-		int[] sigSizes = {100,250,500,750,1000};
-		double[] rolePercentages = {0,25,50,75,100};
-		int numberOfTests = 1000;
-
-		for (int i = 0; i < sigSizes.length; i++) {
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Bioportal/NatPrO");
+		
+	
 				
-			for (int j = 0; j < sigSizes.length; j++) {
-				
-				WriteRandomSigs writer = 
-						new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + ontName + "-" + sigSizes[i] + "-" + ((int) rolePercentages[j])));
-				writer.writeSignatureWithRoles(sigSizes[i], rolePercentages[j],numberOfTests);
-			}
-//			
-			
-		}		
+
+		WriteRandomSigs writer = new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "/natpro-100-100"));
+		writer.writeSignatureWithRoles(100, 100.0, 1000);
+		
+
+	
 		
 		
 	

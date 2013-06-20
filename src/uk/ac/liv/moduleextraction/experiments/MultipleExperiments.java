@@ -5,14 +5,21 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 
+import javax.xml.bind.ValidationEvent;
+
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
+import uk.ac.liv.ontologyutils.axioms.ELValidator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
@@ -59,34 +66,22 @@ public class MultipleExperiments {
 	}
 	
 	public static void main(String[] args) {
-		String ontName = "NCI-08.09d";
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/" + ontName);
 		
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Bioportal/NatPrO");
+		ELValidator valid = new ELValidator();
 		
-		try {
-			int[] testSizes = {750,1000};
-			
-			
-			for (int i = 0; i < testSizes.length; i++) {
-				if(testSizes[i] == 1000){
-					new MultipleExperiments().
-					runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-0"), new AMEXvsSTAR(ont));
-					new MultipleExperiments().
-					runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-25"), new AMEXvsSTAR(ont));
-				}
-				new MultipleExperiments().
-				runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-50"), new AMEXvsSTAR(ont));
-				new MultipleExperiments().
-				runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-75"), new AMEXvsSTAR(ont));
-				new MultipleExperiments().
-				runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/" + ontName + "-" + testSizes[i] + "-100"), new AMEXvsSTAR(ont));
-		 
+		for(OWLLogicalAxiom ax : ont.getLogicalAxioms()){
+			if(!valid.isELAxiom(ax)){
+				System.out.println(ax);
 			}
-
-			
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
+		
+//		try {
+//			new MultipleExperiments().runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "natpro-100-100"), new AMEXvsSTAR(ont));
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+		
 	}
 	
 	

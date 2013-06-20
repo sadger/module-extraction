@@ -45,9 +45,6 @@ public class LovelyFunTimeExtractor implements Extractor {
 			
 			module = extractStarModule(createOntologyFromLogicalAxioms(module), origSig);
 			
-			
-			System.out.println("After Star: " + module.size());
-			
 			moduleSize = module.size();
 			
 			Set<OWLLogicalAxiom> unsupported = getUnsupportedAxioms(module);
@@ -55,7 +52,6 @@ public class LovelyFunTimeExtractor implements Extractor {
 			
 			
 			module  = extractSemanticModule(createOntologyFromLogicalAxioms(module), unsupported, origSig);
-			System.out.println("After Sem: " + module.size());
 			
 			int newModuleSize = module.size(); 
 			
@@ -66,10 +62,9 @@ public class LovelyFunTimeExtractor implements Extractor {
 			iterations++;
 		}
 		
+
 		
-		System.out.println("Iterations: " + iterations);
-		
-		return null;
+		return module;
 	}
 	
 	private Set<OWLLogicalAxiom> extractStarModule(OWLOntology ontology, Set<OWLEntity> signature){

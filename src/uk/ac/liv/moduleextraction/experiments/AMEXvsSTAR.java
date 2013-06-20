@@ -46,6 +46,8 @@ public class AMEXvsSTAR implements Experiment {
 		
 		syntacticModule = getLogicalAxioms(syntacticOntology);
 		semanticModule = semanticExtractor.extractModule(signature);
+		
+		System.out.println("Inc?: "  +syntacticOntology.containsAll(semanticModule));
 	
 	}
 

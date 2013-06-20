@@ -38,7 +38,7 @@ public class FindMeAnOntology {
 		for(File f: ontologyFiles){
 			if(f.isFile()){
 				System.out.println(f.getName());
-				OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(f.getAbsolutePath());
+				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
 				profileOntology(f.getName(), ont);
 				System.out.println();
 
@@ -49,22 +49,22 @@ public class FindMeAnOntology {
 	private void profileOntology(String fileName,OWLOntology ont){
 		System.out.println("Logical Axiom Count: " + ont.getLogicalAxiomCount());
 		DLExpressivityChecker checker = new DLExpressivityChecker(Collections.singleton(ont));
-//		System.out.println("Expressivity: " + checker.getDescriptionLogicName());
-//		AxiomTypeProfile p = new AxiomTypeProfile(ont);
-//		ExpressionTypeProfiler exp = new ExpressionTypeProfiler();
-//		p.printMetrics();
-//		exp.profileOntology(ont);
+		System.out.println("Expressivity: " + checker.getDescriptionLogicName());
+		AxiomTypeProfile p = new AxiomTypeProfile(ont);
+		ExpressionTypeProfiler exp = new ExpressionTypeProfiler();
+		p.printMetrics();
+		exp.profileOntology(ont);
 //	
 //		System.out.println("Class in sig: " + ont.getClassesInSignature().size());
 //		System.out.println("Roles in sig: " + ont.getObjectPropertiesInSignature().size());
 //		System.out.println("Sig size: " + ont.getSignature().size());
 //		System.out.println("");
 
-				System.out.println("Is EL?: " + elvalidator.isELOntology(ont));
-				System.out.println("Is ALC?: " + validator.isALCOntology(ont));
-				AcyclicChecker acyclic = new AcyclicChecker(ont, true);
-				acyclic.isAcyclic();
-				acyclic.printMetrics();
+//				System.out.println("Is EL?: " + elvalidator.isELOntology(ont));
+//				System.out.println("Is ALC?: " + validator.isALCOntology(ont));
+//				AcyclicChecker acyclic = new AcyclicChecker(ont, true);
+//				acyclic.isAcyclic();
+//				acyclic.printMetrics();
 		
 //			boolean isTerm = termChecker.isTerminology(ont);
 //
@@ -80,7 +80,7 @@ public class FindMeAnOntology {
 
 	public static void main(String[] args) {
 	//FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/Tones/NONEL/Big"));
-	FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/hardclassify"));
+	FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/NCI/Profile"));
 		find.profileOntologies();
 	}
 
