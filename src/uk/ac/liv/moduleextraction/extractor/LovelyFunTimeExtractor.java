@@ -1,5 +1,7 @@
 package uk.ac.liv.moduleextraction.extractor;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,9 +12,11 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
+import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
+import uk.ac.liv.ontologyutils.axioms.ELValidator;
 import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
@@ -47,11 +51,16 @@ public class LovelyFunTimeExtractor implements Extractor {
 			
 			moduleSize = module.size();
 			
+			Set<OWLLogicalAxiom> starMod = new HashSet<OWLLogicalAxiom>(module);
+			
 			Set<OWLLogicalAxiom> unsupported = getUnsupportedAxioms(module);
 			module.removeAll(unsupported);
 			
 			
 			module  = extractSemanticModule(createOntologyFromLogicalAxioms(module), unsupported, origSig);
+			
+			starMod.removeAll(module);
+			
 			
 			int newModuleSize = module.size(); 
 			
@@ -60,6 +69,7 @@ public class LovelyFunTimeExtractor implements Extractor {
 			}
 			moduleSize = newModuleSize;
 			iterations++;
+			
 		}
 		
 
@@ -112,17 +122,20 @@ public class LovelyFunTimeExtractor implements Extractor {
 		return null;
 	}
 	
-	public static void main(String[] args) {
-		String ontName = "LiPrO";
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/" + ontName);
+	public static void main(String[] args) throws IOException {
 		
-		LovelyFunTimeExtractor fun = new LovelyFunTimeExtractor(ont);
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_08.09d.OWL");
+		ELValidator valid = new ELValidator();
 		
-		for (int i = 0; i < 50; i++) {
-			fun.extractModule(gen.generateRandomSignature(100));
-			System.out.println("==================");
+		for(OWLLogicalAxiom ax : ont.getLogicalAxioms()){
+			if(!valid.isELAxiom(ax)){
+				System.out.println(ax);
+			}
 		}
+		//LovelyFunTimeExtractor fun = new LovelyFunTimeExtractor(ont);
+
+		
+
 
 	}
 

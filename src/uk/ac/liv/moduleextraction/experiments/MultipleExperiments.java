@@ -13,9 +13,12 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
+import uk.ac.liv.moduleextraction.extractor.EquivalentToTerminologyProcessor;
+import uk.ac.liv.moduleextraction.extractor.NotEquivalentToTerminologyException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
@@ -65,22 +68,19 @@ public class MultipleExperiments {
 		}
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException {
 		
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Bioportal/NatPrO");
-		ELValidator valid = new ELValidator();
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "NCI/Thesaurus_08.09d.OWL");
 		
-		for(OWLLogicalAxiom ax : ont.getLogicalAxioms()){
-			if(!valid.isELAxiom(ax)){
-				System.out.println(ax);
-			}
+		try {
+			new MultipleExperiments().runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/Paper/NCI-20k-axioms"), new IteratingExperiment(ont));
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+
 		
-//		try {
-//			new MultipleExperiments().runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "natpro-100-100"), new AMEXvsSTAR(ont));
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+	
+		
 		
 	}
 	

@@ -10,8 +10,10 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import uk.ac.liv.moduleextraction.util.ModulePaths;
+import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 public class WriteAxiomSignatures {
@@ -44,10 +46,15 @@ public class WriteAxiomSignatures {
 		System.out.println("Written " + i + " signatures");
 	}
 	
-	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Bioportal/LiPrO-converted");
-		//System.out.println(ont);
-		WriteAxiomSignatures writer = new WriteAxiomSignatures(ont, new File(ModulePaths.getSignatureLocation() + "/liprozor"));
+	public static void main(String[] args) throws OWLOntologyCreationException {
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_08.09d.OWL");
+		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+		OWLOntology subOnt = gen.randomAxioms(20000);
+		
+		WriteAxiomSignatures writer = new WriteAxiomSignatures(subOnt, new File(ModulePaths.getSignatureLocation() + "/Paper/NCI-20k-axioms"));
 		writer.writeAxiomSignatures();
+		
+
+
 	}
 }
