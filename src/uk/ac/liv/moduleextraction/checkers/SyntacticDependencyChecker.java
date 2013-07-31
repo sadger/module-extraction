@@ -15,7 +15,7 @@ import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.datastructures.LinkedHashList;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 
-public class NewSyntacticDependencyChecker {
+public class SyntacticDependencyChecker {
 	
 	public boolean hasSyntacticSigDependency(OWLLogicalAxiom chosenAxiom, ChainDependencies dependsW, Set<OWLEntity> signatureAndSigM){
 		

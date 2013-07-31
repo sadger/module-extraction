@@ -16,7 +16,7 @@ import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 
 public class ChainAxiomCollector {
 
-	NewSyntacticDependencyChecker checker = new NewSyntacticDependencyChecker();
+	SyntacticDependencyChecker checker = new SyntacticDependencyChecker();
 	public ChainAxiomCollector() {
 
 	}
@@ -35,7 +35,7 @@ public class ChainAxiomCollector {
 	}
 
 	public Set<OWLLogicalAxiom> collectAxiomChain(boolean[] terminology, int currentIndex, DefinitorialAxiomStore axiomStore, ChainDependencies dependT, Set<OWLEntity> sigUnionSigM) {
-		NewSyntacticDependencyChecker checker = new NewSyntacticDependencyChecker();
+		SyntacticDependencyChecker checker = new SyntacticDependencyChecker();
 		Set<OWLLogicalAxiom> chain = new HashSet<OWLLogicalAxiom>();
 
 		for (int i = currentIndex; i >= 0; i--) {

@@ -1,7 +1,5 @@
 package uk.ac.liv.moduleextraction.extractor;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,25 +15,23 @@ import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
-import uk.ac.liv.moduleextraction.checkers.OLDSyntacticDependencyChecker;
+import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
 import uk.ac.liv.moduleextraction.datastructures.LinkedHashList;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.main.ModulePaths;
 import uk.ac.liv.ontologyutils.main.ModuleUtils;
 
 public class OldApproach {
 	
 	/* Syntactic Checking */
-	private OLDSyntacticDependencyChecker syntaxDepChecker = new OLDSyntacticDependencyChecker();
-
+	private SyntacticDependencyChecker syntaxDepChecker = new SyntacticDependencyChecker();
 	/* Semantic Checking */
 	private LHSSigExtractor lhsExtractor = new LHSSigExtractor();
 	private InseperableChecker insepChecker = new InseperableChecker();
 
 	/* Data Structures */
-	private LinkedHashList<OWLLogicalAxiom> terminology;
+	private ArrayList<OWLLogicalAxiom> terminology;
 	private Set<OWLLogicalAxiom> module;
 	private Set<OWLEntity> signature;
 	private HashSet<OWLEntity> sigUnionSigM;
@@ -46,8 +42,7 @@ public class OldApproach {
 	
 	public OldApproach(Set<OWLLogicalAxiom> term, Set<OWLEntity> sig) {
 		DefinitorialDepth definitorialDepth = new DefinitorialDepth(term);
-		ArrayList<OWLLogicalAxiom> depthSortedAxioms = definitorialDepth.getDefinitorialSortedList();
-		this.terminology = new LinkedHashList<OWLLogicalAxiom>(depthSortedAxioms);
+		this.terminology = definitorialDepth.getDefinitorialSortedList();
 		this.signature = sig;
 		this.module = new HashSet<OWLLogicalAxiom>();
 		
@@ -69,7 +64,7 @@ public class OldApproach {
 			syntaticDependencies.updateDependenciesWith(chosenAxiom);
 			
 			checks++;
-			if(syntaxDepChecker.hasSyntacticSigDependency(W, syntaticDependencies, sigUnionSigM) || 
+			if(syntaxDepChecker.hasSyntacticSigDependency(chosenAxiom, syntaticDependencies, sigUnionSigM) || 
 					insepChecker.isSeperableFromEmptySet(lhsExtractor.getLHSSigAxioms(W, sigUnionSigM, syntaticDependencies), sigUnionSigM)){
 
 				module.add(chosenAxiom);
@@ -111,17 +106,17 @@ public class OldApproach {
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities("/LOCAL/wgatens/Ontologies/Bioportal/NOTEL/Terminologies/Acyclic/Big/LiPrO-converted");
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		Set<OWLEntity> sig = gen.generateRandomSignature(10);
+		Set<OWLEntity> sig = gen.generateRandomSignature(20);
 		
 		Set<OWLLogicalAxiom> syntfirstExtracted = null;
 		Set<OWLLogicalAxiom> oldExtracted = null;
 		
-		SyntacticFirstModuleExtraction syntmod = null;
+		SemanticRuleExtractor syntmod = null;
 		OldApproach oldMod = null;
 		try {
 			long startTime = System.currentTimeMillis();
-			syntmod = new SyntacticFirstModuleExtraction(ont.getLogicalAxioms(), sig);
-			syntfirstExtracted = syntmod.extractModule();
+			syntmod = new SemanticRuleExtractor(ont);
+			syntfirstExtracted = syntmod.extractModule(sig);
 			System.out.println("Time taken: " + ModuleUtils.getTimeAsHMS(System.currentTimeMillis() - startTime));
 			
 			startTime = System.currentTimeMillis();

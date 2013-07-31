@@ -19,7 +19,6 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.liv.moduleextraction.extractor.SyntacticFirstModuleExtraction;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 
 public class DumpExtractionToDisk implements Runnable {

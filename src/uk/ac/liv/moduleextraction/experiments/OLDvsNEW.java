@@ -14,12 +14,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import uk.ac.liv.moduleextraction.extractor.OldApproach;
 import uk.ac.liv.moduleextraction.extractor.SemanticRuleExtractor;
-import uk.ac.liv.moduleextraction.extractor.SyntacticFirstModuleExtraction;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
-import uk.ac.liv.moduleextraction.reloading.DumpExtractionToDisk;
-import uk.ac.liv.moduleextraction.signature.SigManager;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.main.ModulePaths;
 
 public class OLDvsNEW implements Experiment {
 	
