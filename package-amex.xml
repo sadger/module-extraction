@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project module-extraction">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <target name="create_run_jar">
+        <jar destfile="/home/loco8/wgatens/PhD/ModuleExtractionWorkspace/amex.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="uk.ac.liv.moduleextraction.main.CommandLineInterface"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="/home/loco8/wgatens/PhD/ModuleExtractionWorkspace/module-extraction/bin"/>
+            <zipfileset excludes="META-INF/*.SF" src="/users/loco/wgatens/Programs/Jars/owlapi-bin.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="/users/loco/wgatens/Programs/Jars/org.sat4j.core.jar"/>
+            <fileset dir="/home/loco8/wgatens/PhD/ModuleExtractionWorkspace/ontologyutils/bin"/>
+            <zipfileset excludes="META-INF/*.SF" src="/users/loco/wgatens/Programs/Jars/guava-14.0-rc1.jar"/>
+            <fileset dir="/home/loco8/wgatens/PhD/ModuleExtractionWorkspace/propositional/bin"/>
+            <zipfileset excludes="META-INF/*.SF" src="/home/loco8/wgatens/Programs/eclipse/plugins/org.junit_4.10.0.v4_10_0_v20120426-0900/junit.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="/home/loco8/wgatens/Programs/eclipse/plugins/org.hamcrest.core_1.1.0.v20090501071000.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="/users/loco/wgatens/Programs/Jars/slf4j-api-1.7.2.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="/users/loco/wgatens/Programs/Jars/slf4j-simple-1.7.2.jar"/>
+        </jar>
+    </target>
+</project>

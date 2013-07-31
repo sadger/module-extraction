@@ -20,7 +20,7 @@ import uk.ac.liv.ontologyutils.util.ModuleUtils;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
-public class LovelyFunTimeExtractor implements Extractor {
+public class IteratingExtractor implements Extractor {
 
 	private OWLOntology ontology;
 	private SupportedAxiomVerifier verifier;
@@ -29,7 +29,7 @@ public class LovelyFunTimeExtractor implements Extractor {
 	private int starExtractions = 0;
 	private int amexExtrations = 0;
 
-	public LovelyFunTimeExtractor(OWLOntology ont) {
+	public IteratingExtractor(OWLOntology ont) {
 		this.ontology = ont;
 		this.manager = ont.getOWLOntologyManager();
 		this.verifier = new SupportedAxiomVerifier();
@@ -167,22 +167,5 @@ public class LovelyFunTimeExtractor implements Extractor {
 		return null;
 	}
 	
-	public static void main(String[] args) throws IOException {
-		
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_08.09d.OWL");
-		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "/paper-500random"));
-		
-		LovelyFunTimeExtractor fun = new LovelyFunTimeExtractor(ont);
-		int[] tests = {2,289,268};
-		for (int i = 1; i <= 300; i++) {
-			System.out.println("===" + i + "===");
-			fun.extractModule(man.readFile("random500-" + i));
-		}
-
-
-		
-
-
-	}
 
 }

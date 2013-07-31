@@ -27,7 +27,10 @@ public class CommandLineInterface {
 		// 0: Flags, 1: Ontology Loc, 2:Signature loc
 		
 		OWLOntology ontology = null;
+		
+	
 		File sigLocation = null;
+		
 		
 		
 	    if(args.length == 2){
@@ -48,6 +51,13 @@ public class CommandLineInterface {
 			System.exit(-1);
 		}
 
+	    
+	    	
+		File currentDir = new File(".");
+		sigLocation = new File(currentDir +"/" + sigLocation.getName());
+	    
+	    
+	    System.out.println(sigLocation);
 		
 		String sigName = sigLocation.getName();
 		sigLocation = sigLocation.getParentFile();
@@ -96,9 +106,6 @@ public class CommandLineInterface {
 		long SendTime = System.currentTimeMillis() - SstartTime;
 
 		
-		
-	
-
 	
 		if(debugMode){
 			System.out.println();

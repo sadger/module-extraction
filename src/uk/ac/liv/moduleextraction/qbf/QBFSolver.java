@@ -6,6 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.semanticweb.owlapi.model.OWLOntology;
+
+import uk.ac.liv.moduleextraction.extractor.SemanticRuleExtractor;
+import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
+import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 
 public class QBFSolver {
@@ -16,12 +21,17 @@ public class QBFSolver {
 	public boolean isSatisfiable (File dimacsLocation) throws QBFSolverException{
 
 		this.qbfFile = dimacsLocation;
+		
+		System.out.println(qbfFile);
 
 		solverText = "";
 		
-		ProcessBuilder pb = new ProcessBuilder("./sKizzo", dimacsLocation.getAbsolutePath());
+		File qbfSolverLocation = new File(ModulePaths.getQBFSolverLocation());
 		
-		pb.directory(new File(ModulePaths.getQBFSolverLocation()));
+		ProcessBuilder pb = new ProcessBuilder("./" + qbfSolverLocation.getName() , dimacsLocation.getAbsolutePath());
+		
+		pb.directory(qbfSolverLocation.getParentFile());
+		
 		Process proc = null;
 
 		try {
@@ -92,6 +102,13 @@ public class QBFSolver {
 			throw new QBFSolverException();
 		}
 
+	}
+	
+	public static void main(String[] args) {
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "interp/semanticdep.krss");
+		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+		SemanticRuleExtractor extract = new SemanticRuleExtractor(ont);
+		extract.extractModule(gen.generateRandomSignature(3));
 	}
 
 

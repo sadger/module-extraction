@@ -12,7 +12,7 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-import uk.ac.liv.moduleextraction.extractor.LovelyFunTimeExtractor;
+import uk.ac.liv.moduleextraction.extractor.IteratingExtractor;
 import uk.ac.liv.ontologyutils.expressions.ALCValidator;
 import uk.ac.liv.ontologyutils.expressions.ELValidator;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
@@ -22,7 +22,7 @@ import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 public class IteratingExperiment implements Experiment {
 
 	private SyntacticLocalityModuleExtractor starExtractor;
-	private LovelyFunTimeExtractor iteratingExtractor;
+	private IteratingExtractor iteratingExtractor;
 	private int starSize = 0;
 	private int itSize = 0;
 	private Set<OWLLogicalAxiom> starModule;
@@ -39,7 +39,7 @@ public class IteratingExperiment implements Experiment {
 		this.ontology = ont;
 		OWLOntologyManager manager = ont.getOWLOntologyManager();
 		this.starExtractor = new SyntacticLocalityModuleExtractor(manager, ont, ModuleType.STAR);
-		this.iteratingExtractor = new LovelyFunTimeExtractor(ont);
+		this.iteratingExtractor = new IteratingExtractor(ont);
 	}
 
 	public static HashMap<OWLLogicalAxiom, Integer> getDifferenceMap(){
