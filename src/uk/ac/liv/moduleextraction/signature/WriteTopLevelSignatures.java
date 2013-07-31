@@ -14,8 +14,8 @@ import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
 import uk.ac.liv.moduleextraction.chaindependencies.Dependency;
 import uk.ac.liv.moduleextraction.datastructures.LinkedHashList;
-import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
+import uk.ac.liv.ontologyutils.main.ModulePaths;
 
 public class WriteTopLevelSignatures {
 	OWLOntology ontology;
@@ -27,8 +27,7 @@ public class WriteTopLevelSignatures {
 		this.location = location;
 		
 		DefinitorialDepth definitorialDepth = new DefinitorialDepth(ont.getLogicalAxioms());
-		ArrayList<OWLLogicalAxiom> depthSortedAxioms = definitorialDepth.getDefinitorialSortedList();
-		LinkedHashList<OWLLogicalAxiom> terminology = new LinkedHashList<OWLLogicalAxiom>(depthSortedAxioms);
+		ArrayList<OWLLogicalAxiom> terminology = definitorialDepth.getDefinitorialSortedList();
 		
 		d = new ChainDependencies();
 		d.updateDependenciesWith(terminology);

@@ -19,10 +19,10 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.RemoveAxiom;
-import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.ontologyutils.axioms.AxiomExtractor;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
+import uk.ac.liv.ontologyutils.main.ModulePaths;
 import uk.ac.liv.ontologyutils.terminology.EquivalentToTerminologyChecker;
 
 public class EquivalentToTerminologyProcessor {

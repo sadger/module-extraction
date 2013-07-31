@@ -19,8 +19,7 @@ import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.liv.moduleextraction.experiments.ExtractionComparisonFolder;
-import uk.ac.liv.moduleextraction.util.ModulePaths;
+import uk.ac.liv.ontologyutils.main.ModulePaths;
 
 public class SigManager {
 	Logger logger = LoggerFactory.getLogger(SigManager.class);

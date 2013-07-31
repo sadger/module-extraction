@@ -14,9 +14,9 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
-import uk.ac.liv.moduleextraction.util.ModulePaths;
-import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
+import uk.ac.liv.ontologyutils.main.ModulePaths;
+import uk.ac.liv.ontologyutils.main.ModuleUtils;
 import uk.ac.liv.ontologyutils.terminology.AxiomStructureInspector;
 import uk.ac.liv.ontologyutils.terminology.EquivalentToTerminologyChecker;
 import uk.ac.liv.ontologyutils.terminology.TerminologyChecker;

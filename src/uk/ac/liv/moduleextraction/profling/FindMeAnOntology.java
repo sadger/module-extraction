@@ -22,11 +22,11 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.util.DLExpressivityChecker;
 
-import uk.ac.liv.moduleextraction.util.AcyclicChecker;
-import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.ontologyutils.axioms.ALCValidator;
 import uk.ac.liv.ontologyutils.axioms.ELValidator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
+import uk.ac.liv.ontologyutils.main.AcyclicChecker;
+import uk.ac.liv.ontologyutils.main.ModulePaths;
 import uk.ac.liv.ontologyutils.terminology.AxiomStructureInspector;
 import uk.ac.liv.ontologyutils.terminology.EquivalentToTerminologyChecker;
 import uk.ac.liv.ontologyutils.terminology.TerminologyChecker;

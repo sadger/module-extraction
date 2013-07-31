@@ -158,7 +158,6 @@ public class ExpressionTypeProfiler implements OWLClassExpressionVisitor{
 	}
 	@Override
 	public void visit(OWLDataHasValue arg0) {
-		// TODO Auto-generated method stub
 	}
 	@Override
 	public void visit(OWLDataMinCardinality arg0) {

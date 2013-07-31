@@ -16,7 +16,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-import uk.ac.liv.moduleextraction.util.ModuleUtils;
+import uk.ac.liv.ontologyutils.main.ModuleUtils;
 
 public class SignatureGenerator {
 

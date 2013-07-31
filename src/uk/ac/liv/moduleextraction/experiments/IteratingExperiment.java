@@ -15,9 +15,9 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import uk.ac.liv.moduleextraction.extractor.LovelyFunTimeExtractor;
-import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.ontologyutils.axioms.ALCValidator;
 import uk.ac.liv.ontologyutils.axioms.ELValidator;
+import uk.ac.liv.ontologyutils.main.ModuleUtils;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
