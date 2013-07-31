@@ -47,11 +47,12 @@ public class WriteAxiomSignatures {
 	}
 	
 	public static void main(String[] args) throws OWLOntologyCreationException {
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_08.09d.OWL");
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		OWLOntology subOnt = gen.randomAxioms(20000);
 		
-		WriteAxiomSignatures writer = new WriteAxiomSignatures(subOnt, new File(ModulePaths.getSignatureLocation() + "/Paper/NCI-20k-axioms"));
+		
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/iterated-diff-fullstar.owl");
+
+	
+		WriteAxiomSignatures writer = new WriteAxiomSignatures(ont, new File(ModulePaths.getSignatureLocation() + "/Paper/iterated-full-star"));
 		writer.writeAxiomSignatures();
 		
 

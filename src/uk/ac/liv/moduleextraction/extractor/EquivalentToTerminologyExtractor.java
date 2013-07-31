@@ -2,20 +2,35 @@ package uk.ac.liv.moduleextraction.extractor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
+import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+
+import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
+import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
+import uk.ac.liv.moduleextraction.chaindependencies.DependencySet;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
+import uk.ac.liv.propositional.convertors.ALCtoPropositionalConvertor;
 
 
 public class EquivalentToTerminologyExtractor implements Extractor {
@@ -71,20 +86,62 @@ public class EquivalentToTerminologyExtractor implements Extractor {
 	}
 	
 
-	public static void main(String[] args) throws IOException, NotEquivalentToTerminologyException, OWLOntologyCreationException, QBFSolverException {
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/Thesaurus_08.09d.OWL");
-	
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "/chaintest"));
+	public static void main(String[] args) throws IOException, NotEquivalentToTerminologyException, OWLOntologyCreationException, QBFSolverException, OWLOntologyStorageException, InterruptedException {
 		
-		
-		EquivalentToTerminologyExtractor extractor = new EquivalentToTerminologyExtractor(ont);
 
-	
-		for (int i = 1; i <= 100; i++) {
-			System.out.println(extractor.extractModule(man.readFile("random1000-"+ i)).size());
-		}
+
+		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getSignatureLocation() + "/Paper/examples/othersmallmodule2");
+		OWLOntologyManager ontMan = ont.getOWLOntologyManager();
 		
+		DefinitorialDepth depth = new DefinitorialDepth(ont);
+		ArrayList<OWLLogicalAxiom> sorted = depth.getDefinitorialSortedList();
+		System.out.println("Ontology (sorted by definitorial depth): ");
+
+		for(OWLLogicalAxiom ax : ont.getLogicalAxioms()){
+			System.out.println(ax);
+		}
+		System.out.println();
+//
+		System.out.println("As propositional:");
+		ALCtoPropositionalConvertor convertor = new ALCtoPropositionalConvertor();
+		for(OWLLogicalAxiom ax : sorted){
+			System.out.println(convertor.convert(ax));
+		}
+		System.out.println();
+		
+
+
+		
+
+		
+		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "Paper/examples/"));
+
+		EquivalentToTerminologyExtractor extractor = new EquivalentToTerminologyExtractor(ont);
+		Set<OWLEntity> sig = man.readFile("othersignature2");
+		
+	
+	
+		System.out.println("Signature: " + sig);
+		System.out.println();
+		
+
+		Set<OWLLogicalAxiom> module = extractor.extractModule(sig);
+		System.out.println();
+		
+		System.out.println("Module:");
+		Thread.sleep(1000);
+		for(OWLLogicalAxiom ax : module){
+			System.out.println(ax);
+		}
+//
+//		Set<OWLAxiom> modOntology = new HashSet<OWLAxiom>();
+//		modOntology.addAll(module);
+//		
+		//OWLOntology ontformod = ontMan.createOntology(modOntology);
+//		ontMan.saveOntology(ont,new OWLXMLOntologyFormat(), IRI.create(new File(ModulePaths.getSignatureLocation() + "/Paper/examples/othersmallmodule2")));
+		
+		
+	
 	}
 
 

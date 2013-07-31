@@ -39,6 +39,7 @@ public class InseperableChecker {
 				isInseperable = true;
 			}
 			else{
+
 				testCount++;
 				QBFSolver solver =  new QBFSolver();
 				File qbfProblem = writer.generateQBFProblem();
@@ -57,7 +58,7 @@ public class InseperableChecker {
 	
 			
 	
-		
+			
 		}
 
 		//We test for inseparablity and return the negation

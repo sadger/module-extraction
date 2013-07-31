@@ -20,13 +20,14 @@ public class QBFSolver {
 		solverText = "";
 		
 		ProcessBuilder pb = new ProcessBuilder("./sKizzo", dimacsLocation.getAbsolutePath());
+		
 		pb.directory(new File(ModulePaths.getQBFSolverLocation()));
 		Process proc = null;
 
 		try {
 			proc = pb.start();
 		} catch (IOException e) {
-			e.printStackTrace();
+			e.printStackTrace();  
 		}
 
 		InputStream is = proc.getInputStream();

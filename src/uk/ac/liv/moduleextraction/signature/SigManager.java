@@ -118,13 +118,6 @@ public class SigManager {
 		return signature;
 	}
 	
-	public static void main(String[] args) throws IOException {
-		File directory = new File(ModulePaths.getSignatureLocation() + "/michel");
-		SigManager man = new SigManager(directory);
-		for(File f : directory.listFiles()){
-			System.out.println(f.getName() + ":" + man.readFile(f.getName()).hashCode());
-		}
-	}
 
 	
 }

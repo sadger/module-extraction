@@ -7,9 +7,21 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.ToStringRenderer;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
@@ -19,6 +31,7 @@ import uk.ac.liv.moduleextraction.checkers.NewSyntacticDependencyChecker;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.qbf.SeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
+import uk.ac.manchester.cs.owlapi.dlsyntax.DLSyntaxObjectRenderer;
 
 public class SemanticRuleExtractor implements Extractor{
 
@@ -35,6 +48,8 @@ public class SemanticRuleExtractor implements Extractor{
 	long qbfChecks = 0;
 	
 	
+	Logger logger = LoggerFactory.getLogger(SemanticRuleExtractor.class);
+			
 	public static class DefinitorialAxiomStore{
 		final OWLLogicalAxiom[] axioms;
 		
@@ -181,9 +196,10 @@ public class SemanticRuleExtractor implements Extractor{
 
 	private OWLLogicalAxiom findSeparableAxiom(boolean[] terminology)
 			throws IOException, QBFSolverException {
-		System.err.println("Removing inseparability cause");
+	
 		SeparabilityAxiomLocator search = new SeparabilityAxiomLocator(axiomStore.getSubsetAsArray(terminology),sigUnionSigM,dependT);
 		OWLLogicalAxiom insepAxiom = search.getInseperableAxiom();
+		logger.debug("Adding (semantic): {}", insepAxiom);
 		qbfChecks += search.getCheckCount();
 		return insepAxiom;
 	}
@@ -203,10 +219,11 @@ public class SemanticRuleExtractor implements Extractor{
 					if(syntacticDependencyChecker.hasSyntacticSigDependency(chosenAxiom, dependT, sigUnionSigM)){
 						
 						change = true;
-						
 						module.add(chosenAxiom);
 						terminology[i] = false;
+						logger.debug("Adding (syntactic): {}", chosenAxiom);
 						sigUnionSigM.addAll(chosenAxiom.getSignature());
+						
 						
 					}
 				}
@@ -214,11 +231,98 @@ public class SemanticRuleExtractor implements Extractor{
 		}
 	
 	}
+	
+	public static void main(String[] args) throws OWLOntologyCreationException, InterruptedException {
+		ToStringRenderer stringRender = ToStringRenderer.getInstance();
+		DLSyntaxObjectRenderer renderer;
+		renderer =  new DLSyntaxObjectRenderer();
+		stringRender.setRenderer(renderer);
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		OWLDataFactory factory = OWLManager.getOWLDataFactory();
+		
+//		Renal_Pelvis_and_Ureter_Carcinoma ≡ Kidney_and_Ureter_Neoplasm ⊓ Malignant_Urinary_Tract_Neoplasm ⊓ (∃ Disease_May_Have_Finding.Hematuria) ⊓ (∀ Disease_Has_Primary_Anatomic_Site.Renal_Pelvis_and_Ureter)
+//		Urinary_Tract_Neoplasm ≡ Neoplasm_by_Site ⊓ Urinary_Tract_Disorder
+//		Renal_Pelvis_and_Ureter ⊑ ∃ Anatomic_Structure_Is_Physical_Part_Of.Kidney_and_Ureter
+//		Kidney_and_Ureter_Neoplasm ≡ Urinary_Tract_Neoplasm ⊓ (∀ Disease_Has_Associated_Anatomic_Site.Kidney_and_Ureter)
+//		Malignant_Urinary_Tract_Neoplasm ≡ Urinary_Tract_Neoplasm ⊓ (∀ Disease_Has_Abnormal_Cell.Malignant_Cell)
+//		Benign_Nasal_Cavity_Neoplasm ≡ Nasal_Cavity_Neoplasm ⊓ (∀ Disease_Excludes_Abnormal_Cell.Malignant_Cell)
+//		Signature: [Renal_Pelvis_and_Ureter_Carcinoma, Stage_III_Renal_Pelvis_and_Ureter_Carcinoma, Disease_May_Have_Finding]
+		
+		OWLOntology ont = manager.createOntology();
+		
+		OWLClass b = factory.getOWLClass(IRI.create("#Kidney_and_Ureter_Neoplasm"));
+		OWLClass c = factory.getOWLClass(IRI.create("#Malignant_Urinary_Tract_Neoplasm"));
+		OWLClass e = factory.getOWLClass(IRI.create("#Renal_Pelvis_and_Ureter"));
+	
+		OWLClass f = factory.getOWLClass(IRI.create("#Urinary_Tract_Neoplasm"));
+		OWLClass h =  factory.getOWLClass(IRI.create("#Kidney_and_Ureter"));
+		OWLClass i = factory.getOWLClass(IRI.create("#Malignant_Cell"));
+		
 
+		OWLClass extra1 = factory.getOWLClass(IRI.create("#Benign_Nasal_Cavity_Neoplasm"));
+		OWLClass extra2 = factory.getOWLClass(IRI.create("#Nasal_Cavity_Neoplasm"));
+		
+		OWLObjectProperty t = factory.getOWLObjectProperty(IRI.create("#Anatomic_Structure_Is_Physical_Part_Of"));
+		OWLObjectProperty u = factory.getOWLObjectProperty(IRI.create("#Disease_Has_Associated_Anatomic_Site"));
+		OWLObjectProperty v = factory.getOWLObjectProperty(IRI.create("#Disease_Has_Abnormal_Cell")); 
+		OWLObjectProperty x = factory.getOWLObjectProperty(IRI.create("#Disease_Excludes_Abnormal_Cell")); 
+		
+		
+		OWLClassExpression threerhs = factory.getOWLObjectSomeValuesFrom(t, h);
+		
+		OWLClassExpression fourrhs = factory.getOWLObjectIntersectionOf(f, factory.getOWLObjectAllValuesFrom(u, h));
+		
+		OWLClassExpression fiverhs = factory.getOWLObjectIntersectionOf(f, factory.getOWLObjectAllValuesFrom(v, i));
+		
+		OWLClassExpression extrarhs = factory.getOWLObjectIntersectionOf(extra2, factory.getOWLObjectAllValuesFrom(x, i));
+		
+		
+		OWLLogicalAxiom three = factory.getOWLSubClassOfAxiom(e, threerhs);
+		OWLLogicalAxiom four = factory.getOWLEquivalentClassesAxiom(b, fourrhs);
+		OWLLogicalAxiom five = factory.getOWLSubClassOfAxiom(c, fiverhs);
+		OWLLogicalAxiom extra = factory.getOWLSubClassOfAxiom(extra1, extrarhs);
+		
+		
+		//manager.addAxiom(ont, one);
+	//	manager.addAxiom(ont, two);
+		manager.addAxiom(ont, three);
+		manager.addAxiom(ont, four);
+		manager.addAxiom(ont, five);
+		manager.addAxiom(ont, extra);
+		
+		Set<OWLEntity> signature = new HashSet<OWLEntity>();
+		signature.add(b);
+		signature.add(c);
+		signature.add(e);
+		
+		System.out.println("Ontology: ");
+		for(OWLLogicalAxiom ax : ont.getLogicalAxioms()){
+			System.out.println(ax);
+		}
+		System.out.println();
+		
+		System.out.println("Signature: " + signature);
+		System.out.println();
+		
+		SemanticRuleExtractor extractor = new SemanticRuleExtractor(ont);
+		
+		Thread.sleep(1000);
+		
+		System.out.println("Module: ");
+		Set<OWLLogicalAxiom> module = extractor.extractModule(signature);
+		System.out.println();
+		for(OWLLogicalAxiom ax : module){
+			System.out.println(ax);
+		}
+		
+
+	}
+
+
+
+	 
 
 
 	
-
-
 
 }

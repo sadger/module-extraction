@@ -65,7 +65,7 @@ public class OntologySplitter {
 		
 		OntologySplitter splitter = new OntologySplitter();
 		try {
-			splitter.splitOntology(new File(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl"));
+			splitter.splitOntology(new File(ModulePaths.getOntologyLocation() + "NCI/Profile/Thesaurus_08.09d.OWL"));
 		} catch (OWLOntologyCreationException e) {
 			e.printStackTrace();
 		} catch (OWLOntologyStorageException e) {

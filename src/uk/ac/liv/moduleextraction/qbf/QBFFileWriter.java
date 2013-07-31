@@ -60,6 +60,12 @@ public class QBFFileWriter {
 	private int clauseCount;
 
 	public QBFFileWriter(Set<OWLLogicalAxiom> ontology, Set<OWLEntity> signatureAndSigM) {
+		File directoryToWrite = new File(ModulePaths.getQBFSolverLocation() + "/Files");
+		
+		if(!directoryToWrite.exists()){
+			directoryToWrite.mkdirs();
+		}
+		
 		FILE_TO_WRITE =  ModulePaths.getQBFSolverLocation() + "Files/qbf" + System.currentTimeMillis() + ".qdimacs";
 		this.toWrite = new ArrayList<String>();
 		this.ontology = ontology;

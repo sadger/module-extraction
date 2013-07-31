@@ -64,17 +64,17 @@ public class WriteRandomSigs {
 	public static void main(String[] args) {
 
 		
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_08.09d.OWL");
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "NCI/Profile/Thesaurus_08.09d.OWL-equiv");
 				
-
+		
 		double[] roles = {0,25,50,75,100};
 		int[] sizes = {100,250,500,750,1000};
 		
 		for (int i = 0; i < sizes.length; i++) {
 			for (int j = 0; j < roles.length; j++) {
 				WriteRandomSigs writer = 
-						new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "/Paper/NCI-Iterating-" + sizes[i] + "-" + ((int) roles[j])));
-				writer.writeSignatureWithRoles(sizes[i], roles[j], 200);
+						new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "/Paper/NCI-Iterating-Equiv-" + sizes[i] + "-" + ((int) roles[j])));
+				writer.writeSignatureWithRoles(sizes[i], roles[j], 1000);
 			}
 		
 		}

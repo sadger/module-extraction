@@ -1,5 +1,7 @@
 package uk.ac.liv.moduleextraction.util;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,8 +25,10 @@ import org.semanticweb.owlapi.util.SimpleShortFormProvider;
 
 import uk.ac.liv.moduleextraction.chaindependencies.Dependency;
 import uk.ac.liv.moduleextraction.chaindependencies.DependencySet;
+import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.ontologyutils.caching.AxiomCache;
 import uk.ac.liv.ontologyutils.caching.AxiomMetricStore;
+import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 
 import com.google.common.cache.LoadingCache;
 
@@ -118,6 +122,9 @@ public class ModuleUtils {
 	}
 
 	public static String getTimeAsHMS(long timeInMilliseconds){
+		if(timeInMilliseconds < 1000){
+			return "< 1 second";
+		}
 		long hours = TimeUnit.MILLISECONDS.toHours(timeInMilliseconds);
 		long minutes = TimeUnit.MILLISECONDS.toMinutes(timeInMilliseconds) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(timeInMilliseconds));
 		long seconds = TimeUnit.MILLISECONDS.toSeconds(timeInMilliseconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeInMilliseconds));
@@ -159,5 +166,26 @@ public class ModuleUtils {
 						+ spm.getShortForm(ent))));
 			}
 		}
+	}
+	
+	public static Set<OWLLogicalAxiom> getAxiomsForSignature(OWLOntology ontology, Set<OWLEntity> signature){
+		Set<OWLLogicalAxiom> axioms = new HashSet<OWLLogicalAxiom>();
+		
+		for(OWLLogicalAxiom ax : ontology.getLogicalAxioms()){
+			if(ax.getSignature().equals(signature)){
+				axioms.add(ax);
+			}
+		}
+		return axioms;
+		
+	}
+	
+	public static void main(String[] args) throws IOException {
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_08.09d.OWL");
+		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "/Paper/NCI-20k-axioms/showsDifference"));
+
+		Set<OWLEntity> sig = man.readFile("axiom-930980605");
+
+		System.out.println(ModuleUtils.getAxiomsForSignature(ont, sig));
 	}
 }

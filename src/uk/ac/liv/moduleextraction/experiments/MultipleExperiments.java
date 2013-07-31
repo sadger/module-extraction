@@ -3,6 +3,8 @@ package uk.ac.liv.moduleextraction.experiments;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.xml.bind.ValidationEvent;
@@ -10,6 +12,7 @@ import javax.xml.bind.ValidationEvent;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -21,6 +24,7 @@ import uk.ac.liv.moduleextraction.extractor.EquivalentToTerminologyProcessor;
 import uk.ac.liv.moduleextraction.extractor.NotEquivalentToTerminologyException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
+import uk.ac.liv.moduleextraction.signature.WriteRandomSigs;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.ontologyutils.axioms.ELValidator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
@@ -45,10 +49,11 @@ public class MultipleExperiments {
 			newResultFolder.mkdir();
 		}
 		
-		
+		int experimentCount = 1;
 		for(File f : files){
 			if(f.isFile()){
-				System.out.println("Checking " + f.getName());
+				//System.out.println("Experment " + experimentCount + ": " + f.getName());
+			
 				Set<OWLEntity> sig = sigManager.readFile(f.getName());
 				experiment.performExperiment(sig);
 				
@@ -64,21 +69,18 @@ public class MultipleExperiments {
 				
 				//Write any metrics
 				experiment.writeMetrics(experimentLocation);
+				experimentCount++;
 			}
 		}
 	}
 	
-	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException {
+	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
+	
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/iterated-diff-fullstar.owl");
 		
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "NCI/Thesaurus_08.09d.OWL");
-		
-		try {
-			new MultipleExperiments().runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/Paper/NCI-20k-axioms"), new IteratingExperiment(ont));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new MultipleExperiments().runExperiments(ont, new File(ModulePaths.getSignatureLocation() +  "Paper/iterated-full-star"), new IteratingExperiment(ont));
 
-		
+		System.out.println("ALC COUNT: " + IteratingExperiment.alcCount);
 	
 		
 		
