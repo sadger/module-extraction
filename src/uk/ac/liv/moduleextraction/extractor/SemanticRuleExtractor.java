@@ -20,7 +20,7 @@ import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.qbf.SeparabilityAxiomLocator;
-import uk.ac.liv.ontologyutils.main.ModuleUtils;
+import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 public class SemanticRuleExtractor implements Extractor{
 

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
-import uk.ac.liv.ontologyutils.main.ModuleUtils;
+import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 public class SeparabilityAxiomLocator {
 

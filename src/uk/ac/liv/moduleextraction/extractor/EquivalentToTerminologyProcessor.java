@@ -18,8 +18,8 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.main.ModulePaths;
-import uk.ac.liv.ontologyutils.terminology.EquivalentToTerminologyChecker;
+import uk.ac.liv.ontologyutils.ontologies.EquivalentToTerminologyChecker;
+import uk.ac.liv.ontologyutils.util.ModulePaths;
 
 public class EquivalentToTerminologyProcessor {
 

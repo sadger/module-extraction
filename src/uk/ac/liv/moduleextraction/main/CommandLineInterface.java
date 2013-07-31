@@ -13,9 +13,9 @@ import uk.ac.liv.moduleextraction.extractor.Extractor;
 import uk.ac.liv.moduleextraction.extractor.SemanticRuleExtractor;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.main.ModuleUtils;
-import uk.ac.liv.ontologyutils.terminology.EquivalentToTerminologyChecker;
-import uk.ac.liv.ontologyutils.terminology.TerminologyChecker;
+import uk.ac.liv.ontologyutils.ontologies.EquivalentToTerminologyChecker;
+import uk.ac.liv.ontologyutils.ontologies.TerminologyChecker;
+import uk.ac.liv.ontologyutils.util.ModuleUtils;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 

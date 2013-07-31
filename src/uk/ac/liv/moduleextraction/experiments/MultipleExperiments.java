@@ -13,7 +13,7 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import uk.ac.liv.moduleextraction.extractor.NotEquivalentToTerminologyException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.main.ModulePaths;
+import uk.ac.liv.ontologyutils.util.ModulePaths;
 
 public class MultipleExperiments {
 	

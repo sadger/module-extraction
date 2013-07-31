@@ -14,13 +14,13 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.util.DLExpressivityChecker;
 
-import uk.ac.liv.ontologyutils.axioms.ALCValidator;
-import uk.ac.liv.ontologyutils.axioms.ELValidator;
+import uk.ac.liv.ontologyutils.axioms.AxiomStructureInspector;
+import uk.ac.liv.ontologyutils.expressions.ALCValidator;
+import uk.ac.liv.ontologyutils.expressions.ELValidator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.main.ModulePaths;
-import uk.ac.liv.ontologyutils.terminology.AxiomStructureInspector;
-import uk.ac.liv.ontologyutils.terminology.EquivalentToTerminologyChecker;
-import uk.ac.liv.ontologyutils.terminology.TerminologyChecker;
+import uk.ac.liv.ontologyutils.ontologies.EquivalentToTerminologyChecker;
+import uk.ac.liv.ontologyutils.ontologies.TerminologyChecker;
+import uk.ac.liv.ontologyutils.util.ModulePaths;
 
 public class FindMeAnOntology {
 

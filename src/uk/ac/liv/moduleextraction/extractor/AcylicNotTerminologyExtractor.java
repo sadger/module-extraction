@@ -13,11 +13,11 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
+import uk.ac.liv.ontologyutils.axioms.AxiomStructureInspector;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.main.ModulePaths;
-import uk.ac.liv.ontologyutils.terminology.AxiomStructureInspector;
-import uk.ac.liv.ontologyutils.terminology.EquivalentToTerminologyChecker;
-import uk.ac.liv.ontologyutils.terminology.TerminologyChecker;
+import uk.ac.liv.ontologyutils.ontologies.EquivalentToTerminologyChecker;
+import uk.ac.liv.ontologyutils.ontologies.TerminologyChecker;
+import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 

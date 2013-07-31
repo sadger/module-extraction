@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import uk.ac.liv.ontologyutils.main.ModulePaths;
+import uk.ac.liv.ontologyutils.util.ModulePaths;
 
 public class QBFSolver {
 

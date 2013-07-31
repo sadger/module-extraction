@@ -20,7 +20,7 @@ import uk.ac.liv.moduleextraction.datastructures.LinkedHashList;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.main.ModuleUtils;
+import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 public class OldApproach {
 	

@@ -18,7 +18,7 @@ import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.main.ModulePaths;
+import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.propositional.convertors.ALCtoPropositionalConvertor;
 
 

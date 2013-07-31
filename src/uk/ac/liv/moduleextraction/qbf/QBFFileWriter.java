@@ -18,8 +18,8 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
-import uk.ac.liv.ontologyutils.main.ModulePaths;
-import uk.ac.liv.ontologyutils.main.ModuleUtils;
+import uk.ac.liv.ontologyutils.util.ModulePaths;
+import uk.ac.liv.ontologyutils.util.ModuleUtils;
 import uk.ac.liv.propositional.convertors.ALCtoPropositionalConvertor;
 import uk.ac.liv.propositional.convertors.ClauseSettoSATClauses;
 import uk.ac.liv.propositional.convertors.OWLOntologyToClauseSet;

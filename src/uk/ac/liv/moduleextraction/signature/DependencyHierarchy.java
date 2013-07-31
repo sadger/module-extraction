@@ -13,7 +13,7 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import uk.ac.liv.moduleextraction.chaindependencies.DependencySet;
 import uk.ac.liv.moduleextraction.util.OtherUtils;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
-import uk.ac.liv.ontologyutils.main.ModuleUtils;
+import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 
 
