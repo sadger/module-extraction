@@ -47,7 +47,7 @@ public class ChainDependencies extends HashMap<OWLClass, DependencySet>{
 	private void addImmediateDependencies(OWLClassExpression definition, DependencySet axiomDeps) {
 		for(OWLEntity e : definition.getSignature()){
 			if(!e.isTopEntity() && !e.isBottomEntity())
-				axiomDeps.add(new Dependency(e));
+				axiomDeps.add(e);
 		}
 	}
 

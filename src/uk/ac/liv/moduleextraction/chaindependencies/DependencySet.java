@@ -5,17 +5,12 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLEntity;
 
-public class  DependencySet extends HashSet<Dependency>{
-
-	private static final long serialVersionUID = 5147803484884184934L;
-	
-	public Set<OWLEntity> asOWLEntities(){
-		Set<OWLEntity> entities = new HashSet<OWLEntity>();
-		for(Dependency d : this){
-			entities.add(d.getValue());
-		}
-		return entities;
+public class  DependencySet extends HashSet<OWLEntity>{
+	public DependencySet() {
+		super();
 	}
+	
+	private static final long serialVersionUID = 5147803484884184934L;
 	
 	public void mergeWith(DependencySet dependencySet){
 		addAll(dependencySet);

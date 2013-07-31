@@ -40,7 +40,7 @@ public class WriteDepthHierarchySig {
 		int dependencyLevel = 1;
 
 		while(!maxWritten){
-			sigToWrite.addAll(hierarchy.getDependencyForDepth(cls, dependencyLevel).asOWLEntities());
+			sigToWrite.addAll(hierarchy.getDependencyForDepth(cls, dependencyLevel));
 			if(lastSeenSize == sigToWrite.size())
 				maxWritten = true;
 			else{

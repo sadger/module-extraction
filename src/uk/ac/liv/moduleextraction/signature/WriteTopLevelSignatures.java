@@ -12,7 +12,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
-import uk.ac.liv.moduleextraction.chaindependencies.Dependency;
 import uk.ac.liv.moduleextraction.datastructures.LinkedHashList;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.main.ModulePaths;
@@ -40,7 +39,7 @@ public class WriteTopLevelSignatures {
 		for(OWLClass topLevelClass : topLevelClasses){
 			HashSet<OWLEntity> levelClasses = new HashSet<OWLEntity>();
 			for(OWLClass cls : ontology.getClassesInSignature()){
-				if(d.containsKey(cls) && d.get(cls).contains(new Dependency(topLevelClass))){
+				if(d.containsKey(cls) && d.get(cls).contains(topLevelClass)){
 					levelClasses.add(cls);
 				}
 			}

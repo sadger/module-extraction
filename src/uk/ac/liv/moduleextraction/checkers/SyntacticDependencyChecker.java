@@ -28,7 +28,7 @@ public class SyntacticDependencyChecker {
 			return result;
 		}
 		else{
-			HashSet<OWLEntity> intersect = new HashSet<OWLEntity>(dependsW.get(axiomName).asOWLEntities());
+			HashSet<OWLEntity> intersect = new HashSet<OWLEntity>(dependsW.get(axiomName));
 			intersect.retainAll(signatureAndSigM);
 			
 			if(!intersect.isEmpty()){

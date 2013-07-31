@@ -21,19 +21,6 @@ public class ChainAxiomCollector {
 
 	}
 
-	public Set<OWLLogicalAxiom> collectAxiomChain(ListIterator<OWLLogicalAxiom> positionInTerminology, ChainDependencies dependencies, Set<OWLEntity> signatureAndSigM){
-		HashSet<OWLLogicalAxiom> axiomChain = new HashSet<OWLLogicalAxiom>();
-		while(positionInTerminology.hasPrevious()){
-			OWLLogicalAxiom axiom = positionInTerminology.previous();
-
-			if(checker.hasSyntacticSigDependency(axiom, dependencies, signatureAndSigM)){
-				axiomChain.add(axiom);
-				signatureAndSigM.addAll(axiom.getSignature());
-			}
-		}
-		return axiomChain;
-	}
-
 	public Set<OWLLogicalAxiom> collectAxiomChain(boolean[] terminology, int currentIndex, DefinitorialAxiomStore axiomStore, ChainDependencies dependT, Set<OWLEntity> sigUnionSigM) {
 		SyntacticDependencyChecker checker = new SyntacticDependencyChecker();
 		Set<OWLLogicalAxiom> chain = new HashSet<OWLLogicalAxiom>();

@@ -65,7 +65,7 @@ public class LHSSigExtractor {
 		for(OWLEntity sigConcept : signature){
 			DependencySet sigDeps = dependencies.get(sigConcept);
 			if(sigDeps != null)
-				signatureDependencies.addAll(sigDeps.asOWLEntities());
+				signatureDependencies.addAll(sigDeps);
 		}
 	}
 

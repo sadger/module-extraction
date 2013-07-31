@@ -70,7 +70,7 @@ public class DependencyHierarchy {
 		while(!currentDependencies.isEmpty()){
 			DependencySet newDeps = new DependencySet();
 
-			for(OWLEntity dep : currentDependencies.asOWLEntities()){
+			for(OWLEntity dep : currentDependencies){
 				if(dep.isOWLClass())
 					newDeps.addAll(immediateDependencies.get((OWLClass)dep));
 			}
