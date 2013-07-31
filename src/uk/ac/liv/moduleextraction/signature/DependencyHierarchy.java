@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+
 import uk.ac.liv.moduleextraction.chaindependencies.DependencySet;
 import uk.ac.liv.moduleextraction.util.OtherUtils;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;

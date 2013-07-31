@@ -1,7 +1,6 @@
 package uk.ac.liv.moduleextraction.chaindependencies;
 
 import java.util.HashSet;
-import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLEntity;
 

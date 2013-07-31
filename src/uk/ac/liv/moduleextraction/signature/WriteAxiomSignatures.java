@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
@@ -14,7 +13,6 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.main.ModulePaths;
-import uk.ac.liv.ontologyutils.main.ModuleUtils;
 
 public class WriteAxiomSignatures {
 

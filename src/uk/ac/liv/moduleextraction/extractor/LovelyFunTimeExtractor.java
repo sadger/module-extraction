@@ -2,7 +2,6 @@ package uk.ac.liv.moduleextraction.extractor;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInputStream.GetField;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,8 +13,6 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import uk.ac.liv.moduleextraction.signature.SigManager;
-import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
-import uk.ac.liv.ontologyutils.axioms.ELValidator;
 import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.main.ModulePaths;

@@ -7,19 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.ToStringRenderer;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,24 +21,23 @@ import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.qbf.SeparabilityAxiomLocator;
 import uk.ac.liv.ontologyutils.main.ModuleUtils;
-import uk.ac.manchester.cs.owlapi.dlsyntax.DLSyntaxObjectRenderer;
 
 public class SemanticRuleExtractor implements Extractor{
 
-	ChainDependencies dependT;
-	Set<OWLLogicalAxiom> module;
-	Set<OWLEntity> sigUnionSigM;
-	SyntacticDependencyChecker syntacticDependencyChecker;
-	DefinitorialAxiomStore axiomStore;
-	LHSSigExtractor lhsExtractor;
-	InseperableChecker inseperableChecker;
+	private ChainDependencies dependT;
+	private Set<OWLLogicalAxiom> module;
+	private Set<OWLEntity> sigUnionSigM;
+	private SyntacticDependencyChecker syntacticDependencyChecker;
+	private DefinitorialAxiomStore axiomStore;
+	private LHSSigExtractor lhsExtractor;
+	private InseperableChecker inseperableChecker;
 	
-	long syntacticChecks = 0; // A syntactic iteration (total checks = this + qbfchecks)
-	long timeTaken = 0; //Time taken to setup and extract the module (ms)
-	long qbfChecks = 0;
+	private long syntacticChecks = 0; // A syntactic iteration (total checks = this + qbfchecks)
+	private long timeTaken = 0; //Time taken to setup and extract the module (ms)
+	private long qbfChecks = 0;
 	
 	
-	Logger logger = LoggerFactory.getLogger(SemanticRuleExtractor.class);
+	private Logger logger = LoggerFactory.getLogger(SemanticRuleExtractor.class);
 			
 	public static class DefinitorialAxiomStore{
 		final OWLLogicalAxiom[] axioms;

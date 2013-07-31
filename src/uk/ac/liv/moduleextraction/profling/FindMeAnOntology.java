@@ -6,31 +6,21 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
-import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.util.DLExpressivityChecker;
 
 import uk.ac.liv.ontologyutils.axioms.ALCValidator;
 import uk.ac.liv.ontologyutils.axioms.ELValidator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.main.AcyclicChecker;
 import uk.ac.liv.ontologyutils.main.ModulePaths;
 import uk.ac.liv.ontologyutils.terminology.AxiomStructureInspector;
 import uk.ac.liv.ontologyutils.terminology.EquivalentToTerminologyChecker;
 import uk.ac.liv.ontologyutils.terminology.TerminologyChecker;
-import uk.ac.liv.ontologyutils.terminology.ToTerminologyConvertor;
 
 public class FindMeAnOntology {
 

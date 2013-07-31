@@ -2,7 +2,6 @@ package uk.ac.liv.moduleextraction.profling;
 
 import java.util.HashMap;
 
-import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.ClassExpressionType;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;

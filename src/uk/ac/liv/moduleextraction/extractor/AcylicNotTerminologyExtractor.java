@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
@@ -16,7 +15,6 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.main.ModulePaths;
-import uk.ac.liv.ontologyutils.main.ModuleUtils;
 import uk.ac.liv.ontologyutils.terminology.AxiomStructureInspector;
 import uk.ac.liv.ontologyutils.terminology.EquivalentToTerminologyChecker;
 import uk.ac.liv.ontologyutils.terminology.TerminologyChecker;

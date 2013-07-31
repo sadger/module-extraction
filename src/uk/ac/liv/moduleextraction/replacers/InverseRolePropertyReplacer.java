@@ -4,7 +4,6 @@ package uk.ac.liv.moduleextraction.replacers;
 import java.util.HashSet;
 import java.util.Set;
 
-
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLClass;

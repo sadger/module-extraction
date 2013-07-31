@@ -7,17 +7,12 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.util.VersionInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.impl.SimpleLogger;
 
 import uk.ac.liv.moduleextraction.extractor.EquivalentToTerminologyExtractor;
 import uk.ac.liv.moduleextraction.extractor.Extractor;
 import uk.ac.liv.moduleextraction.extractor.SemanticRuleExtractor;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.main.ModulePaths;
 import uk.ac.liv.ontologyutils.main.ModuleUtils;
 import uk.ac.liv.ontologyutils.terminology.EquivalentToTerminologyChecker;
 import uk.ac.liv.ontologyutils.terminology.TerminologyChecker;
