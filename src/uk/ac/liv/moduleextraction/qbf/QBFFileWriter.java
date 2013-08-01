@@ -6,19 +6,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.sat4j.specs.IVec;
-import org.sat4j.specs.IVecInt;
-import org.sat4j.specs.IteratorInt;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
-import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 import uk.ac.liv.propositional.convertors.ALCtoPropositionalConvertor;
 import uk.ac.liv.propositional.convertors.ClauseSettoSATClauses;
@@ -48,7 +43,7 @@ public class QBFFileWriter {
 	private ClauseSet ontologyAsClauseSet;
 	private ClauseSettoSATClauses clauseSetConvertor;
 	private NumberMap numberMap;
-	private IVec<IVecInt> clauses;
+	private List<List<Integer>> clauses;
 	
 	private int variableCount;
 	private int clauseCount;
@@ -82,7 +77,7 @@ public class QBFFileWriter {
 		this.ontologyAsClauseSet = ontologyConvertor.convertOntology(ontology);
 		this.clauseSetConvertor = new ClauseSettoSATClauses(ontologyAsClauseSet);
 		this.numberMap = clauseSetConvertor.getNumberMap();
-		this.clauses = new ClauseSettoSATClauses(ontologyAsClauseSet).convert();
+		this.clauses = new ClauseSettoSATClauses(ontologyAsClauseSet).getSatNumberMapping();
 	}
 	
 	
@@ -107,7 +102,7 @@ public class QBFFileWriter {
 
 	private void writeHeaders() {
 		variableCount = ontologyAsClauseSet.getVariables().size();
-		clauseCount = ontologyAsClauseSet.getClauses().size();
+		clauseCount = ontologyAsClauseSet.size();
 		toWrite.add("p cnf " + variableCount + " " + clauseCount + "\n");		
 	}
 
@@ -146,7 +141,7 @@ public class QBFFileWriter {
 				writer.write(s);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();System.out.println(clauses);
+			e.printStackTrace();
 		} finally{
 			try{
 				fileWriter.flush();
@@ -202,15 +197,15 @@ public class QBFFileWriter {
 	}
 
 	private void writeClauses() {
-		Iterator<IVecInt> vectorsIterator = clauses.iterator();
-
-		while(vectorsIterator.hasNext()){
-			IteratorInt intIterator =  vectorsIterator.next().iterator();
-			while(intIterator.hasNext())
-				toWrite.add(intIterator.next() + " ");
-
-			toWrite.add("0" + "\n");
+		
+		for(List<Integer> clauseAsNumbers : clauses){
+			System.out.println(clauseAsNumbers);
+			for(Integer i : clauseAsNumbers){
+				toWrite.add(i + " ");
+			}
+			toWrite.add("\n");
 		}
+
 	}
 
 

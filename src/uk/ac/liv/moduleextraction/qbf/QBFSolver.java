@@ -22,8 +22,6 @@ public class QBFSolver {
 
 		this.qbfFile = dimacsLocation;
 		
-		System.out.println(qbfFile);
-
 		solverText = "";
 		
 		File qbfSolverLocation = new File(ModulePaths.getQBFSolverLocation());
@@ -105,10 +103,13 @@ public class QBFSolver {
 	}
 	
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "interp/semanticdep.krss");
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		SemanticRuleExtractor extract = new SemanticRuleExtractor(ont);
-		extract.extractModule(gen.generateRandomSignature(3));
+		for (int i = 0; i < 100; i++) {
+			OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "interp/semanticdep.krss");
+			SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+			SemanticRuleExtractor extract = new SemanticRuleExtractor(ont);
+			extract.extractModule(gen.generateRandomSignature(3));
+		}
+
 	}
 
 
