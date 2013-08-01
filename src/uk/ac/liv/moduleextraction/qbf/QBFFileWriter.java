@@ -1,7 +1,9 @@
 package uk.ac.liv.moduleextraction.qbf;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,10 +32,6 @@ public class QBFFileWriter {
 	/* Caches ALC->Clause conversion so need to remain static */
 	private static OWLOntologyToClauseSet ontologyConvertor = new OWLOntologyToClauseSet();
 
-	/* File writing structures */
-	private ArrayList<String> toWrite;
-	static String FILE_TO_WRITE;
-
 	/*OWL Structures*/
 	private Set<OWLLogicalAxiom> ontology;
 	private HashSet<OWLEntity> classesNotInSignature;
@@ -47,12 +45,14 @@ public class QBFFileWriter {
 	
 	private int variableCount;
 	private int clauseCount;
+	
+	private File qbfFile;
+
 
 	public QBFFileWriter(Set<OWLLogicalAxiom> ontology, Set<OWLEntity> signatureAndSigM) {
 		File directoryToWrite = new File("/tmp/");
-		
-		FILE_TO_WRITE =  directoryToWrite.getAbsolutePath() + "/qbf" + System.currentTimeMillis() + ".qdimacs";
-		this.toWrite = new ArrayList<String>();
+		this.qbfFile = new File(directoryToWrite + "/qbf" + System.currentTimeMillis() + ".qdimacs");
+
 		this.ontology = ontology;
 		this.signature = new HashSet<OWLEntity>(signatureAndSigM);
 		this.classesNotInSignature = new HashSet<OWLEntity>();
@@ -97,70 +97,60 @@ public class QBFFileWriter {
 	}
 
 	public File generateQBFProblem() throws IOException{
-		return createQBFFile(createStringsToWrite());
+		return createQBFFile();
 	}
-
-	private void writeHeaders() {
-		variableCount = ontologyAsClauseSet.getVariables().size();
-		clauseCount = ontologyAsClauseSet.size();
-		toWrite.add("p cnf " + variableCount + " " + clauseCount + "\n");		
-	}
-
-	private List<String> createStringsToWrite(){
-		writeHeaders();
-		writeUniversalQuantifiers();
-		writeExistentialQuantifiers();
-		writeClauses();
-
-		/* Clear possibly large number map */
-		numberMap.clear();
-		return toWrite;
-	}
+	
 
 
 
-	private File createQBFFile(List<String> list){
-		File file = new File(FILE_TO_WRITE);
-		if (!file.exists()) {
+	private File createQBFFile() throws IOException{
+		if (!qbfFile.exists()) {
 			try {
-				file.createNewFile();
+				qbfFile.createNewFile();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		FileWriter fileWriter = null;
-		try {
-			fileWriter = new FileWriter(file.getAbsoluteFile());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		BufferedWriter writer = new BufferedWriter(fileWriter);
+		
+		BufferedWriter writer = new BufferedWriter(new FileWriter(qbfFile));
 
 		try{
-			for(String s : list){
-				writer.write(s);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally{
-			try{
-				fileWriter.flush();
+			writeHeaders(writer);
+			writeUniversalQuantifiers(writer);
+			writeExistentialQuantifiers(writer);
+			writeClauses(writer);
+		}
+		finally{
+			try {
 				writer.flush();
-				fileWriter.close();
 				writer.close();
-			}
-			catch (IOException e) {
+				
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 
-		return file;
+
+		/* Clear possibly large number map */
+		numberMap.clear();
+		
+	
+		return qbfFile;
+	
+	}
+	
+	private void writeHeaders(BufferedWriter writer) throws IOException {
+		variableCount = ontologyAsClauseSet.getVariables().size();
+		clauseCount = ontologyAsClauseSet.size();
+		writer.write("p cnf " + variableCount + " " + clauseCount);
+		writer.newLine();
 	}
 
 
-	private void writeUniversalQuantifiers() {
+
+	private void writeUniversalQuantifiers(BufferedWriter writer) throws IOException {
 		if(!signature.isEmpty()){
-			toWrite.add("a ");
+			writer.write("a ");
 			for(OWLEntity ent : signature){
 				PropositionalFormula clsAsVar = convertor.convert(ent);
 				Integer associatedNumber = numberMap.get(clsAsVar);
@@ -169,16 +159,17 @@ public class QBFFileWriter {
 				 * appears in the ontology converted to CNF
 				 */
 				if(!(associatedNumber == null)){
-					toWrite.add(numberMap.get(clsAsVar) + " ");
+					writer.write(numberMap.get(clsAsVar) + " ");
 				}
 			}
-			toWrite.add("0\n");
+			writer.write("0");
+			writer.newLine();
 		}
 	}
 
-	private void writeExistentialQuantifiers() {
+	private void writeExistentialQuantifiers(BufferedWriter writer) throws IOException {
 		if(!classesNotInSignature.isEmpty()){
-			toWrite.add("e ");
+			writer.write("e ");
 			for(OWLEntity ent : classesNotInSignature){
 				PropositionalFormula clsAsVar = convertor.convert(ent);
 				
@@ -188,22 +179,21 @@ public class QBFFileWriter {
 				 */
 				Integer associatedNumber = numberMap.get(clsAsVar);
 				if(!(associatedNumber == null)){
-					toWrite.add(numberMap.get(clsAsVar) + " ");
+					writer.write(numberMap.get(clsAsVar) + " ");
 				}
 				
 			}
-			toWrite.add("0\n");
+			writer.write("0");
+			writer.newLine();
 		}
 	}
 
-	private void writeClauses() {
-		
+	private void writeClauses(BufferedWriter writer) throws IOException {
 		for(List<Integer> clauseAsNumbers : clauses){
-			System.out.println(clauseAsNumbers);
 			for(Integer i : clauseAsNumbers){
-				toWrite.add(i + " ");
+				writer.write(i + " ");
 			}
-			toWrite.add("\n");
+			writer.newLine();		
 		}
 
 	}

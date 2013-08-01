@@ -1,7 +1,11 @@
 package uk.ac.liv.moduleextraction.qbf;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,6 +13,7 @@ import java.io.InputStreamReader;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.liv.moduleextraction.extractor.SemanticRuleExtractor;
+import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
@@ -70,7 +75,7 @@ public class QBFSolver {
 
 		return handleExitCode(proc);
 
-	}
+	}		
 
 	private boolean handleExitCode(Process proc) throws QBFSolverException {
 		int exitValue = -1; 
@@ -78,7 +83,7 @@ public class QBFSolver {
 		try{
 			exitValue = proc.exitValue();
 			/* Delete the qbf file */
-			qbfFile.delete();
+			//qbfFile.delete();
 		}
 		catch(IllegalThreadStateException t){
 			t.printStackTrace();
@@ -102,14 +107,18 @@ public class QBFSolver {
 
 	}
 	
-	public static void main(String[] args) {
-		for (int i = 0; i < 100; i++) {
-			OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "interp/semanticdep.krss");
-			SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-			SemanticRuleExtractor extract = new SemanticRuleExtractor(ont);
-			extract.extractModule(gen.generateRandomSignature(3));
-		}
+	public static void main(String[] args) throws IOException {
 
+			OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
+			SemanticRuleExtractor extract = new SemanticRuleExtractor(ont);
+			SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "/writer-benchmark"));
+			
+			for (int i = 1; i <= 100; i++) {
+				System.out.println("Module " + i + " size: " + extract.extractModule(man.readFile("random200-" + i)).size());
+			}
+			
+
+	
 	}
 
 
