@@ -113,7 +113,7 @@ public class QBFSolver {
 			int Max = 1000;
 	
 			
-			for (int i = 1; i <= 1; i++) {
+			for (int i = 1; i <= 100; i++) {
 				int rand = Min + (int)(Math.random() * ((Max - Min) + 1));
 				System.out.println("Sig size: " + rand);
 				System.out.println("Module " + i + " size: " + extract.extractModule(gen.generateRandomSignature(rand)).size());

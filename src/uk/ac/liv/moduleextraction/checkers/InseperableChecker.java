@@ -14,7 +14,6 @@ import uk.ac.liv.moduleextraction.qbf.QBFFileWriter;
 import uk.ac.liv.moduleextraction.qbf.QBFSolver;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.replacers.InverseRolePropertyReplacer;
-import uk.ac.liv.ontologyutils.util.ModulePaths;
 
 public class InseperableChecker {
 	Logger logger = LoggerFactory.getLogger(InseperableChecker.class);

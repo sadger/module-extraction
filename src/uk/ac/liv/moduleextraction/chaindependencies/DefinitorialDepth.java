@@ -23,8 +23,8 @@ import uk.ac.liv.ontologyutils.util.ModuleUtils;
 public class DefinitorialDepth {
 
 	private Set<OWLLogicalAxiom> logicalAxioms;
-	private HashMap<OWLClass, Set<OWLClass>> dependencies = new HashMap<OWLClass, Set<OWLClass>>();
-	private HashMap<OWLClass, Integer> definitorialDepth = new HashMap<OWLClass, Integer>();
+	private HashMap<OWLClass, Set<OWLClass>> dependencies;
+	private HashMap<OWLClass, Integer> definitorialDepth;
 	private ArrayList<OWLLogicalAxiom> sortedAxiomsByDefinitorialDepth;
 
 	/**
@@ -43,6 +43,9 @@ public class DefinitorialDepth {
 	 */
 	public DefinitorialDepth(Set<OWLLogicalAxiom> axioms){
 		this.logicalAxioms = axioms;
+		this.dependencies = new HashMap<OWLClass, Set<OWLClass>>(axioms.size());
+		this.definitorialDepth = new HashMap<OWLClass, Integer>(axioms.size());
+		
 		populateImmediateDependencies();
 		generateDefinitorialDepths();
 	}
