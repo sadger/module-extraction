@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLEntity;
@@ -16,7 +17,6 @@ import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
-import uk.ac.liv.moduleextraction.datastructures.LinkedHashList;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
@@ -50,7 +50,7 @@ public class OldApproach {
 	}
 	
 	public Set<OWLLogicalAxiom> extractModule() throws IOException, QBFSolverException {
-		LinkedHashList<OWLLogicalAxiom> W  = new LinkedHashList<OWLLogicalAxiom>();
+		LinkedList<OWLLogicalAxiom> W  = new LinkedList<OWLLogicalAxiom>();
 		Iterator<OWLLogicalAxiom> axiomIterator = terminology.iterator();
 		ChainDependencies syntaticDependencies = new ChainDependencies();
 

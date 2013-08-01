@@ -1,11 +1,7 @@
 package uk.ac.liv.moduleextraction.qbf;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,7 +9,6 @@ import java.io.InputStreamReader;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.liv.moduleextraction.extractor.SemanticRuleExtractor;
-import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
@@ -111,10 +106,17 @@ public class QBFSolver {
 
 			OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
 			SemanticRuleExtractor extract = new SemanticRuleExtractor(ont);
-			SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "/writer-benchmark"));
+			SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+			ont.getOWLOntologyManager().removeOntology(ont);
 			
-			for (int i = 1; i <= 100; i++) {
-				System.out.println("Module " + i + " size: " + extract.extractModule(man.readFile("random200-" + i)).size());
+			int Min = 100;
+			int Max = 1000;
+	
+			
+			for (int i = 1; i <= 1; i++) {
+				int rand = Min + (int)(Math.random() * ((Max - Min) + 1));
+				System.out.println("Sig size: " + rand);
+				System.out.println("Module " + i + " size: " + extract.extractModule(gen.generateRandomSignature(rand)).size());
 			}
 			
 
