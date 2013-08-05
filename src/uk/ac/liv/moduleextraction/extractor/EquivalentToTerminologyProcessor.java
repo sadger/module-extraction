@@ -15,6 +15,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
@@ -23,7 +25,9 @@ import uk.ac.liv.ontologyutils.util.ModulePaths;
 
 public class EquivalentToTerminologyProcessor {
 
+	private Logger logger = LoggerFactory.getLogger(EquivalentToTerminologyProcessor.class);
 	
+
 	private static final String NEW_IRI_PREFIX = "http://www.csc.liv.ac.uk";
 	private OWLOntology equivalentToTerminology;
 	private HashMap<OWLClass, HashSet<OWLLogicalAxiom>> repeatedAxioms;
@@ -58,6 +62,7 @@ public class EquivalentToTerminologyProcessor {
 	}
 	
 	public OWLOntology getConvertedOntology() throws OWLOntologyCreationException{
+		logger.debug("{}","Performing preprocessing on ontology");
 		OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
 		factory = OWLManager.getOWLDataFactory();
 		
@@ -75,7 +80,7 @@ public class EquivalentToTerminologyProcessor {
 					OWLClass nameOfRepeated = (OWLClass) AxiomSplitter.getNameofAxiom(repeatedAxiom);
 					OWLClassExpression definitionOfRepeated = AxiomSplitter.getDefinitionofAxiom(repeatedAxiom);
 					OWLClass newClass = 
-							factory.getOWLClass(IRI.create(NEW_IRI_PREFIX + "#RENAMED_" + nameOfRepeated.getIRI().getFragment() + index));
+							factory.getOWLClass(IRI.create(NEW_IRI_PREFIX + "#RENAMED_" + nameOfRepeated.getIRI().getFragment() + "_" + index));
 
 					newNames.add(newClass);
 					renamingMap.put(newClass, nameOfRepeated);
@@ -102,7 +107,7 @@ public class EquivalentToTerminologyProcessor {
 	
 	
 	public Set<OWLLogicalAxiom> postProcessModule(Set<OWLLogicalAxiom> module){
-		
+		logger.debug("{}","Performing postprocessing on module");
 		HashSet<OWLLogicalAxiom> toAdd = new HashSet<OWLLogicalAxiom>();
 		HashSet<OWLLogicalAxiom> toRemove = new HashSet<OWLLogicalAxiom>();
 

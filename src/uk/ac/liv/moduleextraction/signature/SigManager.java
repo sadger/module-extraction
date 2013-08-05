@@ -107,8 +107,9 @@ public class SigManager {
 				e.printStackTrace();
 			}
 		}
-		else
-			System.err.println("No signature file found");
+		else{
+			throw new IOException("No signature file " + "\"" + name + "\"" + " found");
+		}
 		
 
 		return signature;

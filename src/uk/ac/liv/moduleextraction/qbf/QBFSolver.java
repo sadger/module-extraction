@@ -35,7 +35,19 @@ public class QBFSolver {
 		try {
 			proc = pb.start();
 		} catch (IOException e) {
-			e.printStackTrace();  
+			if(!qbfSolverLocation.exists()){
+				System.err.println("ERROR: The location you specified for QBF_LOCATION variable does not exist");
+				System.exit(-1);
+			}
+			else if(!qbfSolverLocation.isFile()){
+				System.err.println("ERROR: The location you specified for QBF_LOCATION variable is a directory " +
+						"please point the variable to the sKizzo binary");
+				System.exit(-1);
+			}
+			else{
+				e.printStackTrace();  
+			}
+
 		}
 
 		InputStream is = proc.getInputStream();

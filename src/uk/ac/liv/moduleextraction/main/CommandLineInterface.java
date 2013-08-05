@@ -2,138 +2,168 @@ package uk.ac.liv.moduleextraction.main;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
+import javax.print.attribute.HashAttributeSet;
+
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
+import org.semanticweb.owlapi.io.ToStringRenderer;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.liv.moduleextraction.extractor.EquivalentToTerminologyExtractor;
 import uk.ac.liv.moduleextraction.extractor.Extractor;
 import uk.ac.liv.moduleextraction.extractor.SemanticRuleExtractor;
 import uk.ac.liv.moduleextraction.signature.SigManager;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.EquivalentToTerminologyChecker;
 import uk.ac.liv.ontologyutils.ontologies.TerminologyChecker;
-import uk.ac.liv.ontologyutils.util.ModuleUtils;
-import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
-import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
+import uk.ac.manchester.cs.owlapi.dlsyntax.DLSyntaxObjectRenderer;
 
 public class CommandLineInterface {
-//	public static Logger logger = LoggerFactory.getLogger(CommandLineInterface.class);
-	public static boolean debugMode = false;
-	public static void main(String[] args) {
-		
-		// 0: Flags, 1: Ontology Loc, 2:Signature loc
-		
-		OWLOntology ontology = null;
-		
 	
-		File sigLocation = null;
+	@SuppressWarnings("static-access")
+	public static void main(String[] args){
+		//Make everything render like description logics
+		ToStringRenderer stringRender = ToStringRenderer.getInstance();
+		DLSyntaxObjectRenderer renderer;
+		renderer =  new DLSyntaxObjectRenderer();
+		stringRender.setRenderer(renderer);
 		
-		
-		
-	    if(args.length == 2){
-			ontology = OntologyLoader.loadOntologyAllAxioms(args[0]);
-			sigLocation = new File(args[1]);
-		}
-		else if(args.length == 3){
-			if(args[0].equals("-v")){
-				debugMode = true;
-				System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");	
-			}
+		Options options = new Options();
 
-			ontology = OntologyLoader.loadOntologyAllAxioms(args[1]);
-			sigLocation = new File(args[2]);
-		}
-		else{
-			System.out.println("Usage: java -jar amex.jar {flags} <ontology location> <signature location>");
-			System.exit(-1);
-		}
+		Option ontologyChoice = OptionBuilder.withArgName("ontology").hasArg().
+				withDescription("Specify ontology to extract module from").create("ont");
 
-	    
-	    	
-		File currentDir = new File(".");
-		sigLocation = new File(currentDir +"/" + sigLocation.getName());
-	    
-	    
-	    System.out.println(sigLocation);
-		
-		String sigName = sigLocation.getName();
-		sigLocation = sigLocation.getParentFile();
-		SigManager sigManager = new SigManager(sigLocation);
-		
-		System.out.println("Ontology (logical axioms): " + ontology.getLogicalAxiomCount());
-		if(debugMode){
-			System.out.println(ontology);
-		}
+		Option sigChoice = OptionBuilder.withArgName("signature").hasArg().
+				withDescription("Specify signature").create("sig");
 
-		Set<OWLEntity> signature = null;
+		Option outputChoice = OptionBuilder.withArgName("output.owl").hasArg().
+				withDescription("Output the resutling module to an owl file").create("o");
+
+		options.addOption("v", "verbose", false, "Be verbose about axioms added and display module");
+		options.addOption("h", "help", false, "print this message" );
+		options.addOption(ontologyChoice);
+		options.addOption(sigChoice);
+		options.addOption(outputChoice);
+
+		CommandLineParser parser = new BasicParser();
+		HelpFormatter formatter = new HelpFormatter();
+		CommandLine cmd = null;
+		File ontologyFile = null;
+		File sigFile = null;
+		Logger logger = null;
+		OWLOntologyManager manager = null;
+		
 		try {
-			signature = sigManager.readFile(sigName);
+			cmd = parser.parse( options, args);
+			
+			if(cmd.hasOption("h") || cmd.hasOption("help") || args.length == 0){
+				formatter.printHelp("java -jar amex.jar", options);
+			}
+			else{
+				if(cmd.hasOption("v") || cmd.hasOption("verbose")){
+					System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");  
+					 logger = LoggerFactory.getLogger(CommandLineInterface.class);
+				}
+			
+				if(cmd.hasOption("ont") && cmd.hasOption("sig")){
+					String pathToOnt = cmd.getOptionValue("ont");
+					String pathToSig = cmd.getOptionValue("sig");
+					
+					ontologyFile = new File(pathToOnt).getAbsoluteFile();
+					sigFile = new File(pathToSig).getAbsoluteFile();
+					
+					//Parse ontology
+					manager = OWLManager.createOWLOntologyManager();
+					OWLOntology ontology = manager.loadOntologyFromOntologyDocument(ontologyFile);
+					
+					//Parse signature
+					SigManager sigManager = new SigManager(sigFile.getParentFile());
+					Set<OWLEntity> signature = sigManager.readFile(sigFile.getName());
+					
+					Extractor moduleExtractor = null;
+
+					TerminologyChecker termChecker = new TerminologyChecker();
+					EquivalentToTerminologyChecker equivChecker = new EquivalentToTerminologyChecker();
+
+					if(termChecker.isTerminology(ontology)){
+						moduleExtractor = new SemanticRuleExtractor(ontology);
+					}
+					else if(equivChecker.isEquivalentToTerminology(ontology)){
+						moduleExtractor = new EquivalentToTerminologyExtractor(ontology);
+					}
+					else{
+						System.out.println("Ontology not supported - must be an acyclic terminology with optional repeated inclusions");
+						System.exit(-1);
+					}
+					
+					long startTime = System.currentTimeMillis();
+					Set<OWLLogicalAxiom> module = moduleExtractor.extractModule(signature);
+					long endTime = System.currentTimeMillis() - startTime;
+					
+
+					if(logger != null && logger.isDebugEnabled()){
+						System.out.println(" -- Module -- ");
+						for(OWLLogicalAxiom ax : module){
+							System.out.println(ax);
+						}
+					}
+					
+					System.out.println("Extracted module: " + module.size() + " axiom(s) in " + ((double)endTime/1000) + " seconds");
+					
+					if(cmd.hasOption("o")){
+						File outputFile = new File(cmd.getOptionValue("o")).getAbsoluteFile();
+						OWLXMLOntologyFormat xmlFormat = new OWLXMLOntologyFormat();
+						
+						Set<OWLAxiom> moduleAxioms = new HashSet<OWLAxiom>();
+						for(OWLLogicalAxiom ax :  module){
+							moduleAxioms.add(ax);
+						}
+						
+						OWLOntology moduleAsOnt = manager.createOntology(moduleAxioms);
+						manager.saveOntology(moduleAsOnt,xmlFormat,IRI.create(outputFile));
+						
+						System.out.println("Output module to: " + outputFile.getAbsolutePath());
+					}
+				}
+				else{
+					System.out.println("You must specify both an ontology and signature file");
+					formatter.printHelp("java -jar amex.jar", options);
+				}
+
+			}	
+		} catch (ParseException e) {
+			System.out.println(e.getMessage());
+			System.out.println("See --help for options");
+		} catch (OWLOntologyCreationException e) {
+			System.out.println("Cannot parse supplied ontology: " + ontologyFile.getAbsolutePath() + " please use a format compatable with the OWL-API " +
+					"(http://owlapi.sourceforge.net/)");
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
+			System.out.println("Unable to parse supplied signature file " + sigFile.getAbsolutePath() + " please use the format specified by AMEX.");
+		} catch (OWLOntologyStorageException e) {
+			System.out.println("Unable to save file - check target folder permissions");
 		}
-
-		
-		System.out.println("Signature: " + signature);
-		System.out.println();
-		
-		Extractor moduleExtractor = null;
-		
-		TerminologyChecker termChecker = new TerminologyChecker();
-		EquivalentToTerminologyChecker equivChecker = new EquivalentToTerminologyChecker();
-		
-		if(termChecker.isTerminology(ontology)){
-			moduleExtractor = new SemanticRuleExtractor(ontology);
-		}
-		else if(equivChecker.isEquivalentToTerminology(ontology)){
-			moduleExtractor = new EquivalentToTerminologyExtractor(ontology);
-		}
-		else{
-			System.err.println("Ontology not supported - must be an acyclic terminology with optional repeated inclusions");
-			System.exit(-1);
-		}
-		
-		SyntacticLocalityModuleExtractor starExtractor = new SyntacticLocalityModuleExtractor(ontology.getOWLOntologyManager(), ontology, ModuleType.STAR);
-		
-		long startTime = System.currentTimeMillis();
-		Set<OWLLogicalAxiom> module = moduleExtractor.extractModule(signature);
-		long endTime = System.currentTimeMillis() - startTime;
-		
-		long SstartTime = System.currentTimeMillis();
-		Set<OWLLogicalAxiom> starMod = ModuleUtils.getLogicalAxioms(starExtractor.extract(signature));
-		long SendTime = System.currentTimeMillis() - SstartTime;
-
-		
 	
-		if(debugMode){
-			System.out.println();
-			System.out.println("== AMEX Module ==");
-			for(OWLLogicalAxiom ax : module){
-				System.out.println(ax);
-			}
 
-
-			System.out.println();
-			
-			System.out.println("== STAR Module ==");
-			for(OWLLogicalAxiom ax : starMod){
-				System.out.println(ax);
-			}
-
-		}
-			
-	
-		System.out.println();
-		
-		System.out.println("AMEX Size (logical axioms): " + module.size());
-		System.out.println("Time taken: " + (double) endTime / 1000 + " seconds");
-	
-		System.out.println("STAR Size (logical axioms): " + starMod.size());
-		System.out.println("Time taken: " + (double) SendTime / 1000 + " seconds");
-		
-		
 
 	}
 }
