@@ -2,6 +2,7 @@ package uk.ac.liv.moduleextraction.main;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,6 +16,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.semanticweb.owlapi.RemoveAllDisjointAxioms;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
 import org.semanticweb.owlapi.io.ToStringRenderer;
@@ -26,6 +28,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.semanticweb.owlapi.model.RemoveAxiom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +36,7 @@ import uk.ac.liv.moduleextraction.extractor.EquivalentToTerminologyExtractor;
 import uk.ac.liv.moduleextraction.extractor.Extractor;
 import uk.ac.liv.moduleextraction.extractor.SemanticRuleExtractor;
 import uk.ac.liv.moduleextraction.signature.SigManager;
+import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
 import uk.ac.liv.ontologyutils.ontologies.EquivalentToTerminologyChecker;
 import uk.ac.liv.ontologyutils.ontologies.TerminologyChecker;
 import uk.ac.manchester.cs.owlapi.dlsyntax.DLSyntaxObjectRenderer;
@@ -94,6 +98,7 @@ public class CommandLineInterface {
 					//Parse ontology
 					manager = OWLManager.createOWLOntologyManager();
 					OWLOntology ontology = manager.loadOntologyFromOntologyDocument(ontologyFile);
+					System.out.println(ontology.getLogicalAxiomCount());
 					
 					//Parse signature
 					SigManager sigManager = new SigManager(sigFile.getParentFile());
@@ -103,7 +108,21 @@ public class CommandLineInterface {
 
 					TerminologyChecker termChecker = new TerminologyChecker();
 					EquivalentToTerminologyChecker equivChecker = new EquivalentToTerminologyChecker();
-
+					
+					SupportedAxiomVerifier supported = new SupportedAxiomVerifier();
+					
+					ArrayList<RemoveAxiom> toRemove = new ArrayList<RemoveAxiom>();
+					for(OWLLogicalAxiom ax : ontology.getLogicalAxioms()){
+						if(!supported.isSupportedAxiom(ax)){
+							toRemove.add(new RemoveAxiom(ontology, ax));
+						}
+					}
+					if(toRemove.size() > 0){
+						System.out.println("Removing " + toRemove.size() + " unsupported axioms");
+						manager.applyChanges(toRemove);
+					}
+	
+					
 					if(termChecker.isTerminology(ontology)){
 						moduleExtractor = new SemanticRuleExtractor(ontology);
 					}
