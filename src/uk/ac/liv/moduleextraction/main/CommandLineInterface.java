@@ -98,7 +98,6 @@ public class CommandLineInterface {
 					//Parse ontology
 					manager = OWLManager.createOWLOntologyManager();
 					OWLOntology ontology = manager.loadOntologyFromOntologyDocument(ontologyFile);
-					System.out.println(ontology.getLogicalAxiomCount());
 					
 					//Parse signature
 					SigManager sigManager = new SigManager(sigFile.getParentFile());

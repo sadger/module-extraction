@@ -36,38 +36,36 @@ public class MultipleExperiments {
 		int experimentCount = 1;
 		for(File f : files){
 			if(f.isFile()){
-				//System.out.println("Experment " + experimentCount + ": " + f.getName());
+				
+				System.out.println("Experment " + experimentCount + ": " + f.getName());
 			
 				Set<OWLEntity> sig = sigManager.readFile(f.getName());
 				experiment.performExperiment(sig);
 				
-				//New folder in result location - same name as sig file
-				File experimentLocation = new File(newResultFolder.getAbsoluteFile() + "/" + f.getName());
-				if(!experimentLocation.exists()){
-					experimentLocation.mkdir();
-				}
-				
-				//Save the signature with the experiment
-				SigManager managerWriter = new SigManager(experimentLocation);
-				managerWriter.writeFile(sig, "signature");
-				
-				//Write any metrics
-				experiment.writeMetrics(experimentLocation);
-				experimentCount++;
+//				//New folder in result location - same name as sig file
+//				File experimentLocation = new File(newResultFolder.getAbsoluteFile() + "/" + f.getName());
+//				if(!experimentLocation.exists()){
+//					experimentLocation.mkdir();
+//				}
+//				
+//				//Save the signature with the experiment
+//				SigManager managerWriter = new SigManager(experimentLocation);
+//				managerWriter.writeFile(sig, "signature");
+//				
+//				//Write any metrics
+//				experiment.writeMetrics(experimentLocation);
+//				experimentCount++;
 			}
 		}
 	}
 	
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
 	
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/iterated-diff-fullstar.owl");
-		
-		new MultipleExperiments().runExperiments(ont, new File(ModulePaths.getSignatureLocation() +  "Paper/iterated-full-star"), new IteratingExperiment(ont));
-
-		System.out.println("ALC COUNT: " + IteratingExperiment.alcCount);
+		OWLOntology nci_full = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "NCI/Thesaurus_08.09d.OWL");
 	
+		new MultipleExperiments().runExperiments(nci_full, new File(ModulePaths.getSignatureLocation() + "/Paper/NCI-20k-axioms-full/mystery"), new IteratingExperiment(nci_full));
 		
-		
+
 	}
 	
 	

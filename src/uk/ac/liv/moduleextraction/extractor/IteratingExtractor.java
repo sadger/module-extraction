@@ -32,6 +32,7 @@ public class IteratingExtractor implements Extractor {
 	
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) {
+				
 		qbfChecks = starExtractions = amexExtrations = 0;
 		
 		Set<OWLLogicalAxiom> module = ontology.getLogicalAxioms();
@@ -55,12 +56,8 @@ public class IteratingExtractor implements Extractor {
 
 				module  = extractSemanticModule(createOntologyFromLogicalAxioms(module), unsupported, origSig);
 
-				if(module.size() != starSize){
-					sizeChanged = true;
-				}
-				else{
-					sizeChanged = false;
-				}
+				sizeChanged = (module.size() != starSize) ? true : false;
+				
 			}
 			else{
 				int semanticSize = module.size();
@@ -75,12 +72,7 @@ public class IteratingExtractor implements Extractor {
 					module.removeAll(unsupported);
 					module  = extractSemanticModule(createOntologyFromLogicalAxioms(module), unsupported, origSig);
 
-					if(module.size() != starSize){
-						sizeChanged = true;
-					}
-					else{
-						sizeChanged = false;
-					}
+					sizeChanged = (module.size() != starSize) ? true : false;
 				}
 				else{
 					sizeChanged = false;
@@ -91,7 +83,7 @@ public class IteratingExtractor implements Extractor {
 
 
 		} while (sizeChanged);
-
+//
 
 		
 		

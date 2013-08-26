@@ -7,10 +7,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+
+import com.google.common.base.Stopwatch;
 
 import uk.ac.liv.moduleextraction.extractor.IteratingExtractor;
 import uk.ac.liv.ontologyutils.expressions.ALCValidator;
@@ -27,16 +30,10 @@ public class IteratingExperiment implements Experiment {
 	private int itSize = 0;
 	private Set<OWLLogicalAxiom> starModule;
 	private Set<OWLLogicalAxiom> itModule;
-	private OWLOntology ontology;
-	static int subcount = 0;
-	static int equivcount = 0;
-	static int othercount = 0;
-	static int alcCount = 0;
 
 	private static HashMap<OWLLogicalAxiom, Integer> differenceMap = new HashMap<OWLLogicalAxiom, Integer>();
 
 	public IteratingExperiment(OWLOntology ont) {
-		this.ontology = ont;
 		OWLOntologyManager manager = ont.getOWLOntologyManager();
 		this.starExtractor = new SyntacticLocalityModuleExtractor(manager, ont, ModuleType.STAR);
 		this.iteratingExtractor = new IteratingExtractor(ont);
@@ -48,30 +45,35 @@ public class IteratingExperiment implements Experiment {
 
 	@Override
 	public void performExperiment(Set<OWLEntity> signature) {
-
-		starModule = ModuleUtils.getLogicalAxioms(starExtractor.extract(signature));
-		starSize = starModule.size();
-
-		ALCValidator valid = new ALCValidator();
-		ELValidator el = new ELValidator();
-
-		if(starModule.size() == ontology.getLogicalAxiomCount()){
-			Set<OWLLogicalAxiom> axioms = ModuleUtils.getAxiomsForSignature(ontology, signature);
-			for(OWLLogicalAxiom axiom : axioms){
-				System.out.println(axiom);
 		
-				if(valid.isALCAxiom(axiom) && !el.isELAxiom(axiom)){
-					alcCount++;
-				}
-			}
-		}
+		
 
+		Stopwatch stopwatch = new Stopwatch().start();
+		//Compute the star module on it's own
+		Set<OWLAxiom> starAxioms = starExtractor.extract(signature);
+		System.out.println(stopwatch.stop());
+		starModule = ModuleUtils.getLogicalAxioms(starAxioms);
+		starSize = starModule.size();
+		
 
+		Stopwatch stopwatch2 = new Stopwatch().start();
+		//And then the iterated one 
 		itModule = iteratingExtractor.extractModule(signature);
 		itSize = itModule.size();
+		System.out.println(stopwatch2.stop());
+//		
+
+	
+		
+
+		
+		System.out.println();
+
 
 
 	}
+	
+	
 
 	@Override
 	public void writeMetrics(File experimentLocation) throws IOException {
@@ -84,15 +86,6 @@ public class IteratingExperiment implements Experiment {
 		writer.flush();
 		writer.close();
 
-		for(OWLLogicalAxiom ax : starModule){
-			Integer count = differenceMap.get(ax);
-			if(count == null){
-				differenceMap.put(ax, 1);
-			}
-			else{
-				differenceMap.put(ax, count + 1);
-			}
-		}
 	}
 
 
