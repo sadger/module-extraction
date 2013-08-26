@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
@@ -30,49 +31,46 @@ public class IteratingExperiment implements Experiment {
 	private int itSize = 0;
 	private Set<OWLLogicalAxiom> starModule;
 	private Set<OWLLogicalAxiom> itModule;
+	private OWLOntology ontology;
+	Stopwatch iteratedWatch;
+	Stopwatch starWatch;
 
 	private static HashMap<OWLLogicalAxiom, Integer> differenceMap = new HashMap<OWLLogicalAxiom, Integer>();
 
 	public IteratingExperiment(OWLOntology ont) {
+		System.out.println(ont.getLogicalAxiomCount());
+		this.ontology = ont;
 		OWLOntologyManager manager = ont.getOWLOntologyManager();
 		this.starExtractor = new SyntacticLocalityModuleExtractor(manager, ont, ModuleType.STAR);
 		this.iteratingExtractor = new IteratingExtractor(ont);
 	}
 
-	public static HashMap<OWLLogicalAxiom, Integer> getDifferenceMap(){
-		return differenceMap;
-	}
+
 
 	@Override
 	public void performExperiment(Set<OWLEntity> signature) {
 		
-		
 
-		Stopwatch stopwatch = new Stopwatch().start();
+		starWatch = new Stopwatch().start();
 		//Compute the star module on it's own
 		Set<OWLAxiom> starAxioms = starExtractor.extract(signature);
-		System.out.println(stopwatch.stop());
+		starWatch.stop();
+		
 		starModule = ModuleUtils.getLogicalAxioms(starAxioms);
+
 		starSize = starModule.size();
 		
 
-		Stopwatch stopwatch2 = new Stopwatch().start();
+		iteratedWatch = new Stopwatch().start();
 		//And then the iterated one 
 		itModule = iteratingExtractor.extractModule(signature);
 		itSize = itModule.size();
-		System.out.println(stopwatch2.stop());
 //		
-
-	
-		
-
-		
-		System.out.println();
+		iteratedWatch.stop();
 
 
 
 	}
-	
 	
 
 	@Override
@@ -80,9 +78,10 @@ public class IteratingExperiment implements Experiment {
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results", false));
 
-		writer.write("StarSize, IteratedSize, Difference, QBFChecks, StarExtractions, AmexExtractions" + "\n");
+		writer.write("StarSize, IteratedSize, Difference, QBFChecks, StarExtractions, AmexExtractions, StarTime, IteratedTime" + "\n");
 		writer.write(starSize + "," + itSize + "," + ((starSize == itSize) ? "0" : "1") + "," +  iteratingExtractor.getQBFChecks() + "," +
-				iteratingExtractor.getStarExtractions() + "," + iteratingExtractor.getAmexExtrations() + "\n");
+				iteratingExtractor.getStarExtractions() + "," + iteratingExtractor.getAmexExtrations() + "," + 
+				+ starWatch.elapsed(TimeUnit.MILLISECONDS) + "," + iteratedWatch.elapsed(TimeUnit.MILLISECONDS) + "\n");
 		writer.flush();
 		writer.close();
 

@@ -2,6 +2,7 @@ package uk.ac.liv.moduleextraction.extractor;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
@@ -9,6 +10,8 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+
+import com.google.common.base.Stopwatch;
 
 import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
@@ -32,7 +35,8 @@ public class IteratingExtractor implements Extractor {
 	
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) {
-				
+		
+		
 		qbfChecks = starExtractions = amexExtrations = 0;
 		
 		Set<OWLLogicalAxiom> module = ontology.getLogicalAxioms();
@@ -50,13 +54,13 @@ public class IteratingExtractor implements Extractor {
 
 				int starSize = module.size();
 
-			
+					
 				Set<OWLLogicalAxiom> unsupported = getUnsupportedAxioms(module);
 				module.removeAll(unsupported);
 
 				module  = extractSemanticModule(createOntologyFromLogicalAxioms(module), unsupported, origSig);
 
-				sizeChanged = (module.size() != starSize) ? true : false;
+				sizeChanged = (module.size() != starSize);
 				
 			}
 			else{
@@ -72,7 +76,7 @@ public class IteratingExtractor implements Extractor {
 					module.removeAll(unsupported);
 					module  = extractSemanticModule(createOntologyFromLogicalAxioms(module), unsupported, origSig);
 
-					sizeChanged = (module.size() != starSize) ? true : false;
+					sizeChanged = (module.size() != starSize);
 				}
 				else{
 					sizeChanged = false;
@@ -91,7 +95,7 @@ public class IteratingExtractor implements Extractor {
 	}
 	
 	
-	private Set<OWLLogicalAxiom> extractStarModule(OWLOntology ontology, Set<OWLEntity> signature){
+	public Set<OWLLogicalAxiom> extractStarModule(OWLOntology ontology, Set<OWLEntity> signature){
 		SyntacticLocalityModuleExtractor 
 		extractor = new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.STAR);
 		

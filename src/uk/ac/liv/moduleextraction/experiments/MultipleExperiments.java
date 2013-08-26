@@ -42,28 +42,28 @@ public class MultipleExperiments {
 				Set<OWLEntity> sig = sigManager.readFile(f.getName());
 				experiment.performExperiment(sig);
 				
-//				//New folder in result location - same name as sig file
-//				File experimentLocation = new File(newResultFolder.getAbsoluteFile() + "/" + f.getName());
-//				if(!experimentLocation.exists()){
-//					experimentLocation.mkdir();
-//				}
-//				
-//				//Save the signature with the experiment
-//				SigManager managerWriter = new SigManager(experimentLocation);
-//				managerWriter.writeFile(sig, "signature");
-//				
-//				//Write any metrics
-//				experiment.writeMetrics(experimentLocation);
-//				experimentCount++;
+				//New folder in result location - same name as sig file
+				File experimentLocation = new File(newResultFolder.getAbsoluteFile() + "/" + f.getName());
+				if(!experimentLocation.exists()){
+					experimentLocation.mkdir();
+				}
+				
+				//Save the signature with the experiment
+				SigManager managerWriter = new SigManager(experimentLocation);
+				managerWriter.writeFile(sig, "signature");
+				
+				//Write any metrics
+				experiment.writeMetrics(experimentLocation);
+				experimentCount++;
 			}
 		}
 	}
 	
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
 	
-		OWLOntology nci_full = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "NCI/Thesaurus_08.09d.OWL");
+		OWLOntology nci_full = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "Thesaurus_08.09d.OWL");
 	
-		new MultipleExperiments().runExperiments(nci_full, new File(ModulePaths.getSignatureLocation() + "/Paper/NCI-20k-axioms-full/mystery"), new IteratingExperiment(nci_full));
+		new MultipleExperiments().runExperiments(nci_full, new File(ModulePaths.getSignatureLocation() + "/mystery"), new IteratingExperiment(nci_full));
 		
 
 	}
