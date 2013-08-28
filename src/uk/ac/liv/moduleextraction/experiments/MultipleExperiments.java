@@ -10,6 +10,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
+import uk.ac.liv.moduleextraction.extractor.EquivalentToTerminologyExtractor;
 import uk.ac.liv.moduleextraction.extractor.NotEquivalentToTerminologyException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
@@ -61,11 +62,11 @@ public class MultipleExperiments {
 	
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
 	
-		OWLOntology nci_full = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "Thesaurus_08.09d.OWL");
-	
-		new MultipleExperiments().runExperiments(nci_full, new File(ModulePaths.getSignatureLocation() + "/mystery"), new IteratingExperiment(nci_full));
+		OWLOntology nci_supported = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "NCI/Thesaurus_08.09d.OWL");
 		
-
+		new MultipleExperiments().runExperiments(nci_supported, new File(ModulePaths.getSignatureLocation() + "/qbfCausingSigs"), new AMEXvsSTAR(nci_supported));
+		
+	
 	}
 	
 	

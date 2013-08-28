@@ -34,7 +34,8 @@ public class SemanticRuleExtractor implements Extractor{
 	
 	private long syntacticChecks = 0; // A syntactic iteration (total checks = this + qbfchecks)
 	private long timeTaken = 0; //Time taken to setup and extract the module (ms)
-	private long qbfChecks = 0;
+	private long qbfChecks = 0; //Total number of times we actually call the qbf solver
+	private long separabilityChecks = 0; // Number of times we need to search for a separability causing axiom
 	
 	
 	private Logger logger = LoggerFactory.getLogger(SemanticRuleExtractor.class);
@@ -133,13 +134,13 @@ public class SemanticRuleExtractor implements Extractor{
 		timeTaken = 0; 
 		qbfChecks = 0;
 		inseperableChecker.resetMetrics();
+		separabilityChecks = 0;
 		
 		long startTime = System.currentTimeMillis();
 		boolean[] terminology = axiomStore.allAxiomsAsBoolean();
 		module = existingModule;
 		sigUnionSigM = ModuleUtils.getClassAndRoleNamesInSet(existingModule);
 		sigUnionSigM.addAll(signature);
-		
 		try {
 			applyRules(terminology);
 		} catch (IOException e) {
@@ -158,6 +159,7 @@ public class SemanticRuleExtractor implements Extractor{
 		metrics.put("Time taken", timeTaken);
 		metrics.put("Syntactic Checks", syntacticChecks);
 		metrics.put("QBF Checks", qbfChecks);
+		metrics.put("Separability Checks", separabilityChecks);
 		return metrics;
 	}
 
@@ -185,7 +187,8 @@ public class SemanticRuleExtractor implements Extractor{
 
 	private OWLLogicalAxiom findSeparableAxiom(boolean[] terminology)
 			throws IOException, QBFSolverException {
-	
+		
+		separabilityChecks++;
 		SeparabilityAxiomLocator search = new SeparabilityAxiomLocator(axiomStore.getSubsetAsArray(terminology),sigUnionSigM,dependT);
 		OWLLogicalAxiom insepAxiom = search.getInseperableAxiom();
 		logger.debug("Adding (semantic): {}", insepAxiom);

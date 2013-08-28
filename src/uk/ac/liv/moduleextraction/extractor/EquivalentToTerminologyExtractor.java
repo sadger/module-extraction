@@ -66,6 +66,7 @@ public class EquivalentToTerminologyExtractor implements Extractor {
 		metrics.put("Time taken", timeTaken);
 		metrics.put("Syntactic Checks", extractorMetrics.get("Syntactic Checks"));
 		metrics.put("QBF Checks", extractorMetrics.get("QBF Checks"));
+		metrics.put("Separability Checks", extractorMetrics.get("Separability Checks"));
 		
 		return metrics;
 	}
@@ -74,64 +75,6 @@ public class EquivalentToTerminologyExtractor implements Extractor {
 		return extractor.getQBFMetrics();
 	}
 	
-
-	public static void main(String[] args) throws IOException, NotEquivalentToTerminologyException, OWLOntologyCreationException, QBFSolverException, OWLOntologyStorageException, InterruptedException {
-		
-
-
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getSignatureLocation() + "/Paper/examples/othersmallmodule2");
-		OWLOntologyManager ontMan = ont.getOWLOntologyManager();
-		
-		DefinitorialDepth depth = new DefinitorialDepth(ont);
-		ArrayList<OWLLogicalAxiom> sorted = depth.getDefinitorialSortedList();
-		System.out.println("Ontology (sorted by definitorial depth): ");
-
-		for(OWLLogicalAxiom ax : ont.getLogicalAxioms()){
-			System.out.println(ax);
-		}
-		System.out.println();
-//
-		System.out.println("As propositional:");
-		ALCtoPropositionalConvertor convertor = new ALCtoPropositionalConvertor();
-		for(OWLLogicalAxiom ax : sorted){
-			System.out.println(convertor.convert(ax));
-		}
-		System.out.println();
-		
-
-
-		
-
-		
-		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "Paper/examples/"));
-
-		EquivalentToTerminologyExtractor extractor = new EquivalentToTerminologyExtractor(ont);
-		Set<OWLEntity> sig = man.readFile("othersignature2");
-		
-	
-	
-		System.out.println("Signature: " + sig);
-		System.out.println();
-		
-
-		Set<OWLLogicalAxiom> module = extractor.extractModule(sig);
-		System.out.println();
-		
-		System.out.println("Module:");
-		Thread.sleep(1000);
-		for(OWLLogicalAxiom ax : module){
-			System.out.println(ax);
-		}
-//
-//		Set<OWLAxiom> modOntology = new HashSet<OWLAxiom>();
-//		modOntology.addAll(module);
-//		
-		//OWLOntology ontformod = ontMan.createOntology(modOntology);
-//		ontMan.saveOntology(ont,new OWLXMLOntologyFormat(), IRI.create(new File(ModulePaths.getSignatureLocation() + "/Paper/examples/othersmallmodule2")));
-		
-		
-	
-	}
 
 
 

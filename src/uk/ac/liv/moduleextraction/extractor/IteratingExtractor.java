@@ -52,10 +52,12 @@ public class IteratingExtractor implements Extractor {
 			if(iteration == 1){
 				module = extractStarModule(createOntologyFromLogicalAxioms(module), origSig);
 
+				
 				int starSize = module.size();
-
 					
 				Set<OWLLogicalAxiom> unsupported = getUnsupportedAxioms(module);
+				
+				
 				module.removeAll(unsupported);
 
 				module  = extractSemanticModule(createOntologyFromLogicalAxioms(module), unsupported, origSig);
@@ -73,6 +75,7 @@ public class IteratingExtractor implements Extractor {
 					
 					int starSize = module.size();
 					Set<OWLLogicalAxiom> unsupported = getUnsupportedAxioms(module);
+					
 					module.removeAll(unsupported);
 					module  = extractSemanticModule(createOntologyFromLogicalAxioms(module), unsupported, origSig);
 
@@ -87,7 +90,7 @@ public class IteratingExtractor implements Extractor {
 
 
 		} while (sizeChanged);
-//
+ 
 
 		
 		
