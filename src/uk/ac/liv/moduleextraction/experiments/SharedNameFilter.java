@@ -5,19 +5,25 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
 
+import uk.ac.liv.moduleextraction.profling.AxiomTypeProfile;
+import uk.ac.liv.moduleextraction.profling.ExpressionTypeProfiler;
 import uk.ac.liv.ontologyutils.axioms.AxiomStructureInspector;
+import uk.ac.liv.ontologyutils.expressions.ExpressionTypeCounter;
+import uk.ac.liv.ontologyutils.loader.OntologyLoader;
+import uk.ac.liv.ontologyutils.util.ModulePaths;
 
 public class SharedNameFilter implements SupportedFilter {
 
-	public enum REMOVAL_METHOD{
+	public enum RemovalMethod{
 		REMOVE_INCLUSIONS,
 		REMOVE_EQUALITIES,
 		RANDOM,
 	}
 	AxiomStructureInspector inspector;
-	REMOVAL_METHOD remove_method;
-	public SharedNameFilter(AxiomStructureInspector inspector, REMOVAL_METHOD remove_method) {
+	RemovalMethod remove_method;
+	public SharedNameFilter(AxiomStructureInspector inspector, RemovalMethod remove_method) {
 		this.inspector = inspector;
 		this.remove_method = remove_method;
 	}
@@ -33,10 +39,10 @@ public class SharedNameFilter implements SupportedFilter {
 		Set<OWLClass> sharedNames = inspector.getNamesInIntersection();
 
 		for(OWLClass cls : sharedNames){
-			if(remove_method == REMOVAL_METHOD.REMOVE_INCLUSIONS){
+			if(remove_method == RemovalMethod.REMOVE_INCLUSIONS){
 				unsupported.addAll(inspector.getPrimitiveDefinitions(cls));
 			}
-			else if(remove_method == REMOVAL_METHOD.REMOVE_INCLUSIONS){
+			else if(remove_method == RemovalMethod.REMOVE_INCLUSIONS){
 				unsupported.addAll(inspector.getDefinitions(cls));
 			}else{
 				//50% chance for each approach to be selected per name
@@ -49,7 +55,10 @@ public class SharedNameFilter implements SupportedFilter {
 			}
 
 		}
+		System.out.println("Removing: " + unsupported);
 		return unsupported;
 	}
+	
+
 
 }
