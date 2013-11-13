@@ -13,6 +13,7 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import uk.ac.liv.moduleextraction.extractor.EquivalentToTerminologyExtractor;
 import uk.ac.liv.moduleextraction.extractor.NotEquivalentToTerminologyException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
+import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 
@@ -28,7 +29,7 @@ public class MultipleExperiments {
 		
 		/* Create new folder in result location with same name as signature
 		folder */
-		File newResultFolder = new File(ModulePaths.getResultLocation() + "/" + signaturesLocation.getName());
+		File newResultFolder = new File(ModulePaths.getResultLocation() + "/sharednames/" + signaturesLocation.getName());
 		if(!newResultFolder.exists()){
 			System.out.println("Making new directory " + newResultFolder.getAbsolutePath());
 			newResultFolder.mkdir();
@@ -62,11 +63,25 @@ public class MultipleExperiments {
 	
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
 	
-		OWLOntology nci_supported = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "NCI/Thesaurus_08.09d.OWL");
+//		File sharedNameDirectory = new File(ModulePaths.getOntologyLocation() + "/SharedConceptNames/");
+//		for(File f : sharedNameDirectory.listFiles()){
+//			if(f.isFile()){
+//				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
+//				System.out.println(f.getName());
+//				new MultipleExperiments().runExperiments(ont, new File(ModulePaths.getSignatureLocation() + "/sharednames/" + f.getName()), new SharedNameExperiment(ont));
+//			}
+//		}
+//		
+
+		OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/SharedConceptNames/CHEBI");
 		
-		new MultipleExperiments().runExperiments(nci_supported, new File(ModulePaths.getSignatureLocation() + "/qbfCausingSigs"), new AMEXvsSTAR(nci_supported));
+		SignatureGenerator gen = new SignatureGenerator(ontology.getLogicalAxioms());
+		for (int i = 1; i <= 1000; i++) {
+			System.out.println("Experiment " + i + ":");
+			new SharedNameExperiment(ontology).performExperiment(gen.generateRandomSignature(500));
+		}
+
 		
-	
 	}
 	
 	

@@ -39,10 +39,12 @@ public class SharedNameFilter implements SupportedFilter {
 		Set<OWLClass> sharedNames = inspector.getNamesInIntersection();
 
 		for(OWLClass cls : sharedNames){
+			
 			if(remove_method == RemovalMethod.REMOVE_INCLUSIONS){
+		
 				unsupported.addAll(inspector.getPrimitiveDefinitions(cls));
 			}
-			else if(remove_method == RemovalMethod.REMOVE_INCLUSIONS){
+			else if(remove_method == RemovalMethod.REMOVE_EQUALITIES){
 				unsupported.addAll(inspector.getDefinitions(cls));
 			}else{
 				//50% chance for each approach to be selected per name
@@ -55,7 +57,6 @@ public class SharedNameFilter implements SupportedFilter {
 			}
 
 		}
-		System.out.println("Removing: " + unsupported);
 		return unsupported;
 	}
 	

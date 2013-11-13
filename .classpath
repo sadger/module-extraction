@@ -10,7 +10,7 @@
 	<classpathentry kind="var" path="JAR_LOCATION/slf4j-api-1.7.2.jar"/>
 	<classpathentry kind="var" path="JAR_LOCATION/slf4j-simple-1.7.2.jar"/>
 	<classpathentry kind="var" path="JAR_LOCATION/commons-cli-1.2.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/OntologyUtils"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Propositional"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ontologyutils"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/propositional"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

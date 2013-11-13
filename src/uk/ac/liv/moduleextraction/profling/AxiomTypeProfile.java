@@ -19,7 +19,7 @@ public class AxiomTypeProfile {
 			AxiomType<?> axiomType = axiom.getAxiomType();
 			Integer count = typeMap.get(axiomType);
 			if(axiomType == AxiomType.INVERSE_OBJECT_PROPERTIES){
-				System.out.println(axiom);
+				//System.out.println(axiom);
 			}
 			if(count == null)
 				typeMap.put(axiomType, 1);

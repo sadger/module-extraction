@@ -57,62 +57,27 @@ public class FindMeAnOntology {
 		AxiomTypeProfile p = new AxiomTypeProfile(ont);
 		ExpressionTypeProfiler exp = new ExpressionTypeProfiler();
 		p.printMetrics();
+		System.out.println();
 		exp.profileOntology(ont);
 //	
-		System.out.println("Class in sig: " + ont.getClassesInSignature().size());
-		System.out.println("Roles in sig: " + ont.getObjectPropertiesInSignature().size());
-		System.out.println("Sig size: " + ont.getSignature().size());
-		System.out.println("");
-		
-		Set<OWLObjectProperty> prop = new HashSet<OWLObjectProperty>();
-		Set<OWLClass> cls = new HashSet<OWLClass>();
-		int alcCount = 0;
-		for (OWLLogicalAxiom ax : ont.getLogicalAxioms()) {
-			prop.addAll(ax.getObjectPropertiesInSignature());
-			cls.addAll(ax.getClassesInSignature());
-			if(validator.isALCAxiom(ax) && !elvalidator.isELAxiom(ax)){
-				alcCount++;
-			}
-		}
-		
-		System.out.println("Prop:" + prop.size());
-		System.out.println("Cls " + cls.size());
-		System.out.println("ALC " + alcCount);
-		
-
-
-//				System.out.println("Is EL?: " + elvalidator.isELOntology(ont));
-//				System.out.println("Is ALC?: " + validator.isALCOntology(ont));
-//				AcyclicChecker acyclic = new AcyclicChecker(ont, true);
-//				acyclic.isAcyclic();
-//				acyclic.printMetrics();
-		
-//			boolean isTerm = termChecker.isTerminology(ont);
-//
-//				if(!isTerm)
-//					System.out.println("\t" + termChecker.getCheckStatus());
-//				System.out.println("Is terminology: " + isTerm);
-//				System.out.println("Logically equivalent to terminology?: " + equivTermChecker.isEquivalentToTerminology(ont));
+//		System.out.println("Class in sig: " + ont.getClassesInSignature().size());
+//		System.out.println("Roles in sig: " + ont.getObjectPropertiesInSignature().size());
+//		System.out.println("Sig size: " + ont.getSignature().size());
+//		System.out.println("");	
 //		
-		AxiomStructureInspector struct = new AxiomStructureInspector(ont);
-		System.out.println("Concept names with repeated inclusions " + struct.countNamesWithRepeatedInclusions());
-		System.out.println("Concept names with repeated equalities " + struct.countNamesWithRepeatedEqualities());
-		System.out.println("Prim(T) ∩ Def(T)" + struct.getNamesInIntersection().size());
-		
-		
+		System.out.println();
+		AxiomStructureInspector inspector = new AxiomStructureInspector(ont);
+		System.out.println("Shared names: " + inspector.getNamesInIntersection().size());
+		System.out.println("Names w/ repeated incluson: " + inspector.countNamesWithRepeatedInclusions());
+		System.out.println("Names w/ repeated equalities: " + inspector.countNamesWithRepeatedEqualities());
+
 	}
 
 	public static void main(String[] args) throws OWLOntologyCreationException, OWLOntologyStorageException {
-	//FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/Tones/NONEL/Big"));
-	FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/NCI/Profile"));
-		find.profileOntologies();
-		
-//		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "NCI/Profile/Thesaurus_08.09d.OWL");
-//		OWLOntologyManager man = ont.getOWLOntologyManager();
-//		OWLOntology ncistar = man.createOntology(ont.getAxioms());
-//		
-//		man.saveOntology(ncistar, new OWLXMLOntologyFormat(), IRI.create(new File(ModulePaths.getOntologyLocation() + "NCI/Profile/NCI-star.owl")));
-//				
+
+	FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/SharedConceptNames"));
+	find.profileOntologies();
+			
 	}
 
 

@@ -49,7 +49,7 @@ public class ExpressionTypeProfiler implements OWLClassExpressionVisitor{
 			definition.accept(this);
 		}
 		else{
-			System.out.println("Not profiling " + axiom);
+			//System.out.println("Not profiling " + axiom);
 		}
 	}
 	

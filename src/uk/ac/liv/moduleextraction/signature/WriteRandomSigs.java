@@ -62,10 +62,17 @@ public class WriteRandomSigs {
        
 	public static void main(String[] args) {
 
-		
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
-		WriteRandomSigs writer = new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "/writer-benchmark"));
-		writer.writeSignature(200, 100);
+		File sharedNames = new File(ModulePaths.getOntologyLocation() + "SharedConceptNames/");
+		for(File f : sharedNames.listFiles()){
+			if(f.isFile()){
+				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "SharedConceptNames/" + f.getName());
+				int sigSize = Math.min(1000, ont.getLogicalAxiomCount() / 100 * 10);
+				System.out.println(sigSize);
+				WriteRandomSigs writer = new WriteRandomSigs(ont, new File(ModulePaths.getSignatureLocation() + "/sharednames/" + f.getName()));
+				writer.writeSignatureWithRoles(sigSize, 50, 200);
+			}
+		}
+	
 				
 		
 

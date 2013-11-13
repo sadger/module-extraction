@@ -1,5 +1,6 @@
 package uk.ac.liv.moduleextraction.experiments;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,7 +14,8 @@ import uk.ac.liv.ontologyutils.util.ModulePaths;
 
 public class OntologyFilters implements SupportedFilter {
 
-	HashSet<SupportedFilter> filters = new HashSet<SupportedFilter>();
+	// Queue of filters the output of the i-th passed to i+1-th
+	ArrayList<SupportedFilter> filters = new ArrayList<SupportedFilter>();
 	
 	public OntologyFilters() {
 		// TODO Auto-generated constructor stub
