@@ -120,37 +120,7 @@ public class NewIteratingExtractor implements Extractor {
 		return module;
 	}
 
-	public static void main(String[] args) {
-
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "examples/workingexample.krss");
-		System.out.println(ont);
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		NewIteratingExtractor n = new NewIteratingExtractor(ont,null);
-		OWLDataFactory factory = OWLManager.getOWLDataFactory();
-		Set<OWLEntity> sig = new HashSet<OWLEntity>();
-		sig.add(factory.getOWLClass(IRI.create("ONT#A")));
-		sig.add(factory.getOWLClass(IRI.create("ONT#B")));
-
-		System.out.println("Signature: " + sig);
-		//			new SharedNameExperiment(ont).performExperiment(sig);
-		//			System.out.println("S:" + new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.STAR).extract(sig));
-
-		SharedNameFilter filter = new SharedNameFilter(new AxiomStructureInspector(ont), RemovalMethod.REMOVE_INCLUSIONS);
-		Set<OWLLogicalAxiom> unsupported = filter.getUnsupportedAxioms(ont.getLogicalAxioms());
-		Set<OWLLogicalAxiom> supported = new HashSet<OWLLogicalAxiom>(ont.getLogicalAxioms());
-		supported.removeAll(unsupported);
-		System.out.println("I" + new EquivalentToTerminologyExtractor(n.createOntologyFromLogicalAxioms(supported)).extractModule(unsupported, sig));
-		System.out.println( );
-		filter = new SharedNameFilter(new AxiomStructureInspector(ont), RemovalMethod.REMOVE_EQUALITIES);
-		unsupported = filter.getUnsupportedAxioms(ont.getLogicalAxioms());
-		supported = new HashSet<OWLLogicalAxiom>(ont.getLogicalAxioms());
-		supported.removeAll(unsupported);
-		System.out.println("E" + new EquivalentToTerminologyExtractor(n.createOntologyFromLogicalAxioms(supported)).extractModule(unsupported, sig));
-		System.out.println();	
-
-
-
-	}
+	
 
 
 	public static OWLOntology createOntology(Set<OWLLogicalAxiom> axioms) {
@@ -165,6 +135,12 @@ public class NewIteratingExtractor implements Extractor {
 
 		return ont;
 
+	}
+	public int getStarExtractions() {
+		return starExtractions;
+	}
+	public int getAmexExtrations() {
+		return amexExtrations;
 	}
 
 }

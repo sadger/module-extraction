@@ -102,6 +102,12 @@ public class AMEXvsSTAR implements Experiment {
 		}
 		return result;
 	}
+
+	@Override
+	public void performExperiment(Set<OWLEntity> sig, File f) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 
 }

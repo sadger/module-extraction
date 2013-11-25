@@ -16,17 +16,19 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import com.google.common.base.Stopwatch;
 
+import uk.ac.liv.moduleextraction.experiments.SharedNameFilter.RemovalMethod;
 import uk.ac.liv.moduleextraction.extractor.IteratingExtractor;
+import uk.ac.liv.moduleextraction.extractor.NewIteratingExtractor;
 import uk.ac.liv.ontologyutils.expressions.ALCValidator;
 import uk.ac.liv.ontologyutils.expressions.ELValidator;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
-public class IteratingExperiment implements Experiment {
+public class NewIteratingExperiment implements Experiment {
 
 	private SyntacticLocalityModuleExtractor starExtractor;
-	private IteratingExtractor iteratingExtractor;
+	private NewIteratingExtractor iteratingExtractor;
 	private int starSize = 0;
 	private int itSize = 0;
 	private Set<OWLLogicalAxiom> starModule;
@@ -34,15 +36,17 @@ public class IteratingExperiment implements Experiment {
 	private OWLOntology ontology;
 	Stopwatch iteratedWatch;
 	Stopwatch starWatch;
+	private File location;
+	private File sigLocation;
 
-	private static HashMap<OWLLogicalAxiom, Integer> differenceMap = new HashMap<OWLLogicalAxiom, Integer>();
 
-	public IteratingExperiment(OWLOntology ont) {
+	public NewIteratingExperiment(OWLOntology ont, File originalLocation) {
 		System.out.println(ont.getLogicalAxiomCount());
 		this.ontology = ont;
+		this.location = originalLocation;
 		OWLOntologyManager manager = ont.getOWLOntologyManager();
 		this.starExtractor = new SyntacticLocalityModuleExtractor(manager, ont, ModuleType.STAR);
-		this.iteratingExtractor = new IteratingExtractor(ont);
+		this.iteratingExtractor = new NewIteratingExtractor(ont, RemovalMethod.REMOVE_EQUALITIES);
 	}
 
 
@@ -72,27 +76,25 @@ public class IteratingExperiment implements Experiment {
 
 	}
 	
+	public void performExperiment(Set<OWLEntity> signature, File signatureLocation){
+		this.sigLocation = signatureLocation;
+		performExperiment(signature);
+	}
+	
 
 	@Override
 	public void writeMetrics(File experimentLocation) throws IOException {
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results", false));
 
-		writer.write("StarSize, IteratedSize, Difference, QBFChecks, StarExtractions, AmexExtractions, StarTime, IteratedTime" + "\n");
-		writer.write(starSize + "," + itSize + "," + ((starSize == itSize) ? "0" : "1") + "," +  iteratingExtractor.getQBFChecks() + "," +
+		writer.write("StarSize, IteratedSize, Difference, StarExtractions, AmexExtractions, StarTime, IteratedTime, OntLocation, SigLocation" + "\n");
+		writer.write(starSize + "," + itSize + "," + ((starSize == itSize) ? "0" : "1") + "," +
 				iteratingExtractor.getStarExtractions() + "," + iteratingExtractor.getAmexExtrations() + "," + 
-				+ starWatch.elapsed(TimeUnit.MILLISECONDS) + "," + iteratedWatch.elapsed(TimeUnit.MILLISECONDS) + "\n");
+				+ starWatch.elapsed(TimeUnit.MILLISECONDS) + "," + iteratedWatch.elapsed(TimeUnit.MILLISECONDS) + ","
+				+ location.getAbsolutePath() + "," + sigLocation.getAbsolutePath() + "\n");
 		writer.flush();
 		writer.close();
 
-	}
-
-
-
-	@Override
-	public void performExperiment(Set<OWLEntity> sig, File f) {
-		// TODO Auto-generated method stub
-		
 	}
 
 

@@ -11,4 +11,6 @@ public interface Experiment {
 	public void performExperiment(Set<OWLEntity> signature);
 	
 	public void writeMetrics(File experimentLocation) throws IOException;
+
+	public void performExperiment(Set<OWLEntity> sig, File f);
 }
