@@ -16,6 +16,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import uk.ac.liv.moduleextraction.experiments.OntologyFilters;
+import uk.ac.liv.moduleextraction.experiments.RepeatedEqualitiesFilter;
 import uk.ac.liv.moduleextraction.experiments.SharedNameExperiment;
 import uk.ac.liv.moduleextraction.experiments.SharedNameFilter;
 import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
@@ -71,8 +72,10 @@ public class NewIteratingExtractor implements Extractor {
 
 	private Set<OWLLogicalAxiom> getUnsupportedAxioms(Set<OWLLogicalAxiom> axioms){
 		OntologyFilters filters = new OntologyFilters();
+		AxiomStructureInspector inspector = new AxiomStructureInspector(axioms);
 		filters.addFilter(new SupportedExpressivenessFilter());
-		filters.addFilter(new SharedNameFilter(new AxiomStructureInspector(axioms), removal_method));
+		filters.addFilter(new SharedNameFilter(inspector, removal_method));
+		filters.addFilter(new RepeatedEqualitiesFilter(inspector));
 		return filters.getUnsupportedAxioms(axioms);
 	}
 
