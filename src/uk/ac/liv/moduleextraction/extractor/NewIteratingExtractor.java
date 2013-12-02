@@ -3,12 +3,8 @@ package uk.ac.liv.moduleextraction.extractor;
 import java.util.HashSet;
 import java.util.Set;
 
-import junit.extensions.RepeatedTest;
-
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -17,10 +13,9 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import uk.ac.liv.moduleextraction.experiments.OntologyFilters;
 import uk.ac.liv.moduleextraction.experiments.RepeatedEqualitiesFilter;
-import uk.ac.liv.moduleextraction.experiments.SharedNameExperiment;
 import uk.ac.liv.moduleextraction.experiments.SharedNameFilter;
-import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.experiments.SharedNameFilter.RemovalMethod;
+import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.axioms.AxiomStructureInspector;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
@@ -35,12 +30,10 @@ public class NewIteratingExtractor implements Extractor {
 	private OWLOntologyManager manager;
 	private int starExtractions = 0;
 	private int amexExtrations = 0;
-	private RemovalMethod removal_method;
 
-	public NewIteratingExtractor(OWLOntology ont, RemovalMethod method) {
+	public NewIteratingExtractor(OWLOntology ont) {
 		this.ontology = ont;
 		this.manager = ont.getOWLOntologyManager();
-		this.removal_method = method;
 	}
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) {
@@ -74,7 +67,7 @@ public class NewIteratingExtractor implements Extractor {
 		OntologyFilters filters = new OntologyFilters();
 		AxiomStructureInspector inspector = new AxiomStructureInspector(axioms);
 		filters.addFilter(new SupportedExpressivenessFilter());
-		filters.addFilter(new SharedNameFilter(inspector, removal_method));
+		filters.addFilter(new SharedNameFilter(inspector,RemovalMethod.REMOVE_EQUALITIES));
 		filters.addFilter(new RepeatedEqualitiesFilter(inspector));
 		return filters.getUnsupportedAxioms(axioms);
 	}
@@ -144,6 +137,13 @@ public class NewIteratingExtractor implements Extractor {
 	}
 	public int getAmexExtrations() {
 		return amexExtrations;
+	}
+	
+	public static void main(String[] args) {
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/examples/repeatedequalities.krss");
+		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+		Set<OWLLogicalAxiom> module = new NewIteratingExtractor(ont).extractModule(gen.generateRandomSignature(2));
+		System.out.println(module);
 	}
 
 }

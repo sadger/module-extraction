@@ -26,10 +26,9 @@ public class SignatureGenerator {
 	private Set<OWLObjectProperty> axiomsRoles;
 
 	public SignatureGenerator(Set<OWLLogicalAxiom> axioms) {
-		this.logicalAxioms = axioms;
-		this.axiomsClasses =  ModuleUtils.getClassesInSet(logicalAxioms);
-		this.axiomsSignature = ModuleUtils.getClassAndRoleNamesInSet(logicalAxioms);
-		this.axiomsRoles = ModuleUtils.getRolesInSet(logicalAxioms);
+		this.axiomsClasses =  ModuleUtils.getClassesInSet(axioms);
+		this.axiomsSignature = ModuleUtils.getClassAndRoleNamesInSet(axioms);
+		this.axiomsRoles = ModuleUtils.getRolesInSet(axioms);
 	}
 
 	

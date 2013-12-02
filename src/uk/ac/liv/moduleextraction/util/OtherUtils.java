@@ -17,4 +17,5 @@ public class OtherUtils {
 		
 		return dependencies;
 	}
+	
 }

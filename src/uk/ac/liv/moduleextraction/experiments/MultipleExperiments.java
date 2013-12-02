@@ -1,21 +1,29 @@
 package uk.ac.liv.moduleextraction.experiments;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 import uk.ac.liv.moduleextraction.extractor.EquivalentToTerminologyExtractor;
 import uk.ac.liv.moduleextraction.extractor.NotEquivalentToTerminologyException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
+import uk.ac.liv.moduleextraction.signature.WriteRandomSigs;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
@@ -110,15 +118,32 @@ public class MultipleExperiments {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
 
-		File ontologyLocation = new File(ModulePaths.getOntologyLocation() + "SharedConceptNames/vivo");
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontologyLocation.getAbsolutePath());
-		File sigDirectory = new File(ModulePaths.getSignatureLocation() + "testingnames/vivo");
-		
-		new MultipleExperiments().runExperiments(ont, 
-				new File(ModulePaths.getSignatureLocation() + "/testingnames/vivo"), 
-				new NewIteratingExperiment(ont, ontologyLocation));
-		
-	
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		try{
+			BufferedReader br = new BufferedReader(new FileReader(ModulePaths.getSignatureLocation() + "NewIteratingExperiments/acyclic-supported-no-nci"));
+			String line;
+			while ((line = br.readLine()) != null) {
+			   File ontologyLocation = new File(line);
+			   System.out.println(ontologyLocation.getName());
+			   OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ontologyLocation.getAbsolutePath());
+			   Set<OWLAxiom> logicalAxioms = new HashSet<OWLAxiom>();
+			   for(OWLLogicalAxiom axiom : ontology.getLogicalAxioms()){
+				   logicalAxioms.add(axiom);
+			   }
+			   OWLOntology logicalOntology = ontology.getOWLOntologyManager().createOntology(logicalAxioms);
+			   ontology = null;
+			   new MultipleExperiments().runExperiments(
+					   logicalOntology, 
+					   new File(ModulePaths.getSignatureLocation() + "/NewIteratingEvaluation/AxiomSignatures/" + ontologyLocation.getName()), 
+					   new IteratingModuleInspector(logicalOntology));
+			  
+			  
+			   logicalOntology = null;
+			}
+			br.close();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
 
 	}
 

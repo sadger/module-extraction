@@ -46,7 +46,7 @@ public class NewIteratingExperiment implements Experiment {
 		this.location = originalLocation;
 		OWLOntologyManager manager = ont.getOWLOntologyManager();
 		this.starExtractor = new SyntacticLocalityModuleExtractor(manager, ont, ModuleType.STAR);
-		this.iteratingExtractor = new NewIteratingExtractor(ont, RemovalMethod.REMOVE_EQUALITIES);
+		this.iteratingExtractor = new NewIteratingExtractor(ont);
 	}
 
 
@@ -71,8 +71,6 @@ public class NewIteratingExperiment implements Experiment {
 		itSize = itModule.size();
 //		
 		iteratedWatch.stop();
-
-
 
 	}
 	
