@@ -1,10 +1,7 @@
 package uk.ac.liv.moduleextraction.qbf;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
@@ -37,7 +34,7 @@ public class SeparabilityAxiomLocator {
 	public SeparabilityAxiomLocator(List<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> mod, Set<OWLEntity> sig, 
 			ChainDependencies dependencies) throws IOException, QBFSolverException{
 		this.module = mod;
-		this.axiomList = term.toArray(new OWLLogicalAxiom[0]);
+		this.axiomList = term.toArray(new OWLLogicalAxiom[term.size()]);
 
 		this.sigUnionSigM = sig;
 		
@@ -64,9 +61,7 @@ public class SeparabilityAxiomLocator {
 		while(lastAdded.length > 0){
 
 			ArrayList<OWLLogicalAxiom> toCheck = new ArrayList<OWLLogicalAxiom>();
-			for (int i = 0; i < W.length; i++) {
-				toCheck.add(W[i]);
-			}
+            Collections.addAll(toCheck, W);
 
 			Set<OWLLogicalAxiom> lhsW = lhsExtractor.getLHSSigAxioms(toCheck, sigUnionSigM, termDependencies);
 
@@ -97,7 +92,6 @@ public class SeparabilityAxiomLocator {
 				logger.trace("Removing: {}",lastRemoved.length);
 
 			}
-
 		}
 		
 		return  axiomList[W.length];

@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
@@ -13,7 +12,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.liv.moduleextraction.extractor.NewIteratingExtractor;
 import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
-import uk.ac.liv.ontologyutils.expressions.ELValidator;
 
 public class IteratingModuleInspector implements Experiment {
 

@@ -1,8 +1,5 @@
 package uk.ac.liv.moduleextraction.extractor;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -11,15 +8,6 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
-
-import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
-import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
-import uk.ac.liv.moduleextraction.signature.SigManager;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.util.ModulePaths;
-import uk.ac.liv.propositional.convertors.ALCtoPropositionalConvertor;
 
 
 public class EquivalentToTerminologyExtractor implements Extractor {

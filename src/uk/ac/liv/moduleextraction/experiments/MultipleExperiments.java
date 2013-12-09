@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,14 +18,10 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
-import uk.ac.liv.moduleextraction.extractor.EquivalentToTerminologyExtractor;
 import uk.ac.liv.moduleextraction.extractor.NotEquivalentToTerminologyException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
-import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
-import uk.ac.liv.moduleextraction.signature.WriteRandomSigs;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
-import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 public class MultipleExperiments {
 

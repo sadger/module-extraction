@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -16,11 +15,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import com.google.common.base.Stopwatch;
 
-import uk.ac.liv.moduleextraction.experiments.SharedNameFilter.RemovalMethod;
-import uk.ac.liv.moduleextraction.extractor.IteratingExtractor;
 import uk.ac.liv.moduleextraction.extractor.NewIteratingExtractor;
-import uk.ac.liv.ontologyutils.expressions.ALCValidator;
-import uk.ac.liv.ontologyutils.expressions.ELValidator;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;

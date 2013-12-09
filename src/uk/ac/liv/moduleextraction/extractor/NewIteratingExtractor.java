@@ -50,7 +50,7 @@ public class NewIteratingExtractor implements Extractor {
 			if(module.size() < starSize){
 				int amexSize = module.size();
 				module = extractStarModule(createOntologyFromLogicalAxioms(module), origSig);
-				sizeChanged = (module.size() < amexSize ? true : false);
+				sizeChanged = (module.size() < amexSize);
 			}
 			else{
 				sizeChanged = false;
