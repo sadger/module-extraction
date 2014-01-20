@@ -7,7 +7,7 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
-import uk.ac.liv.moduleextraction.extractor.SemanticRuleExtractor.DefinitorialAxiomStore;
+import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
 
 public class ChainAxiomCollector {
 
