@@ -55,11 +55,7 @@ public class InseperableChecker {
 				maxClause = Math.max(maxClause, writer.getClauseCount());
 				maxVar = Math.max(maxVar, writer.getVariableCount());
 			}
-			
 	
-			
-	
-			
 		}
 
 		//We test for inseparablity and return the negation
@@ -72,6 +68,7 @@ public class InseperableChecker {
 	
 	public void resetMetrics(){
 		testCount = 0;
+		
 		maxClause = 0;
 		maxVar= 0;
 		totalClause = 0;

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
@@ -34,43 +35,53 @@ public class FindMeAnOntology {
 
 		File[] ontologyFiles = ontologyDirectory.listFiles();
 		Collections.sort(Arrays.asList(ontologyFiles));
+		System.out.println("Name,Expressiveness,LogicalAxioms,Inclusions,Equivalences, Repeated Inclusions, Repeated Equivalances, SharedNames, Concepts, Roles");
 		for(File f: ontologyFiles){
 			if(f.isFile()){
-				System.out.println(f.getName());
+//				System.out.println(f.getName());
 				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
 				profileOntology(f.getName(), ont);
-				System.out.println();
+//				System.out.println();
+
 
 			}
 		}
 	}
 
 	private void profileOntology(String fileName,OWLOntology ont){
-		System.out.println("Logical Axiom Count: " + ont.getLogicalAxiomCount());
+//		System.out.println("Logical Axiom Count: " + ont.getLogicalAxiomCount());
 		DLExpressivityChecker checker = new DLExpressivityChecker(Collections.singleton(ont));
-		System.out.println("Expressivity: " + checker.getDescriptionLogicName());
-		AxiomTypeProfile p = new AxiomTypeProfile(ont);
-		ExpressionTypeProfiler exp = new ExpressionTypeProfiler();
-		p.printMetrics();
-		System.out.println();
-		exp.profileOntology(ont);
+		String express = checker.getDescriptionLogicName();
+		
+        String shortName = fileName.substring(Math.max(0, fileName.length() - 20));
+//		AxiomTypeProfile p = new AxiomTypeProfile(ont);
+//		ExpressionTypeProfiler exp = new ExpressionTypeProfiler();
+//		p.printMetrics();
+//		System.out.println();
+//		exp.profileOntology(ont);
 //	
 //		System.out.println("Class in sig: " + ont.getClassesInSignature().size());
 //		System.out.println("Roles in sig: " + ont.getObjectPropertiesInSignature().size());
 //		System.out.println("Sig size: " + ont.getSignature().size());
 //		System.out.println("");	
 //		
-		System.out.println();
+        
+
+
+		
 		AxiomStructureInspector inspector = new AxiomStructureInspector(ont);
-		System.out.println("Shared names: " + inspector.getNamesInIntersection().size());
-		System.out.println("Names w/ repeated incluson: " + inspector.countNamesWithRepeatedInclusions());
-		System.out.println("Names w/ repeated equalities: " + inspector.countNamesWithRepeatedEqualities());
+		
+		System.out.println(shortName + "," + express + ","+ ont.getLogicalAxiomCount() + "," + ont.getAxiomCount(AxiomType.SUBCLASS_OF) + "," + 
+		ont.getAxiomCount(AxiomType.EQUIVALENT_CLASSES) + "," + inspector.countNamesWithRepeatedInclusions() +
+		"," + inspector.countNamesWithRepeatedEqualities() + "," + inspector.getNamesInIntersection().size() 
+		+ "," + ont.getClassesInSignature().size() + "," + ont.getObjectPropertiesInSignature().size());
+
 
 	}
 
 	public static void main(String[] args) throws OWLOntologyCreationException, OWLOntologyStorageException {
 
-	FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/SharedConceptNames"));
+	FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/semantic-only"));
 	find.profileOntologies();
 			
 	}

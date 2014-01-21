@@ -36,7 +36,6 @@ public class NewIteratingExperiment implements Experiment {
 
 
 	public NewIteratingExperiment(OWLOntology ont, File originalLocation) {
-		System.out.println(ont.getLogicalAxiomCount());
 		this.ontology = ont;
 		this.location = originalLocation;
 		OWLOntologyManager manager = ont.getOWLOntologyManager();
@@ -68,6 +67,23 @@ public class NewIteratingExperiment implements Experiment {
 		iteratedWatch.stop();
 
 	}
+	
+	public int getIteratedSize(){
+		return itSize;
+	}
+	
+	public int getStarSize(){
+		return starSize;
+	}
+	
+	public Set<OWLLogicalAxiom> getHybridModule(){
+		return itModule;
+	}
+	
+	public Set<OWLLogicalAxiom> getStarModule(){
+		return starModule;
+	}
+	
 	
 	public void performExperiment(Set<OWLEntity> signature, File signatureLocation){
 		this.sigLocation = signatureLocation;
