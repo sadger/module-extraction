@@ -42,8 +42,7 @@ public class SeparabilityAxiomLocator {
 		sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(module));
 	}
 
-	public SeparabilityAxiomLocator(OWLLogicalAxiom[] subsetAsArray,
-			Set<OWLEntity> sigUnionSigM2, ChainDependencies dependT) {
+	public SeparabilityAxiomLocator(OWLLogicalAxiom[] subsetAsArray,Set<OWLEntity> sigUnionSigM2, ChainDependencies dependT) {
 		this.axiomList = subsetAsArray;
 		this.sigUnionSigM = sigUnionSigM2;
 		this.termDependencies = dependT;
@@ -60,15 +59,21 @@ public class SeparabilityAxiomLocator {
 
 		while(lastAdded.length > 0){
 
-			ArrayList<OWLLogicalAxiom> toCheck = new ArrayList<OWLLogicalAxiom>();
-            Collections.addAll(toCheck, W);
-
-			Set<OWLLogicalAxiom> lhsW = lhsExtractor.getLHSSigAxioms(toCheck, sigUnionSigM, termDependencies);
-
+			Collection<OWLLogicalAxiom> toCheck = null;
+         
+			/* If we are doing syntactic and semantic rules we can generate dependT - it doesn't work currently
+			 * with shared names or repeated equalities in ontologies.*/
+            if(termDependencies != null){
+        		toCheck = lhsExtractor.getLHSSigAxioms(Arrays.asList(W), sigUnionSigM, termDependencies);
+            }
+            else{
+            	toCheck = Arrays.asList(W);
+            }
+	
 			checkCount++;
 
 			/* If inseperable */
-			if(!insepChecker.isSeperableFromEmptySet(lhsW, sigUnionSigM)){
+			if(!insepChecker.isSeperableFromEmptySet(toCheck, sigUnionSigM)){
 
 				lastAdded = getTopHalf(lastRemoved);
 
