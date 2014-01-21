@@ -2,6 +2,7 @@ package uk.ac.liv.moduleextraction.checkers;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ public class InseperableChecker {
 	private long totalClause = 0;
 	private long totalVar = 0;
 	
-	public boolean isSeperableFromEmptySet(Set<OWLLogicalAxiom> w, Set<OWLEntity> signatureAndSigM) throws IOException, QBFSolverException{
+	public boolean isSeperableFromEmptySet(Collection<OWLLogicalAxiom> w, Set<OWLEntity> signatureAndSigM) throws IOException, QBFSolverException{
 		boolean isInseperable = true;
 
 		/* If W is empty it IS the empty set so cannot be separable from itself */

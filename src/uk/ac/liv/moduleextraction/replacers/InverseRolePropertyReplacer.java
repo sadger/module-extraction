@@ -1,6 +1,7 @@
 package uk.ac.liv.moduleextraction.replacers;
 
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -69,7 +70,7 @@ public class InverseRolePropertyReplacer implements OWLClassExpressionVisitorEx<
 	/* 
 	 * Convert a set of axioms rather than an ontology
 	 */
-	public Set<OWLLogicalAxiom> convert(Set<OWLLogicalAxiom> axioms){
+	public Set<OWLLogicalAxiom> convert(Collection<OWLLogicalAxiom> axioms){
 		Set<OWLLogicalAxiom> newAxiomSet = new HashSet<OWLLogicalAxiom>();
 		for(OWLLogicalAxiom axiom : axioms){
 			newAxiomSet.add(visit(axiom));
