@@ -1,5 +1,6 @@
 package uk.ac.liv.moduleextraction.chaindependencies;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -22,30 +23,29 @@ import uk.ac.liv.ontologyutils.util.ModuleUtils;
  */
 public class AxiomDependencies extends HashMap<OWLLogicalAxiom, DependencySet>{
 
-	public AxiomDependencies() {
-		
+	private AxiomDefinitorialDepth depth;
+	private ArrayList<OWLLogicalAxiom> sortedAxioms;
+	
+	public AxiomDependencies(OWLOntology ontology) {
+		depth = new AxiomDefinitorialDepth(ontology);
+		sortedAxioms = depth.getDefinitorialSortedList();
+		calculateDependencies();
 	}
 	
-	public void updateDependenciesWith(List<OWLLogicalAxiom> sortedAxioms){
+	private void calculateDependencies(){
 		for(Iterator<OWLLogicalAxiom> it = sortedAxioms.iterator(); it.hasNext();){
 			updateDependenciesWith(it.next());
 		}	
 	}
-	
-	public void updateDependenciesWith(OWLLogicalAxiom[] axiomArray){
-		for(OWLLogicalAxiom ax : axiomArray){
-			updateDependenciesWith(ax);
-		}
-	}
-	
-	public void updateDependenciesWith(OWLLogicalAxiom axiom){
-
+		
+	private void updateDependenciesWith(OWLLogicalAxiom axiom){
+		OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
 		OWLClassExpression definition = AxiomSplitter.getDefinitionofAxiom(axiom);
 
 		DependencySet axiomDeps = new DependencySet();
 		
 		addImmediateDependencies(definition,axiomDeps);
-		updateFromDefinition(definition, axiomDeps);
+		updateFromDefinition(name, definition, axiomDeps);
 
 		put(axiom, axiomDeps);
 	}
@@ -57,12 +57,14 @@ public class AxiomDependencies extends HashMap<OWLLogicalAxiom, DependencySet>{
 		}
 	}
 
-	private void updateFromDefinition(OWLClassExpression definition, DependencySet axiomDeps) {
+	private void updateFromDefinition(OWLClass axiomName, OWLClassExpression definition, DependencySet axiomDeps) {
 		for(OWLClass cls : ModuleUtils.getNamedClassesInSignature(definition)){
 
 			for(OWLLogicalAxiom axiom : keySet()){
 				OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
-				if(name.equals(cls)){
+				//TODO does this check make it any faster? 
+				// OR we could simply search up to the index of the axiom (probably better) 
+				if(depth.lookup(cls) < depth.lookup(axiomName) && name.equals(cls)){
 					DependencySet clsDependencies = get(axiom);
 					if(clsDependencies != null){
 						axiomDeps.addAll(clsDependencies);
@@ -80,8 +82,7 @@ public class AxiomDependencies extends HashMap<OWLLogicalAxiom, DependencySet>{
 		for(OWLLogicalAxiom axiom : dtSorted){
 			System.out.println(axiom);
 		}
-		AxiomDependencies depends = new AxiomDependencies();
-		depends.updateDependenciesWith(dtSorted);
+		AxiomDependencies depends = new AxiomDependencies(ont);
 		
 		System.out.println(depends);
 	}
