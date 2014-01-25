@@ -14,8 +14,10 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 
+import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
+import uk.ac.liv.moduleextraction.checkers.ELAxiomChainCollector;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.experiments.SemanticOnlyComparison;
@@ -34,14 +36,19 @@ public class SemanticOnlyExtractor implements Extractor {
 	private Set<OWLEntity> sigUnionSigM;
 	private InseperableChecker inseparableChecker;
 	private long qbfChecks = 0;
+	private ELAxiomChainCollector chainCollector;
+	private AxiomDependencies dependT;
 
 	public SemanticOnlyExtractor(OWLOntology ontology) {
 		this(ontology.getLogicalAxioms());
 	}
 
 	public SemanticOnlyExtractor(Set<OWLLogicalAxiom> ontology){
-		axiomStore = new DefinitorialAxiomStore(ontology);
-		inseparableChecker = new InseperableChecker();
+		this.dependT = new AxiomDependencies(ontology);
+		this.axiomStore = new DefinitorialAxiomStore(dependT.getDefinitorialSortedAxioms());
+		System.out.println(dependT.getDefinitorialSortedAxioms());
+		this.inseparableChecker = new InseperableChecker();
+		this.chainCollector = new ELAxiomChainCollector();
 	}
 
 	@Override
@@ -68,24 +75,49 @@ public class SemanticOnlyExtractor implements Extractor {
 		sigUnionSigM = ModuleUtils.getClassAndRoleNamesInSet(existingModule);
 		sigUnionSigM.addAll(signature);
 
-		try{
-						
-			while(inseparableChecker.isSeperableFromEmptySet(axiomStore.getSubsetAsList(terminology),sigUnionSigM)){
-				OWLLogicalAxiom axiom = findSeparableAxiom(terminology);
-				module.add(axiom);
-				axiomStore.removeAxiom(terminology, axiom);
-				sigUnionSigM.addAll(axiom.getSignature());
-			}
-			qbfChecks += inseparableChecker.getTestCount();
+		try {
+			applyRules(terminology);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (QBFSolverException e) {
+			e.printStackTrace();
 		}
-		catch(IOException ioe){
-			ioe.printStackTrace();
-		} catch (QBFSolverException qbfe) {
-			qbfe.printStackTrace();
-		}
-
 
 		return module;
+	}
+
+	public void applyRules(boolean[] terminology) throws IOException, QBFSolverException{
+
+		moveELChainsToModule(terminology);			
+		while(inseparableChecker.isSeperableFromEmptySet(axiomStore.getSubsetAsList(terminology),sigUnionSigM)){
+			OWLLogicalAxiom axiom = findSeparableAxiom(terminology);
+			System.out.println("Separable: " + axiom);
+			module.add(axiom);
+			axiomStore.removeAxiom(terminology, axiom);
+			sigUnionSigM.addAll(axiom.getSignature());
+			qbfChecks += inseparableChecker.getTestCount();
+			applyRules(terminology);
+		}
+	}
+
+	private void moveELChainsToModule(boolean[] terminology){
+		boolean change = true;
+		while(change){
+			change = false;
+			for (int i = 0; i < terminology.length; i++) {
+				if(terminology[i]){
+					OWLLogicalAxiom chosenAxiom = axiomStore.getAxiom(i);
+					System.out.println("Testing: " + chosenAxiom);
+					if(chainCollector.hasELSyntacticDependency(chosenAxiom, dependT, sigUnionSigM)){
+						change = true;
+						ArrayList<OWLLogicalAxiom> chain = chainCollector.collectELAxiomChain(terminology, i, axiomStore, dependT, sigUnionSigM);
+						System.out.println("Chain: " +  chain);
+						module.addAll(chain);
+
+					}
+				}
+			}
+		}
 	}
 
 	public long getQBFCount(){
@@ -93,10 +125,11 @@ public class SemanticOnlyExtractor implements Extractor {
 	}
 
 	public static void main(String[] args) throws IOException {
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/semantic-only/test.krss");
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/axiomdep.krss");
+		ModuleUtils.remapIRIs(ont, "X");
 		SemanticOnlyExtractor extractor = new SemanticOnlyExtractor(ont);
 		System.out.println(ont);
+
 		OWLDataFactory f = OWLManager.getOWLDataFactory();
 		OWLClass a = f.getOWLClass(IRI.create("X#A"));
 		OWLClass b = f.getOWLClass(IRI.create("X#B"));
@@ -104,18 +137,15 @@ public class SemanticOnlyExtractor implements Extractor {
 		OWLObjectProperty r = f.getOWLObjectProperty(IRI.create("X#r"));
 		Set<OWLEntity> sig = new HashSet<OWLEntity>();
 		sig.add(a);
-// 		sig.add(b);
+		sig.add(c);
 
 		System.out.println(sig);
-		SemanticOnlyComparison compare = new SemanticOnlyComparison(ont, null);
-		compare.performExperiment(sig);
-		compare.writeMetrics(null);
+		Set<OWLLogicalAxiom> module = extractor.extractModule(sig);
+		System.out.println(module);
 
-
-
-//		System.out.println(sig);
-//		Set<OWLLogicalAxiom> module = extractor.extractModule(sig);
-//		System.out.println("|M|: " + module);
+		//		System.out.println(sig);
+		//		Set<OWLLogicalAxiom> module = extractor.extractModule(sig);
+		//		System.out.println("|M|: " + module);
 	}
 
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -27,7 +28,11 @@ public class AxiomDependencies extends HashMap<OWLLogicalAxiom, DependencySet>{
 	private ArrayList<OWLLogicalAxiom> sortedAxioms;
 	
 	public AxiomDependencies(OWLOntology ontology) {
-		depth = new AxiomDefinitorialDepth(ontology);
+		this(ontology.getLogicalAxioms());
+	}
+	
+	public AxiomDependencies(Set<OWLLogicalAxiom> axioms){
+		depth = new AxiomDefinitorialDepth(axioms);
 		sortedAxioms = depth.getDefinitorialSortedList();
 		calculateDependencies();
 	}
@@ -74,6 +79,11 @@ public class AxiomDependencies extends HashMap<OWLLogicalAxiom, DependencySet>{
 
 		}
 	}
+	
+	public ArrayList<OWLLogicalAxiom> getDefinitorialSortedAxioms() {
+		return sortedAxioms;
+	}
+	
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/axiomdep.krss");
 		
