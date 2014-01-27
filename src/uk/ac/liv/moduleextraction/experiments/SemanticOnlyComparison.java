@@ -64,9 +64,10 @@ public class SemanticOnlyComparison implements Experiment {
 
 		int qbfSmaller = (semanticModule.size() < starIterExperiment.getHybridModule().size()) ? 1 : 0;
 
-		writer.write("StarSize, HybridSize, QBFSize, QBFSmaller? QBFChecks" + "\n");
+		writer.write("StarSize, HybridSize, QBFSize, QBFSmaller, QBFChecks, SignatureLocation" + "\n");
 		writer.write(starIterExperiment.getStarSize() + "," + starIterExperiment.getIteratedSize() + 
-				"," + semanticModule.size() + "," + semanticExtractor.getQBFCount() + "," + String.valueOf(qbfSmaller) + "\n");
+				"," + semanticModule.size() + "," + String.valueOf(qbfSmaller) + "," + semanticExtractor.getQBFCount() + 
+				"," + sigLocation.getAbsolutePath() + "\n");
 
 		writer.flush();
 		writer.close();

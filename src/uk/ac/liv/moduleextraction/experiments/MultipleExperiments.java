@@ -112,6 +112,12 @@ public class MultipleExperiments {
 			if(f.isFile()){
 				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
 				
+				new MultipleExperiments().runExperiments(
+						ont, 
+						new File(ModulePaths.getSignatureLocation() + "/semantic-only/AxiomSignatures/" + f.getName()),
+						new SemanticOnlyComparison(ont, f));
+			
+				
 				for(int i : intervals){
 					new MultipleExperiments().runExperiments(
 							ont, 
@@ -119,7 +125,8 @@ public class MultipleExperiments {
 							new SemanticOnlyComparison(ont, f));
 				
 				}
-			
+				
+		
 			
 			}
 		}
