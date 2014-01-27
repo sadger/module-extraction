@@ -1,21 +1,14 @@
 package uk.ac.liv.moduleextraction.experiments;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 import uk.ac.liv.moduleextraction.extractor.NotEquivalentToTerminologyException;
@@ -90,7 +83,7 @@ public class MultipleExperiments {
 			source = source.getParentFile();
 		}
 
-		//Build the path from the start of the destinated using the pushed directory names2
+		//Build the path from the start of the destinated using the pushed directory names
 		String target = destination.getAbsolutePath();
 		while(!directoriesToWrite.isEmpty()){
 			target = target + "/" + directoriesToWrite.pop();
@@ -113,33 +106,27 @@ public class MultipleExperiments {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
 
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		try{
-			BufferedReader br = new BufferedReader(new FileReader(ModulePaths.getSignatureLocation() + "NewIteratingExperiments/acyclic-supported-no-nci"));
-			String line;
-			while ((line = br.readLine()) != null) {
-			   File ontologyLocation = new File(line);
-			   System.out.println(ontologyLocation.getName());
-			   OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ontologyLocation.getAbsolutePath());
-			   Set<OWLAxiom> logicalAxioms = new HashSet<OWLAxiom>();
-			   for(OWLLogicalAxiom axiom : ontology.getLogicalAxioms()){
-				   logicalAxioms.add(axiom);
-			   }
-			   OWLOntology logicalOntology = ontology.getOWLOntologyManager().createOntology(logicalAxioms);
-			   ontology = null;
-			   new MultipleExperiments().runExperiments(
-					   logicalOntology, 
-					   new File(ModulePaths.getSignatureLocation() + "/NewIteratingEvaluation/AxiomSignatures/" + ontologyLocation.getName()), 
-					   new IteratingModuleInspector(logicalOntology));
-			  
-			  
-			   logicalOntology = null;
+		File ontLocation = new File(ModulePaths.getOntologyLocation() + "/semantic-only");
+		int[] intervals = {10,25,50,75};
+		for(File f: ontLocation.listFiles()){
+			if(f.isFile()){
+				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
+				
+				for(int i : intervals){
+					new MultipleExperiments().runExperiments(
+							ont, 
+							new File(ModulePaths.getSignatureLocation() + "/semantic-only/RandomSignatures/" + f.getName() + "/" + "size-"+i),
+							new SemanticOnlyComparison(ont, f));
+				
+				}
+			
+			
 			}
-			br.close();
-		}catch(IOException e){
-			e.printStackTrace();
 		}
 
+ 
+		
+				
 	}
 
 

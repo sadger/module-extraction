@@ -60,34 +60,18 @@ public class SemanticOnlyComparison implements Experiment {
 	@Override
 	public void writeMetrics(File experimentLocation) throws IOException {
 
-		//BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results", false));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results", false));
 
 		int qbfSmaller = (semanticModule.size() < starIterExperiment.getHybridModule().size()) ? 1 : 0;
 
-
-
-		System.out.print("StarSize, HybridSize, QBFSize, QBFSmaller? QBFChecks" + "\n");
-		System.out.print(starIterExperiment.getStarSize() + "," + starIterExperiment.getIteratedSize() + 
+		writer.write("StarSize, HybridSize, QBFSize, QBFSmaller? QBFChecks" + "\n");
+		writer.write(starIterExperiment.getStarSize() + "," + starIterExperiment.getIteratedSize() + 
 				"," + semanticModule.size() + "," + semanticExtractor.getQBFCount() + "," + String.valueOf(qbfSmaller) + "\n");
 
-
-
-
-		//		writer.flush();
-		//		writer.close();
-
-		//		System.out.println("Star:" + starIterExperiment.getStarModule());
-		//		System.out.println("Hybrid: " + starIterExperiment.getHybridModule());
-		//		System.out.println("QBF: " + semanticModule.size());
-		//		System.out.println("Checks:" + semanticExtractor.getQBFCount());
-		//		System.out.println();w
-
-
+		writer.flush();
+		writer.close();
 
 	}
-
-
-
 
 
 
