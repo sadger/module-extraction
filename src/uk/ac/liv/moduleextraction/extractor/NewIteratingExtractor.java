@@ -47,16 +47,21 @@ public class NewIteratingExtractor implements Extractor {
 		boolean sizeChanged = false;
 		do{
 			int starSize = module.size();
-			
-			
+
+
 			MeaninglessEquivalenceChecker checker = new MeaninglessEquivalenceChecker(module);
-			module.removeAll(checker.getMeaninglessEquivalances());
+			Set<OWLLogicalAxiom> meaningless = checker.getMeaninglessEquivalances();
+			if(!meaningless.isEmpty()){
+				System.out.println("M: " + meaningless);
+			}
+			module.removeAll(meaningless);
+			
 
 			Set<OWLLogicalAxiom> unsupportedAxioms = getUnsupportedAxioms(module);
 			module.removeAll(unsupportedAxioms);
 			module  = extractSemanticModule(createOntologyFromLogicalAxioms(module), unsupportedAxioms, origSig);
-			
-			
+
+
 			if(module.size() < starSize){
 				int amexSize = module.size();
 				module = extractStarModule(createOntologyFromLogicalAxioms(module), origSig);
@@ -127,7 +132,7 @@ public class NewIteratingExtractor implements Extractor {
 		return module;
 	}
 
-	
+
 
 
 	public static OWLOntology createOntology(Set<OWLLogicalAxiom> axioms) {
@@ -149,13 +154,13 @@ public class NewIteratingExtractor implements Extractor {
 	public int getAmexExtrations() {
 		return amexExtrations;
 	}
-	
+
 	public static void main(String[] args) {
-//		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms("/LOCAL/wgatens/Ontologies/" + "/semantic-only/examples/meaningless.krss");
-//		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-//		Set<OWLEntity> signature;
-//		Set<OWLLogicalAxiom> module = new NewIteratingExtractor(ont).extractModule(gen.generateRandomSignature(2));
-//		System.out.println(module);
+		//		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms("/LOCAL/wgatens/Ontologies/" + "/semantic-only/examples/meaningless.krss");
+		//		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+		//		Set<OWLEntity> signature;
+		//		Set<OWLLogicalAxiom> module = new NewIteratingExtractor(ont).extractModule(gen.generateRandomSignature(2));
+		//		System.out.println(module);
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
 		OWLClass top = factory.getOWLThing();
 		for(File f: new File("/LOCAL/wgatens/Ontologies/" + "/semantic-only/EL").listFiles()){
@@ -163,7 +168,7 @@ public class NewIteratingExtractor implements Extractor {
 				System.out.println(f.getName());
 				OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
 				for(OWLLogicalAxiom axiom : ontology.getLogicalAxioms()){
-				
+
 					if(axiom.getSignature().contains(top)){
 						System.out.println(axiom);
 					}

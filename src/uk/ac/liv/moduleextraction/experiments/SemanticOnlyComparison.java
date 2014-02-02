@@ -13,6 +13,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import uk.ac.liv.moduleextraction.extractor.SemanticOnlyExtractor;
+import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
@@ -74,24 +75,26 @@ public class SemanticOnlyComparison implements Experiment {
 
 	}
 
+	public void printMetrics(){
+		System.out.println("StarSize, HybridSize, QBFSize");
+		System.out.println(starIterExperiment.getStarSize() + "," + starIterExperiment.getIteratedSize() + 
+				"," + semanticModule.size());
+	}
 
 
 	public static void main(String[] args) throws IOException, OWLOntologyCreationException {
 		//		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/semantic-only/test.krss");
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/semantic-only/GRO_CPGA-core");
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/semantic-only/558a7b9f-294f-41a0-af30-ff7a7e821fd5_pe_xp.owl2-core");
+		SigManager man = new SigManager(new File("/LOCAL/wgatens/Results/semantic-only/EL-TESTING/RandomSignatures/558a7b9f-294f-41a0-af30-ff7a7e821fd5_pe_xp.owl2-core/size-10-SemanticOnlyComparison/random10-106"));
 		SemanticOnlyComparison compare = new SemanticOnlyComparison(ont, null);
+		
+		Set<OWLEntity> sig = man.readFile("signature");
+		//System.out.println(sig);
+		compare.performExperiment(sig);
+		compare.printMetrics();
 
-		//	System.out.println(ont);
-		for (int i = 1; i <= 100; i++) {
-			System.out.println(i);
-			Set<OWLEntity> sig = gen.generateRandomSignature(75);
-			//System.out.println(sig);
-			compare.performExperiment(sig);
-			compare.writeMetrics(null);
 
-		}
-
+	
 
 	}
 
