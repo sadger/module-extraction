@@ -31,7 +31,7 @@ public class MultipleExperiments {
 
 		/* Create new folder in result location with same name as signature
 		folder */
-		File newResultFolder = copyDirectoryStructure(signaturesLocation, "Signatures",new File("/LOCAL/wgatens/Results"));
+		File newResultFolder = copyDirectoryStructure(signaturesLocation, "Signatures",new File(ModulePaths.getResultLocation()));
 
 
 		
@@ -106,30 +106,17 @@ public class MultipleExperiments {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
 
-		File ontLocation = new File(ModulePaths.getOntologyLocation() + "/semantic-only/EL");
-		int[] intervals = {10,25,50,75};
-		for(File f: ontLocation.listFiles()){
-			if(f.isFile()){
-				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
-				
-//				new MultipleExperiments().runExperiments(
-//						ont, 
-//						new File("/LOCAL/wgatens/Signatures/" + "/semantic-only/EL-TESTING/AxiomSignatures/" + f.getName()),
-//						new SemanticOnlyComparison(ont, f));
-//			
-				
-				for(int i : intervals){
-					new MultipleExperiments().runExperiments(
-							ont, 
-							new File(ModulePaths.getSignatureLocation() + "/semantic-only/EL-TESTING/RandomSignatures/" + f.getName() + "/" + "size-"+i),
-							new SemanticOnlyComparison(ont, f));
-//				
-				}
-				
+		File ontloc = new File(ModulePaths.getOntologyLocation() + "/semantic-only/Thesaurus_11.04d.owl-core");
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath());
 		
-			
-			}
+		MultipleExperiments multi = new MultipleExperiments();
+		int[] intervals = {100,250,500,1000};
+		for(int i : intervals){
+			multi.runExperiments(ont, 
+					new File(ModulePaths.getSignatureLocation() + "/semantic-only/RandomSignatures/" + ontloc.getName() + "/size-" + i),
+					new SemanticOnlyComparison(ont, ontloc));
 		}
+	
 
  
 		

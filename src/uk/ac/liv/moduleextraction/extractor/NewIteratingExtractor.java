@@ -51,9 +51,6 @@ public class NewIteratingExtractor implements Extractor {
 
 			MeaninglessEquivalenceChecker checker = new MeaninglessEquivalenceChecker(module);
 			Set<OWLLogicalAxiom> meaningless = checker.getMeaninglessEquivalances();
-			if(!meaningless.isEmpty()){
-				System.out.println("M: " + meaningless);
-			}
 			module.removeAll(meaningless);
 			
 
