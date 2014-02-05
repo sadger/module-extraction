@@ -24,13 +24,13 @@ public class SharedNameFilter implements SupportedFilter {
 
 	@Override
 	public boolean isRequired() {
-		return inspector.getNamesInIntersection().size() > 0;
+		return inspector.getSharedNames().size() > 0;
 	}
 
 	@Override
 	public Set<OWLLogicalAxiom> getUnsupportedAxioms(Set<OWLLogicalAxiom> axioms) {
 		HashSet<OWLLogicalAxiom> unsupported = new HashSet<OWLLogicalAxiom>();
-		Set<OWLClass> sharedNames = inspector.getNamesInIntersection();
+		Set<OWLClass> sharedNames = inspector.getSharedNames();
 
 		for(OWLClass cls : sharedNames){
 			

@@ -73,7 +73,7 @@ public class FindMeAnOntology {
 		
 		System.out.println(shortName + "," + express + ","+ ont.getLogicalAxiomCount() + "," + ont.getAxiomCount(AxiomType.SUBCLASS_OF) + "," + 
 		ont.getAxiomCount(AxiomType.EQUIVALENT_CLASSES) + "," + inspector.countNamesWithRepeatedInclusions() +
-		"," + inspector.countNamesWithRepeatedEqualities() + "," + inspector.getNamesInIntersection().size() 
+		"," + inspector.countNamesWithRepeatedEqualities() + "," + inspector.getSharedNames().size() 
 		+ "," + ont.getClassesInSignature().size() + "," + ont.getObjectPropertiesInSignature().size());
 
 

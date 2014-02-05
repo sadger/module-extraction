@@ -74,7 +74,7 @@ public class AcylicNotTerminologyExtractor implements Extractor {
 			else{
 				Set<OWLLogicalAxiom> initialModule = new HashSet<OWLLogicalAxiom>();
 				
-					for(OWLClass cls : structureInspector.getNamesInIntersection()){
+					for(OWLClass cls : structureInspector.getSharedNames()){
 						if(strategy == RemovalStrategy.REMOVE_SUBSUMPTIONS){
 							initialModule.addAll(structureInspector.getPrimitiveDefinitions(cls));
 						}

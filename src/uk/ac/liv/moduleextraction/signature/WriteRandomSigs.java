@@ -22,6 +22,9 @@ public class WriteRandomSigs {
 	
 	public WriteRandomSigs(OWLOntology ont, File loc) {
 		this.location = loc;
+		if(!loc.exists()){
+			loc.mkdirs();
+		}
 		this.ontology = ont;
 		this.sigGen = new  SignatureGenerator(ontology.getLogicalAxioms());
 	}
@@ -65,21 +68,14 @@ public class WriteRandomSigs {
 	}
        
 	public static void main(String[] args) {
-		try{
-			BufferedReader br = new BufferedReader(new FileReader(ModulePaths.getSignatureLocation() + "NewIteratingExperiments/acyclic-supported-no-nci"));
-			String line;
-			while ((line = br.readLine()) != null) {
-			   File ontologyLocation = new File(line);
-			   System.out.println(ontologyLocation.getName());
-			   OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ontologyLocation.getAbsolutePath());
-			   WriteRandomSigs writer =  new WriteRandomSigs(ontology, new File(ModulePaths.getSignatureLocation() + "/NewIteratingExperiments/" + ontologyLocation.getName()));
-			   int percentage = (int) Math.round(Math.min(ModuleUtils.getCoreSize(ontology.getLogicalAxioms()) * 0.1, 1000));
-			   writer.writeSignature(percentage, 200);
-			   ontology.getOWLOntologyManager().removeOntology(ontology);
-			}
-			br.close();
-		}catch(IOException e){
-			e.printStackTrace();
-		}
+		File ontloc = new File(ModulePaths.getOntologyLocation() + "/semantic-only/Thesaurus_11.04d.OWL-core");
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath());
+		WriteRandomSigs writer = new WriteRandomSigs(
+				ont, 
+				new File(ModulePaths.getSignatureLocation() + "/semantic-only/RandomSignatures/" + ontloc.getName() + "/size-750/"));
+		writer.writeSignature(750, 200);
+		
+		
+		
 	}
 }

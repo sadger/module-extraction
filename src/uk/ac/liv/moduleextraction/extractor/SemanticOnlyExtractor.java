@@ -18,6 +18,7 @@ import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
 import uk.ac.liv.moduleextraction.checkers.ELAxiomChainCollector;
+import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.experiments.SemanticOnlyComparison;
@@ -38,6 +39,7 @@ public class SemanticOnlyExtractor implements Extractor {
 	private long qbfChecks = 0;
 	private ELAxiomChainCollector chainCollector;
 	private AxiomDependencies dependT;
+	private ExtendedLHSSigExtractor lhsExtractor;
 
 	public SemanticOnlyExtractor(OWLOntology ontology) {
 		this(ontology.getLogicalAxioms());
@@ -48,6 +50,7 @@ public class SemanticOnlyExtractor implements Extractor {
 		this.axiomStore = new DefinitorialAxiomStore(dependT.getDefinitorialSortedAxioms());
 		this.inseparableChecker = new InseperableChecker();
 		this.chainCollector = new ELAxiomChainCollector();
+		this.lhsExtractor = new ExtendedLHSSigExtractor();
 	}
 
 	@Override
@@ -90,7 +93,8 @@ public class SemanticOnlyExtractor implements Extractor {
 	public void applyRules(boolean[] terminology) throws IOException, QBFSolverException{
 
 		moveELChainsToModule(terminology);			
-		if(inseparableChecker.isSeperableFromEmptySet(axiomStore.getSubsetAsList(terminology),sigUnionSigM)){
+		Set<OWLLogicalAxiom> lhs = lhsExtractor.getLHSSigAxioms(terminology, axiomStore, sigUnionSigM, dependT);
+		if(inseparableChecker.isSeperableFromEmptySet(lhs,sigUnionSigM)){
 			OWLLogicalAxiom axiom = findSeparableAxiom(terminology);
 			module.add(axiom);
 			axiomStore.removeAxiom(terminology, axiom);

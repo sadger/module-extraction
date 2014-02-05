@@ -106,11 +106,11 @@ public class MultipleExperiments {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
 
-		File ontloc = new File(ModulePaths.getOntologyLocation() + "/semantic-only/Thesaurus_11.04d.owl-core");
+		File ontloc = new File(ModulePaths.getOntologyLocation() + "/semantic-only/Thesaurus_11.04d.OWL-core");
 		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath());
-		
+		System.out.println(ont.getLogicalAxiomCount());
 		MultipleExperiments multi = new MultipleExperiments();
-		int[] intervals = {100,250,500,1000};
+		int[] intervals = {750};
 		for(int i : intervals){
 			multi.runExperiments(ont, 
 					new File(ModulePaths.getSignatureLocation() + "/semantic-only/RandomSignatures/" + ontloc.getName() + "/size-" + i),
