@@ -13,6 +13,7 @@ import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 import uk.ac.liv.moduleextraction.extractor.NotEquivalentToTerminologyException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
+import uk.ac.liv.ontologyutils.expressions.ELValidator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 
@@ -23,7 +24,7 @@ public class MultipleExperiments {
 
 	public void runExperiments(OWLOntology ontology, File signaturesLocation, Experiment experimentType) throws IOException{
 		this.experiment = experimentType;
-		
+
 		Experiment experiment = experimentType;
 		SigManager sigManager = new SigManager(signaturesLocation);
 		File[] files = signaturesLocation.listFiles();
@@ -34,7 +35,7 @@ public class MultipleExperiments {
 		File newResultFolder = copyDirectoryStructure(signaturesLocation, "Signatures",new File(ModulePaths.getResultLocation()));
 
 
-		
+
 
 		int experimentCount = 1;
 		for(File f : files){
@@ -99,28 +100,41 @@ public class MultipleExperiments {
 			System.out.println("Making directory: " + targetFile.getAbsolutePath());
 			targetFile.mkdirs();
 		}
-		
+
 
 		return targetFile;
 	} 
 
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
 
-		File ontloc = new File(ModulePaths.getOntologyLocation() + "/semantic-only/Thesaurus_11.04d.OWL-core");
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath());
-		System.out.println(ont.getLogicalAxiomCount());
-		MultipleExperiments multi = new MultipleExperiments();
-		int[] intervals = {750};
-		for(int i : intervals){
-			multi.runExperiments(ont, 
-					new File(ModulePaths.getSignatureLocation() + "/semantic-only/RandomSignatures/" + ontloc.getName() + "/size-" + i),
-					new SemanticOnlyComparison(ont, ontloc));
-		}
-	
+		File ontloc = new File(ModulePaths.getOntologyLocation() + "/semantic-only/meaningful/");
+		ELValidator valid = new ELValidator();
 
- 
+		for(File f : ontloc.listFiles()){
+			if(f.isFile()){
+				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
+				if(valid.isELOntology(ont)){
+					int[] intervals = {10,25,50,75};
+					for(int i : intervals){
+						MultipleExperiments multi = new MultipleExperiments();
+						multi.runExperiments(ont, 
+								new File(ModulePaths.getSignatureLocation() + "/semantic-only-meaningful/RandomSignatures/" 
+										+ f.getName().substring(0, f.getName().length()-1) + "/size-" + i),
+								new SemanticOnlyComparison(ont, ontloc));
+					
+					}
 		
-				
+
+				}
+
+			}
+		}
+
+
+
+
+
+
 	}
 
 

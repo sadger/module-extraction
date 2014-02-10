@@ -93,8 +93,7 @@ public class SemanticOnlyExtractor implements Extractor {
 	public void applyRules(boolean[] terminology) throws IOException, QBFSolverException{
 
 		moveELChainsToModule(terminology);			
-		Set<OWLLogicalAxiom> lhs = lhsExtractor.getLHSSigAxioms(terminology, axiomStore, sigUnionSigM, dependT);
-		if(inseparableChecker.isSeperableFromEmptySet(lhs,sigUnionSigM)){
+		if(inseparableChecker.isSeperableFromEmptySet(axiomStore.getSubsetAsList(terminology),sigUnionSigM)){
 			OWLLogicalAxiom axiom = findSeparableAxiom(terminology);
 			module.add(axiom);
 			axiomStore.removeAxiom(terminology, axiom);
