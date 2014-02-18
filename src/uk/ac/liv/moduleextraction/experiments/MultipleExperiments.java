@@ -107,35 +107,57 @@ public class MultipleExperiments {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
 
-		File ontloc = new File(ModulePaths.getOntologyLocation() + "/semantic-only/meaningful/");
-		ELValidator valid = new ELValidator();
+		File ontloc = new File(ModulePaths.getOntologyLocation() + "/NCI/Profile/");
 
-		for(File f : ontloc.listFiles()){
-			if(f.isFile()){
-				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
-				if(valid.isELOntology(ont)){
-					int[] intervals = {10,25,50,75};
-					for(int i : intervals){
-						MultipleExperiments multi = new MultipleExperiments();
-						multi.runExperiments(ont, 
-								new File(ModulePaths.getSignatureLocation() + "/semantic-only-meaningful/RandomSignatures/" 
-										+ f.getName().substring(0, f.getName().length()-1) + "/size-" + i),
-								new SemanticOnlyComparison(ont, ontloc));
-					
-					}
+		String[] ontologies = {"NCI-star.owl", "NCI-star-inc.owl", "NCI-star-equiv.owl"};
+
+		int[] intervals = {100,250,500,750,1000};
+		int[] roles = {0,50,25,75,100};
+
+		OWLOntology ont = null;
 		
-
-				}
-
+		ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath() + "/" + ontologies[1]);
+		for(int r : roles){
+			for(int i : intervals){
+				MultipleExperiments multi = new MultipleExperiments();
+				multi.runExperiments(ont, 
+						new File(ModulePaths.getSignatureLocation() + "/Paper/NCI-Star-Inc/role-" + r + "/size-" + i), 
+						new SemanticOnlyComparison(ont, ontloc));				
 			}
 		}
 
+		ont = null;
+		
+		ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath() + "/" + ontologies[0]);
+		for(int r : roles){
+			for(int i : intervals){
+				MultipleExperiments multi = new MultipleExperiments();
+				multi.runExperiments(ont, 
+						new File(ModulePaths.getSignatureLocation() + "/Paper/NCI-Star/role-" + r + "/size-" + i), 
+						new SemanticOnlyComparison(ont, ontloc));				
+			}
+		}
+		ont = null;
+
+
+
+		ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath() + "/" + ontologies[2]);
+		for(int r : roles){
+			for(int i : intervals){
+				MultipleExperiments multi = new MultipleExperiments();
+				multi.runExperiments(ont, 
+						new File(ModulePaths.getSignatureLocation() + "/Paper/NCI-Star-Equiv/role-" + r + "/size-" + i), 
+						new SemanticOnlyComparison(ont, ontloc));				
+			}
+		}
+
+	
 
 
 
 
 
-	}
+}
 
 
 

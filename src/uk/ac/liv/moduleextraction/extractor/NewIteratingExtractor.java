@@ -57,6 +57,13 @@ public class NewIteratingExtractor implements Extractor {
 			Set<OWLLogicalAxiom> unsupportedAxioms = getUnsupportedAxioms(module);
 			module.removeAll(unsupportedAxioms);
 			module  = extractSemanticModule(createOntologyFromLogicalAxioms(module), unsupportedAxioms, origSig);
+			
+			checker = new MeaninglessEquivalenceChecker(module);
+			meaningless = checker.getMeaninglessEquivalances();
+			if(meaningless.size()  > 0){
+				System.out.println("ARFY");
+			}
+			module.removeAll(meaningless);
 
 
 			if(module.size() < starSize){

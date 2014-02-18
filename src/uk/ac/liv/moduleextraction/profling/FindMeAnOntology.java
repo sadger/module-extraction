@@ -81,7 +81,7 @@ public class FindMeAnOntology {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, OWLOntologyStorageException {
 
-	FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/semantic-only"));
+	FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/NCI/Profile"));
 	find.profileOntologies();
 			
 	}
