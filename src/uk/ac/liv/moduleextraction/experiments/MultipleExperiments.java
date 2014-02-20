@@ -107,51 +107,28 @@ public class MultipleExperiments {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
 
-		File ontloc = new File(ModulePaths.getOntologyLocation() + "/NCI/Profile/");
+		File ontloc = new File(ModulePaths.getOntologyLocation() + "/NCI/Profile/NCI-star.owl");
 
-		String[] ontologies = {"NCI-star.owl", "NCI-star-inc.owl", "NCI-star-equiv.owl"};
+//		String[] ontologies = {"NCI-star.owl", "NCI-star-inc.owl", "NCI-star-equiv.owl"};
 
 		int[] intervals = {100,250,500,750,1000};
 		int[] roles = {0,50,25,75,100};
 
 		OWLOntology ont = null;
 		
-		ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath() + "/" + ontologies[1]);
+		ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath());
 		for(int r : roles){
 			for(int i : intervals){
 				MultipleExperiments multi = new MultipleExperiments();
 				multi.runExperiments(ont, 
-						new File(ModulePaths.getSignatureLocation() + "/Paper/NCI-Star-Inc/role-" + r + "/size-" + i), 
+						new File(ModulePaths.getSignatureLocation() + "/womo-new/RandomSignatures/" + ontloc.getName() + "/role-" + r + "/size-" + i), 
 						new SemanticOnlyComparison(ont, ontloc));				
 			}
 		}
 
 		ont = null;
 		
-		ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath() + "/" + ontologies[0]);
-		for(int r : roles){
-			for(int i : intervals){
-				MultipleExperiments multi = new MultipleExperiments();
-				multi.runExperiments(ont, 
-						new File(ModulePaths.getSignatureLocation() + "/Paper/NCI-Star/role-" + r + "/size-" + i), 
-						new SemanticOnlyComparison(ont, ontloc));				
-			}
-		}
-		ont = null;
 
-
-
-		ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath() + "/" + ontologies[2]);
-		for(int r : roles){
-			for(int i : intervals){
-				MultipleExperiments multi = new MultipleExperiments();
-				multi.runExperiments(ont, 
-						new File(ModulePaths.getSignatureLocation() + "/Paper/NCI-Star-Equiv/role-" + r + "/size-" + i), 
-						new SemanticOnlyComparison(ont, ontloc));				
-			}
-		}
-
-	
 
 
 

@@ -31,7 +31,12 @@ public class WriteRandomSigs {
 	
 	
 	public void writeSignatureWithRoles(int sigSize, double rolePercentage, int numberOfTests){
-		SigManager sigManager = new SigManager(location);
+		
+		File rolePct = new File(location.getAbsolutePath() + "/role-" + ((int) rolePercentage) + "/size-" + sigSize);
+		if(!rolePct.exists()){
+			rolePct.mkdirs();
+		}
+		SigManager sigManager = new SigManager(rolePct);
 		
 		
 		for(int i=1; i<=numberOfTests; i++){
@@ -66,15 +71,24 @@ public class WriteRandomSigs {
 		}
 		System.out.println("Written " + numberOfTests + " signatures");
 	}
-       
+
 	public static void main(String[] args) {
-		File ontloc = new File(ModulePaths.getOntologyLocation() + "/semantic-only/Thesaurus_11.04d.OWL-core");
+		File ontloc = new File(ModulePaths.getOntologyLocation() + "/NCI/Profile/NCI-star.owl");
+		int[] intervals = {100,250,500,750,1000};
+		double[] roles = {0,25,50,75,100};
 		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath());
 		WriteRandomSigs writer = new WriteRandomSigs(
 				ont, 
-				new File(ModulePaths.getSignatureLocation() + "/semantic-only/RandomSignatures/" + ontloc.getName() + "/size-750/"));
-		writer.writeSignature(750, 200);
+				new File(ModulePaths.getSignatureLocation() + "/womo-new/RandomSignatures/" + ontloc.getName()));
 		
+		for(int i : intervals){
+			for(double r : roles){
+				writer.writeSignatureWithRoles(i, r, 200);
+			}
+		}
+
+		
+
 		
 		
 	}
