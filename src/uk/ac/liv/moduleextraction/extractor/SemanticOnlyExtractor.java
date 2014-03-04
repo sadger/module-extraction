@@ -23,6 +23,7 @@ import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.experiments.SemanticOnlyComparison;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
+import uk.ac.liv.moduleextraction.qbf.SemanticSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.SeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
@@ -48,6 +49,7 @@ public class SemanticOnlyExtractor implements Extractor {
 	public SemanticOnlyExtractor(Set<OWLLogicalAxiom> ontology){
 		this.dependT = new AxiomDependencies(ontology);
 		this.axiomStore = new DefinitorialAxiomStore(dependT.getDefinitorialSortedAxioms());
+//		this.axiomStore = new DefinitorialAxiomStore(ontology);
 		this.inseparableChecker = new InseperableChecker();
 		this.chainCollector = new ELAxiomChainCollector();
 		this.lhsExtractor = new ExtendedLHSSigExtractor();
@@ -61,7 +63,8 @@ public class SemanticOnlyExtractor implements Extractor {
 	private OWLLogicalAxiom findSeparableAxiom(boolean[] terminology)
 			throws IOException, QBFSolverException {
 
-		SeparabilityAxiomLocator search = new SeparabilityAxiomLocator(axiomStore.getSubsetAsArray(terminology),sigUnionSigM,null);
+		SemanticSeparabilityAxiomLocator search = 
+				new SemanticSeparabilityAxiomLocator(axiomStore.getSubsetAsArray(terminology),sigUnionSigM,dependT);
 
 		OWLLogicalAxiom insepAxiom = search.getInseperableAxiom();
 		qbfChecks += search.getCheckCount();
@@ -93,7 +96,8 @@ public class SemanticOnlyExtractor implements Extractor {
 	public void applyRules(boolean[] terminology) throws IOException, QBFSolverException{
 
 		moveELChainsToModule(terminology);			
-		if(inseparableChecker.isSeperableFromEmptySet(axiomStore.getSubsetAsList(terminology),sigUnionSigM)){
+		Set<OWLLogicalAxiom> lhs = lhsExtractor.getLHSSigAxioms(terminology, axiomStore, sigUnionSigM, dependT);
+		if(inseparableChecker.isSeperableFromEmptySet(lhs,sigUnionSigM)){
 			OWLLogicalAxiom axiom = findSeparableAxiom(terminology);
 			module.add(axiom);
 			axiomStore.removeAxiom(terminology, axiom);
@@ -125,29 +129,7 @@ public class SemanticOnlyExtractor implements Extractor {
 		return qbfChecks;
 	}
 
-	public static void main(String[] args) throws IOException {
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/semantic-only/GRO_CPGA-core");
 
-
-		SemanticOnlyExtractor syntactic = new SemanticOnlyExtractor(ont);
-		SemanticOnlyExtractor semantic = new SemanticOnlyExtractor(ont);
-
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-
-		for (int i = 0; i < 100 ; i++) {
-			Set<OWLEntity> sig = gen.generateRandomSignature(10);
-			System.out.println(sig);
-			Set<OWLLogicalAxiom> module = syntactic.extractModule(sig);
-			Set<OWLLogicalAxiom> module2 = semantic.extractModule(sig);
-			System.out.println("Same module?: " + module.equals(module2));
-			System.out.println("Module: " + module.size());
-		}
-
-
-		//		System.out.println(sig);
-		//		Set<OWLLogicalAxiom> module = extractor.extractModule(sig);
-		//		System.out.println("|M|: " + module);
-	}
 
 
 
