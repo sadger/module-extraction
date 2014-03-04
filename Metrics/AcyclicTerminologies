@@ -1,0 +1,81 @@
+ADW-converted
+Axioms: 357
+== Axiom Types ==
+⊑ :357
+== Expression Types ==
+Nominal:62
+⊓:60
+Class:715
+
+BRIDG
+Axioms: 4382
+== Axiom Types ==
+⊑ :276
+DifferentIndividuals:2
+DatatypeDefinition:1
+InverseObjectProperties:333
+ObjectPropertyDomain:973
+ClassAssertion:245
+DisjointObjectProperties:1
+DisjointClasses:30
+ObjectPropertyRange:974
+SubObjectPropertyOf:1308
+ObjectPropertyAssertion:239
+== Expression Types ==
+Class:2824
+⊓:215
+ObjectMaxCardinality:967
+ObjectMinCardinality:1305
+
+LiPrO-converted
+Axioms: 714
+== Axiom Types ==
+≡ :268
+⊑ :446
+== Expression Types ==
+ObjectMinCardinality:5
+⊓:515
+Class:3487
+∃:364
+⊔:356
+ObjectMaxCardinality:4
+ObjectExactCardinality:257
+∀:268
+¬:1
+
+NatPrO-converted
+Axioms: 9458
+== Axiom Types ==
+⊑ :9458
+== Expression Types ==
+ObjectExactCardinality:1
+ObjectMinCardinality:1
+∃:2
+⊔:1
+⊓:2539
+∀:8
+Class:21822
+
+ONSTR-converted
+Axioms: 1395
+== Axiom Types ==
+≡ :167
+⊑ :1228
+== Expression Types ==
+¬:1
+⊔:108
+Class:3385
+⊓:312
+∃:402
+
+OPB.properties-converted
+Axioms: 676
+== Axiom Types ==
+⊑ :676
+== Expression Types ==
+∃:4
+⊓:91
+Class:1456
+ObjectMinCardinality:3
+ObjectExactCardinality:96
+ObjectMaxCardinality:1
