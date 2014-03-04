@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
@@ -16,6 +17,7 @@ import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.ontologyutils.expressions.ELValidator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
+import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 public class MultipleExperiments {
 
@@ -37,20 +39,27 @@ public class MultipleExperiments {
 
 
 
+
 		int experimentCount = 1;
 		for(File f : files){
 			if(f.isFile()){
 
-				System.out.println("Experment " + experimentCount + ": " + f.getName());
-
-				Set<OWLEntity> sig = sigManager.readFile(f.getName());
-				experiment.performExperiment(sig,f);
-
+				System.out.println("Experiment " + experimentCount + ": " + f.getName());
+				experimentCount++;
 				//New folder in result location - same name as sig file
 				File experimentLocation = new File(newResultFolder.getAbsoluteFile() + "/" + f.getName());
 				if(!experimentLocation.exists()){
 					experimentLocation.mkdir();
 				}
+				
+				if(new File(experimentLocation.getAbsolutePath() + "/experiment-results").exists()){
+					System.out.println("Experiment results already exists - skipping");
+					continue;
+				}
+
+				Set<OWLEntity> sig = sigManager.readFile(f.getName());
+				experiment.performExperiment(sig,f);
+
 
 				//Save the signature with the experiment
 				SigManager managerWriter = new SigManager(experimentLocation);
@@ -58,7 +67,7 @@ public class MultipleExperiments {
 
 				//Write any metrics
 				experiment.writeMetrics(experimentLocation);
-				experimentCount++;
+
 			}
 		}
 	}
@@ -107,34 +116,25 @@ public class MultipleExperiments {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
 
-		File ontloc = new File(ModulePaths.getOntologyLocation() + "/NCI/Profile/NCI-star.owl");
 
-//		String[] ontologies = {"NCI-star.owl", "NCI-star-inc.owl", "NCI-star-equiv.owl"};
 
-		int[] intervals = {100,250,500,750,1000};
-		int[] roles = {0,50,25,75,100};
 
-		OWLOntology ont = null;
-		
-		ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath());
-		for(int r : roles){
-			for(int i : intervals){
-				MultipleExperiments multi = new MultipleExperiments();
-				multi.runExperiments(ont, 
-						new File(ModulePaths.getSignatureLocation() + "/womo-new/RandomSignatures/" + ontloc.getName() + "/role-" + r + "/size-" + i), 
-						new SemanticOnlyComparison(ont, ontloc));				
-			}
-		}
-
-		ont = null;
 		
 
 
+		File ontLoc = new File(ModulePaths.getOntologyLocation() + "/Thesaurus_08.09d.OWL-QBF");
+
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontLoc.getAbsolutePath());
 
 
+	
+		MultipleExperiments multi = new MultipleExperiments();
+		multi.runExperiments(ont, 
+				new File(ModulePaths.getSignatureLocation() + "/qbf-only/AxiomSignatures/" + ontLoc.getName()),
+				new SemanticOnlyComparison(ont, ontLoc));
+		
 
-
-}
+	}
 
 
 
