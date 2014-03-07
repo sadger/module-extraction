@@ -8,9 +8,10 @@ import org.junit.runners.Suite.SuiteClasses;
 import static org.junit.Assert.*;
 
 import dependencies.SyntacticDependencyTests;
+import extractions.ExtractionTests;
 
 @RunWith(Suite.class)
-@SuiteClasses({SyntacticDependencyTests.class})
+@SuiteClasses({SyntacticDependencyTests.class, ExtractionTests.class})
 
 public class ModuleExtractionTests {
 
