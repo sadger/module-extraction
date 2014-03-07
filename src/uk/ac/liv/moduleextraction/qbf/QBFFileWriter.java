@@ -46,10 +46,11 @@ public class QBFFileWriter {
 	private File qbfFile;
 
 
-	public QBFFileWriter(Set<OWLLogicalAxiom> ontology, Set<OWLEntity> signatureAndSigM) {
+	public QBFFileWriter(Set<OWLLogicalAxiom> ontology, Set<OWLEntity> signatureAndSigM) throws IOException {
 		File directoryToWrite = new File("/tmp/");
-		this.qbfFile = new File(directoryToWrite + "/qbf" + System.currentTimeMillis() + ".qdimacs");
+		//this.qbfFile = new File(directoryToWrite + "/qbf" + System.currentTimeMillis() + ".qdimacs");
 
+		this.qbfFile = File.createTempFile("qbf", ".qdimacs",directoryToWrite);
 		this.ontology = ontology;
 		this.signature = new HashSet<OWLEntity>(signatureAndSigM);
 		this.classesNotInSignature = new HashSet<OWLEntity>();

@@ -22,13 +22,21 @@ public class WriteRandomSigs {
 	
 	public WriteRandomSigs(OWLOntology ont, File loc) {
 		this.location = loc;
+		if(!loc.exists()){
+			loc.mkdirs();
+		}
 		this.ontology = ont;
 		this.sigGen = new  SignatureGenerator(ontology.getLogicalAxioms());
 	}
 	
 	
 	public void writeSignatureWithRoles(int sigSize, double rolePercentage, int numberOfTests){
-		SigManager sigManager = new SigManager(location);
+		
+		File rolePct = new File(location.getAbsolutePath() + "/role-" + ((int) rolePercentage) + "/size-" + sigSize);
+		if(!rolePct.exists()){
+			rolePct.mkdirs();
+		}
+		SigManager sigManager = new SigManager(rolePct);
 		
 		
 		for(int i=1; i<=numberOfTests; i++){
@@ -63,23 +71,25 @@ public class WriteRandomSigs {
 		}
 		System.out.println("Written " + numberOfTests + " signatures");
 	}
-       
+
 	public static void main(String[] args) {
-		try{
-			BufferedReader br = new BufferedReader(new FileReader(ModulePaths.getSignatureLocation() + "NewIteratingExperiments/acyclic-supported-no-nci"));
-			String line;
-			while ((line = br.readLine()) != null) {
-			   File ontologyLocation = new File(line);
-			   System.out.println(ontologyLocation.getName());
-			   OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ontologyLocation.getAbsolutePath());
-			   WriteRandomSigs writer =  new WriteRandomSigs(ontology, new File(ModulePaths.getSignatureLocation() + "/NewIteratingExperiments/" + ontologyLocation.getName()));
-			   int percentage = (int) Math.round(Math.min(ModuleUtils.getCoreSize(ontology.getLogicalAxioms()) * 0.1, 1000));
-			   writer.writeSignature(percentage, 200);
-			   ontology.getOWLOntologyManager().removeOntology(ontology);
+		File ontloc = new File(ModulePaths.getOntologyLocation() + "/NCI/Profile/NCI-star.owl");
+		int[] intervals = {100,250,500,750,1000};
+		double[] roles = {0,25,50,75,100};
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath());
+		WriteRandomSigs writer = new WriteRandomSigs(
+				ont, 
+				new File(ModulePaths.getSignatureLocation() + "/womo-new/RandomSignatures/" + ontloc.getName()));
+		
+		for(int i : intervals){
+			for(double r : roles){
+				writer.writeSignatureWithRoles(i, r, 200);
 			}
-			br.close();
-		}catch(IOException e){
-			e.printStackTrace();
 		}
+
+		
+
+		
+		
 	}
 }

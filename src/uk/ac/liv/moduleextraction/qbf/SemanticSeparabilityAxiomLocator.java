@@ -8,17 +8,19 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
+import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
-public class SeparabilityAxiomLocator {
+public class SemanticSeparabilityAxiomLocator {
 
-	Logger logger = LoggerFactory.getLogger(SeparabilityAxiomLocator.class);
+	Logger logger = LoggerFactory.getLogger(SemanticSeparabilityAxiomLocator.class);
 
 	/* Semantic Checking */
-	private LHSSigExtractor lhsExtractor = new LHSSigExtractor();
+	private ExtendedLHSSigExtractor lhsExtractor = new ExtendedLHSSigExtractor();
 	private InseperableChecker insepChecker = new InseperableChecker();
 
 	/* Data structures */
@@ -29,20 +31,20 @@ public class SeparabilityAxiomLocator {
 
 	private OWLLogicalAxiom[] axiomList;
 
-	private ChainDependencies termDependencies; 
-	
-	public SeparabilityAxiomLocator(List<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> mod, Set<OWLEntity> sig, 
-			ChainDependencies dependencies) throws IOException, QBFSolverException{
-		this.module = mod;
-		this.axiomList = term.toArray(new OWLLogicalAxiom[term.size()]);
+	private AxiomDependencies termDependencies; 
+	//	
+	//	public SemanticSeparabilityAxiomLocator(List<OWLLogicalAxiom> term, Set<OWLLogicalAxiom> mod, Set<OWLEntity> sig, 
+	//			ChainDependencies dependencies) throws IOException, QBFSolverException{
+	//		this.module = mod;
+	//		this.axiomList = term.toArray(new OWLLogicalAxiom[term.size()]);
+	//
+	//		this.sigUnionSigM = sig;
+	//		
+	//		this.termDependencies = dependencies;
+	//		sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(module));
+	//	}
 
-		this.sigUnionSigM = sig;
-		
-		this.termDependencies = dependencies;
-		sigUnionSigM.addAll(ModuleUtils.getClassAndRoleNamesInSet(module));
-	}
-
-	public SeparabilityAxiomLocator(OWLLogicalAxiom[] subsetAsArray,Set<OWLEntity> sigUnionSigM2, ChainDependencies dependT) {
+	public SemanticSeparabilityAxiomLocator(OWLLogicalAxiom[] subsetAsArray,Set<OWLEntity> sigUnionSigM2, AxiomDependencies dependT) {
 		this.axiomList = subsetAsArray;
 		this.sigUnionSigM = sigUnionSigM2;
 		this.termDependencies = dependT;
@@ -60,16 +62,11 @@ public class SeparabilityAxiomLocator {
 		while(lastAdded.length > 0){
 
 			Collection<OWLLogicalAxiom> toCheck = null;
-         
-			/* If we are doing syntactic and semantic rules we can generate dependT - it doesn't work currently
-			 * with shared names or repeated equalities in ontologies.*/
-            if(termDependencies != null){
-        		toCheck = lhsExtractor.getLHSSigAxioms(Arrays.asList(W), sigUnionSigM, termDependencies);
-            }
-            else{
-            	toCheck = Arrays.asList(W);
-            }
-	
+
+
+			toCheck = Arrays.asList(W); //lhsExtractor.getLHSSigAxioms(Arrays.asList(W), sigUnionSigM, termDependencies);
+
+
 			checkCount++;
 
 			/* If inseperable */
@@ -98,7 +95,7 @@ public class SeparabilityAxiomLocator {
 
 			}
 		}
-		
+
 		return  axiomList[W.length];
 	}
 

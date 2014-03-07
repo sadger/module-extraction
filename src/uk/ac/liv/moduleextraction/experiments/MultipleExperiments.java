@@ -1,27 +1,23 @@
 package uk.ac.liv.moduleextraction.experiments;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 import uk.ac.liv.moduleextraction.extractor.NotEquivalentToTerminologyException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
+import uk.ac.liv.ontologyutils.expressions.ELValidator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
+import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 public class MultipleExperiments {
 
@@ -30,7 +26,7 @@ public class MultipleExperiments {
 
 	public void runExperiments(OWLOntology ontology, File signaturesLocation, Experiment experimentType) throws IOException{
 		this.experiment = experimentType;
-		
+
 		Experiment experiment = experimentType;
 		SigManager sigManager = new SigManager(signaturesLocation);
 		File[] files = signaturesLocation.listFiles();
@@ -41,22 +37,29 @@ public class MultipleExperiments {
 		File newResultFolder = copyDirectoryStructure(signaturesLocation, "Signatures",new File(ModulePaths.getResultLocation()));
 
 
-		
+
+
 
 		int experimentCount = 1;
 		for(File f : files){
 			if(f.isFile()){
 
-				System.out.println("Experment " + experimentCount + ": " + f.getName());
-
-				Set<OWLEntity> sig = sigManager.readFile(f.getName());
-				experiment.performExperiment(sig,f);
-
+				System.out.println("Experiment " + experimentCount + ": " + f.getName());
+				experimentCount++;
 				//New folder in result location - same name as sig file
 				File experimentLocation = new File(newResultFolder.getAbsoluteFile() + "/" + f.getName());
 				if(!experimentLocation.exists()){
 					experimentLocation.mkdir();
 				}
+				
+				if(new File(experimentLocation.getAbsolutePath() + "/experiment-results").exists()){
+					System.out.println("Experiment results already exists - skipping");
+					continue;
+				}
+
+				Set<OWLEntity> sig = sigManager.readFile(f.getName());
+				experiment.performExperiment(sig,f);
+
 
 				//Save the signature with the experiment
 				SigManager managerWriter = new SigManager(experimentLocation);
@@ -64,7 +67,7 @@ public class MultipleExperiments {
 
 				//Write any metrics
 				experiment.writeMetrics(experimentLocation);
-				experimentCount++;
+
 			}
 		}
 	}
@@ -90,7 +93,7 @@ public class MultipleExperiments {
 			source = source.getParentFile();
 		}
 
-		//Build the path from the start of the destinated using the pushed directory names2
+		//Build the path from the start of the destinated using the pushed directory names
 		String target = destination.getAbsolutePath();
 		while(!directoriesToWrite.isEmpty()){
 			target = target + "/" + directoriesToWrite.pop();
@@ -106,39 +109,30 @@ public class MultipleExperiments {
 			System.out.println("Making directory: " + targetFile.getAbsolutePath());
 			targetFile.mkdirs();
 		}
-		
+
 
 		return targetFile;
 	} 
 
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
 
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		try{
-			BufferedReader br = new BufferedReader(new FileReader(ModulePaths.getSignatureLocation() + "NewIteratingExperiments/acyclic-supported-no-nci"));
-			String line;
-			while ((line = br.readLine()) != null) {
-			   File ontologyLocation = new File(line);
-			   System.out.println(ontologyLocation.getName());
-			   OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ontologyLocation.getAbsolutePath());
-			   Set<OWLAxiom> logicalAxioms = new HashSet<OWLAxiom>();
-			   for(OWLLogicalAxiom axiom : ontology.getLogicalAxioms()){
-				   logicalAxioms.add(axiom);
-			   }
-			   OWLOntology logicalOntology = ontology.getOWLOntologyManager().createOntology(logicalAxioms);
-			   ontology = null;
-			   new MultipleExperiments().runExperiments(
-					   logicalOntology, 
-					   new File(ModulePaths.getSignatureLocation() + "/NewIteratingEvaluation/AxiomSignatures/" + ontologyLocation.getName()), 
-					   new IteratingModuleInspector(logicalOntology));
-			  
-			  
-			   logicalOntology = null;
-			}
-			br.close();
-		}catch(IOException e){
-			e.printStackTrace();
-		}
+
+
+
+		
+
+
+		File ontLoc = new File(ModulePaths.getOntologyLocation() + "/Thesaurus_08.09d.OWL-QBF");
+
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontLoc.getAbsolutePath());
+
+
+	
+		MultipleExperiments multi = new MultipleExperiments();
+		multi.runExperiments(ont, 
+				new File(ModulePaths.getSignatureLocation() + "/qbf-only/AxiomSignatures/" + ontLoc.getName()),
+				new SemanticOnlyComparison(ont, ontLoc));
+		
 
 	}
 

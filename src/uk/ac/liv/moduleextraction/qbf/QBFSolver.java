@@ -90,12 +90,15 @@ public class QBFSolver {
 		try{
 			exitValue = proc.exitValue();
 			/* Delete the qbf file */
-			//qbfFile.delete();
+			qbfFile.delete();
 		}
 		catch(IllegalThreadStateException t){
 			t.printStackTrace();
 		}
 		finally{
+			if(qbfFile.exists()){
+				System.out.println("WARNING: QBF File not deleted");
+			}
 			proc.destroy();
 		}
 	
