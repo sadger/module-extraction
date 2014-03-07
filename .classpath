@@ -12,5 +12,6 @@
 	<classpathentry kind="var" path="JAR_LOCATION/commons-cli-1.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ontologyutils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/propositional"/>
+	<classpathentry kind="var" path="JAR_LOCATION/junit-4.11.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
