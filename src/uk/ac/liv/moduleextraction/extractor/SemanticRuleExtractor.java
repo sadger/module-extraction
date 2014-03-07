@@ -2,6 +2,7 @@ package uk.ac.liv.moduleextraction.extractor;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,6 +46,10 @@ public class SemanticRuleExtractor implements Extractor{
 	
 	
 	public SemanticRuleExtractor(OWLOntology ontology) {
+		this(ontology.getLogicalAxioms());
+	}
+	
+	public SemanticRuleExtractor(Set<OWLLogicalAxiom> ontology){
 		dependT = new ChainDependencies(ontology);
 		axiomStore = new DefinitorialAxiomStore(dependT.getSortedAxioms());
 		
@@ -53,7 +58,7 @@ public class SemanticRuleExtractor implements Extractor{
 		inseperableChecker = new InseperableChecker();
 	}
 	
-
+	
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) {
 		return extractModule(new HashSet<OWLLogicalAxiom>(), signature);
