@@ -133,5 +133,11 @@ public class AxiomDependencyGeneration {
 		a2depends.add(c);
 		a2depends.add(e);
 		assertTrue("A axiom 2 depends",dependencies.get(asub2).equals(a2depends));
+		
+		DependencySet bdepends = new DependencySet();
+		bdepends.add(c);
+		bdepends.add(d);
+		bdepends.add(e);
+		assertTrue("B axiom depends",dependencies.get(bsub3).equals(bdepends));
 	}
 }

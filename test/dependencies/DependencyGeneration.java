@@ -33,10 +33,8 @@ public class DependencyGeneration {
 		OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms("TestData/dependencies/simple-dependencies.krss");
 		ModuleUtils.remapIRIs(ontology, "X");
 		
-		DefinitorialDepth definitorialDepth = new DefinitorialDepth(ontology);
-		ArrayList<OWLLogicalAxiom> depthSortedAxioms = definitorialDepth.getDefinitorialSortedList();
-		ChainDependencies dependT = new ChainDependencies();
-		dependT.updateDependenciesWith(depthSortedAxioms);
+		ChainDependencies dependT = new ChainDependencies(ontology);
+
 		OWLDataFactory factory = OWLManager.getOWLDataFactory();
 
 		OWLClass a = factory.getOWLClass(IRI.create("X#A"));

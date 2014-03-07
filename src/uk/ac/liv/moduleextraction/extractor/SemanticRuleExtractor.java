@@ -45,12 +45,8 @@ public class SemanticRuleExtractor implements Extractor{
 	
 	
 	public SemanticRuleExtractor(OWLOntology ontology) {
-		DefinitorialDepth definitorialDepth = new DefinitorialDepth(ontology);
-		// You MUST sort axioms to calculate dependencies properly 
-		ArrayList<OWLLogicalAxiom> depthSortedAxioms = definitorialDepth.getDefinitorialSortedList();
-		dependT = new ChainDependencies();
-		dependT.updateDependenciesWith(depthSortedAxioms);
-		axiomStore = new DefinitorialAxiomStore(depthSortedAxioms);
+		dependT = new ChainDependencies(ontology);
+		axiomStore = new DefinitorialAxiomStore(dependT.getSortedAxioms());
 		
 		syntacticDependencyChecker = new SyntacticDependencyChecker();
 		lhsExtractor = new LHSSigExtractor();

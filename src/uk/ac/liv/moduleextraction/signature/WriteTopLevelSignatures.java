@@ -23,12 +23,7 @@ public class WriteTopLevelSignatures {
 	public WriteTopLevelSignatures(OWLOntology ont, File location) {
 		this.ontology = ont;
 		this.location = location;
-		
-		DefinitorialDepth definitorialDepth = new DefinitorialDepth(ont.getLogicalAxioms());
-		ArrayList<OWLLogicalAxiom> terminology = definitorialDepth.getDefinitorialSortedList();
-		
-		d = new ChainDependencies();
-		d.updateDependenciesWith(terminology);
+		d = new ChainDependencies(ont);
 	}
 	
 	public void writeSignatures(){
