@@ -154,8 +154,62 @@ public class ExtractionTests {
 		
 		
 		Set<OWLLogicalAxiom> module = extractor.extractModule(signature);
-		System.out.println(module);
 		
 		assertTrue("Extraction whole ontology", module.equals(expectedModule));
 	}
+	
+	@Test
+	public void alcNCIExtraction(){
+		//Constructing classes and axioms
+		OWLDataFactory factory = OWLManager.getOWLDataFactory();
+		OWLClass renal = factory.getOWLClass(IRI.create("X#Renal_Pelvis_and_U"));
+		OWLClass kidney = factory.getOWLClass(IRI.create("X#K_and_U"));
+		OWLClass kidney_neo = factory.getOWLClass(IRI.create("X#K_and_U_Neoplasm"));
+		OWLClass ut_neo = factory.getOWLClass(IRI.create("X#U_T_Neoplasm"));
+		OWLClass malignant = factory.getOWLClass(IRI.create("X#Malignant_Cell"));
+		OWLClass mal_ut_neo = factory.getOWLClass(IRI.create("X#Malignant_U_T_Neoplasm"));
+		OWLClass ben_ut_neo = factory.getOWLClass(IRI.create("X#Benign_U_T_Neoplasm"));
+		
+		OWLObjectProperty partOf = factory.getOWLObjectProperty(IRI.create("X#partOf"));
+		OWLObjectProperty hasSite = factory.getOWLObjectProperty(IRI.create("X#hasSite"));
+		OWLObjectProperty hasAbnCell = factory.getOWLObjectProperty(IRI.create("X#hasAbnCell"));
+		OWLObjectProperty excludesAbnCell = factory.getOWLObjectProperty(IRI.create("X#excludesAbnCell"));
+		
+		OWLSubClassOfAxiom renal_inc = factory.getOWLSubClassOfAxiom(renal, factory.getOWLObjectSomeValuesFrom(partOf, kidney));
+		OWLEquivalentClassesAxiom kidney_eq = 
+				factory.getOWLEquivalentClassesAxiom(kidney_neo,
+						factory.getOWLObjectIntersectionOf(ut_neo,factory.getOWLObjectAllValuesFrom(hasSite, kidney)));
+		OWLEquivalentClassesAxiom mal_ut_eq = 
+				factory.getOWLEquivalentClassesAxiom(mal_ut_neo,
+						factory.getOWLObjectIntersectionOf(ut_neo,factory.getOWLObjectAllValuesFrom(hasAbnCell, malignant)));
+		OWLEquivalentClassesAxiom ben_ut_eq = 
+				factory.getOWLEquivalentClassesAxiom(ben_ut_neo,
+						factory.getOWLObjectIntersectionOf(ut_neo,factory.getOWLObjectAllValuesFrom(excludesAbnCell, malignant)));
+		
+		//Constructing ontology and signature
+		Set<OWLLogicalAxiom> ontology = new HashSet<OWLLogicalAxiom>();
+		ontology.add(renal_inc);
+		ontology.add(kidney_eq);
+		ontology.add(mal_ut_eq);
+		ontology.add(ben_ut_eq);
+		
+		HashSet<OWLEntity> signature = new HashSet<OWLEntity>();
+		signature.add(renal);
+		signature.add(mal_ut_neo);
+		signature.add(kidney_neo);
+		
+		HashSet<OWLLogicalAxiom> expectedModule = new HashSet<OWLLogicalAxiom>();
+		expectedModule.add(renal_inc);
+		expectedModule.add(kidney_eq);
+		expectedModule.add(mal_ut_eq);
+		
+
+		//Extraction testing 
+		SemanticRuleExtractor extractor = new SemanticRuleExtractor(ontology);
+		assertTrue("Module extraction",extractor.extractModule(signature).equals(expectedModule));
+		
+		
+		
+	}
+
 }
