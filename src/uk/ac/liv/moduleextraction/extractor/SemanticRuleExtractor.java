@@ -14,8 +14,10 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
+import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
@@ -26,12 +28,13 @@ import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 public class SemanticRuleExtractor implements Extractor{
 
-	private ChainDependencies dependT;
+	private AxiomDependencies dependencies;
 	private Set<OWLLogicalAxiom> module;
 	private Set<OWLEntity> sigUnionSigM;
 	private SyntacticDependencyChecker syntacticDependencyChecker;
 	private DefinitorialAxiomStore axiomStore;
-	private LHSSigExtractor lhsExtractor;
+	
+	private ExtendedLHSSigExtractor eLHSExtractor;
 	private InseperableChecker inseperableChecker;
 	
 	private long syntacticChecks = 0; // A syntactic iteration (total checks = this + qbfchecks)
@@ -44,17 +47,18 @@ public class SemanticRuleExtractor implements Extractor{
 			
 
 	
-	
 	public SemanticRuleExtractor(OWLOntology ontology) {
 		this(ontology.getLogicalAxioms());
 	}
 	
 	public SemanticRuleExtractor(Set<OWLLogicalAxiom> ontology){
-		dependT = new ChainDependencies(ontology);
-		axiomStore = new DefinitorialAxiomStore(dependT.getSortedAxioms());
+
+		dependencies = new AxiomDependencies(ontology);
+		axiomStore = new DefinitorialAxiomStore(dependencies.getDefinitorialSortedAxioms());
 		
 		syntacticDependencyChecker = new SyntacticDependencyChecker();
-		lhsExtractor = new LHSSigExtractor();
+		
+		eLHSExtractor = new ExtendedLHSSigExtractor();
 		inseperableChecker = new InseperableChecker();
 	}
 	
@@ -110,7 +114,9 @@ public class SemanticRuleExtractor implements Extractor{
 	private void applyRules(boolean[] terminology) throws IOException, QBFSolverException{
 		applySyntacticRule(terminology);
 		
-		HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(axiomStore.getSubsetAsList(terminology),sigUnionSigM,dependT);
+		HashSet<OWLLogicalAxiom> lhsSigT = eLHSExtractor.getLHSSigAxioms(axiomStore.getSubsetAsList(terminology), sigUnionSigM, dependencies);
+		//HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(axiomStore.getSubsetAsList(terminology),sigUnionSigM,dependT);
+		
 		qbfChecks++;
 		if(inseperableChecker.isSeperableFromEmptySet(lhsSigT, sigUnionSigM)){
 			OWLLogicalAxiom insepAxiom = findSeparableAxiom(terminology);
@@ -126,7 +132,7 @@ public class SemanticRuleExtractor implements Extractor{
 			throws IOException, QBFSolverException {
 		
 		separabilityChecks++;
-		SeparabilityAxiomLocator search = new SeparabilityAxiomLocator(axiomStore.getSubsetAsArray(terminology),sigUnionSigM,dependT);
+		SeparabilityAxiomLocator search = new SeparabilityAxiomLocator(axiomStore.getSubsetAsArray(terminology),sigUnionSigM,dependencies);
 		OWLLogicalAxiom insepAxiom = search.getInseperableAxiom();
 		logger.debug("Adding (semantic): {}", insepAxiom);
 		qbfChecks += search.getCheckCount();
@@ -145,7 +151,7 @@ public class SemanticRuleExtractor implements Extractor{
 					
 					OWLLogicalAxiom chosenAxiom = axiomStore.getAxiom(i);
 					syntacticChecks++;
-					if(syntacticDependencyChecker.hasSyntacticSigDependency(chosenAxiom, dependT, sigUnionSigM)){
+					if(syntacticDependencyChecker.hasSyntacticSigDependency(chosenAxiom, dependencies, sigUnionSigM)){
 						
 						change = true;
 						module.add(chosenAxiom);

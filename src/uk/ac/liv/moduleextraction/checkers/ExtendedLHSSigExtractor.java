@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -42,14 +43,19 @@ public class ExtendedLHSSigExtractor {
 		this.dependencies = dependT;
 		HashSet<OWLLogicalAxiom> lhsSigT = new HashSet<OWLLogicalAxiom>();
 		generateSignatureDependencies(axiomStore.getSubsetAsList(terminology), sigUnionSigM);
-		//Set<OWLClass> sharedOrRepeated = getSharedOrRepeatedNames(axiomStore.getSubsetAsList(terminology));
+		Set<OWLClass> sharedOrRepeated = getSharedOrRepeatedNames(axiomStore.getSubsetAsList(terminology));
 
 		for (int i = 0; i < terminology.length; i++) {
 			if(terminology[i]){
 				OWLLogicalAxiom axiom = axiomStore.getAxiom(i);
-				OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
-				if(sigUnionSigM.contains(name) || isInSigDependencies(name)){
+				if(!isInclusionOrEquation(axiom)){
 					lhsSigT.add(axiom);
+				}
+				else{
+					OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
+					if(sigUnionSigM.contains(name) || isInSigDependencies(name) || sharedOrRepeated.contains(name)){
+						lhsSigT.add(axiom);
+					}
 				}
 			}
 		}
@@ -62,8 +68,8 @@ public class ExtendedLHSSigExtractor {
 
 		HashSet<OWLLogicalAxiom> lhsSigT = new HashSet<OWLLogicalAxiom>();
 		this.dependencies = depends;
-		
-		
+
+
 		generateSignatureDependencies(sortedOntology, sigUnionSigM);
 		for(OWLLogicalAxiom axiom : sortedOntology){
 			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
@@ -113,6 +119,10 @@ public class ExtendedLHSSigExtractor {
 
 	}
 
+	private boolean isInclusionOrEquation(OWLLogicalAxiom axiom){
+		return (axiom.getAxiomType() == AxiomType.SUBCLASS_OF || axiom.getAxiomType() == AxiomType.EQUIVALENT_CLASSES);
+	}
+
 	public static void main(String[] args) {
 		File ontloc = new File(ModulePaths.getOntologyLocation() + "/semantic-only/Genomic-CDS-core");
 		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath());
@@ -125,7 +135,7 @@ public class ExtendedLHSSigExtractor {
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
 		Set<OWLEntity> sig = gen.generateRandomSignature(75);
 
-		System.out.println("Sig: " + sig);
+		System.out.println("Sig: " + sig.size());
 		Set<OWLLogicalAxiom> lhs = extractor.getLHSSigAxioms(store.allAxiomsAsBoolean(), store, sig, dependencies);
 		System.out.println("LHS: " + lhs.size());
 	}

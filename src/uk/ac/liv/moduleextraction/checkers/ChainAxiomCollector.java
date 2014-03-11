@@ -6,6 +6,7 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
+import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
 
@@ -16,7 +17,7 @@ public class ChainAxiomCollector {
 
 	}
 
-	public Set<OWLLogicalAxiom> collectAxiomChain(boolean[] terminology, int currentIndex, DefinitorialAxiomStore axiomStore, ChainDependencies dependT, Set<OWLEntity> sigUnionSigM) {
+	public Set<OWLLogicalAxiom> collectAxiomChain(boolean[] terminology, int currentIndex, DefinitorialAxiomStore axiomStore, AxiomDependencies dependT, Set<OWLEntity> sigUnionSigM) {
 		SyntacticDependencyChecker checker = new SyntacticDependencyChecker();
 		Set<OWLLogicalAxiom> chain = new HashSet<OWLLogicalAxiom>();
 
