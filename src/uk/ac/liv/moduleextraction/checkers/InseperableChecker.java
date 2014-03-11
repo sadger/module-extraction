@@ -3,6 +3,7 @@ package uk.ac.liv.moduleextraction.checkers;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
@@ -32,7 +33,7 @@ public class InseperableChecker {
 		if(!w.isEmpty()){
 			InverseRolePropertyReplacer replacer = new InverseRolePropertyReplacer();
 			//Remove inverse roles from the QBF problem
-			QBFFileWriter writer = new QBFFileWriter(replacer.convert(w),signatureAndSigM);
+			QBFFileWriter writer = new QBFFileWriter(new HashSet<OWLLogicalAxiom>(w),signatureAndSigM);
 			
 			/* An empty clause set need not be checked - in fact the QBF solver complains about
 			 * and empty problem*/

@@ -117,21 +117,19 @@ public class MultipleExperiments {
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
 
 
-
-
-		
-
-
 		File ontLoc = new File(ModulePaths.getOntologyLocation() + "/Thesaurus_08.09d.OWL-QBF");
 
 		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontLoc.getAbsolutePath());
 
-
-	
 		MultipleExperiments multi = new MultipleExperiments();
-		multi.runExperiments(ont, 
-				new File(ModulePaths.getSignatureLocation() + "/qbf-only/AxiomSignatures/" + ontLoc.getName()),
-				new SemanticOnlyComparison(ont, ontLoc));
+		int[] intervals = {100,250,500,750,1000};
+		String rolepct = args[0];
+		for(int i : intervals){
+			multi.runExperiments(ont, 
+					new File(ModulePaths.getSignatureLocation() + "/qbf-only/RandomSignatures/" + ontLoc.getName() + "/role-" + rolepct + "/size-" + i),
+					new SemanticOnlyComparison(ont, ontLoc));
+		}
+
 		
 
 	}

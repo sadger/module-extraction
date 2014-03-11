@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
@@ -16,6 +17,8 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+
+import com.google.common.base.Stopwatch;
 
 import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.extractor.SemanticOnlyExtractor;
@@ -38,6 +41,8 @@ public class SemanticOnlyComparison implements Experiment {
 	private Set<OWLEntity> refsig;
 	static Set<OWLLogicalAxiom> differences = new HashSet<OWLLogicalAxiom>();
 	static int total = 0;
+	private Stopwatch semanticStopwatch;
+	private Stopwatch hybridStopwatch;
 
 	public SemanticOnlyComparison(OWLOntology ont, File originalLocation) {
 		this.ontology = ont;
@@ -50,13 +55,17 @@ public class SemanticOnlyComparison implements Experiment {
 		starIterExperiment = 
 				new NewIteratingExperiment(ontology,originalLocation);
 
-
+		hybridStopwatch = new Stopwatch().start();
 		starIterExperiment.performExperiment(signature);
+		hybridStopwatch.stop();
+		
 		Set<OWLLogicalAxiom> hybridModule = starIterExperiment.getHybridModule();
+		
 
+		semanticStopwatch = new Stopwatch().start();
 		semanticExtractor = new SemanticOnlyExtractor(hybridModule);
 		semanticModule = semanticExtractor.extractModule(signature);
-
+		semanticStopwatch.stop();
 
 
 	}
@@ -76,9 +85,11 @@ public class SemanticOnlyComparison implements Experiment {
 
 		int qbfSmaller = (semanticModule.size() < starIterExperiment.getHybridModule().size()) ? 1 : 0;
 
-		writer.write("StarSize, HybridSize, QBFSize, QBFSmaller, QBFChecks, SignatureLocation" + "\n");
+		writer.write("StarSize, HybridSize, QBFSize, QBFSmaller, QBFChecks, TimeHybrid, TimeQBF, SignatureLocation" + "\n");
 		writer.write(starIterExperiment.getStarSize() + "," + starIterExperiment.getIteratedSize() + 
-				"," + semanticModule.size() + "," + String.valueOf(qbfSmaller) + "," + semanticExtractor.getQBFCount() + 
+				"," + semanticModule.size() + "," + String.valueOf(qbfSmaller) + "," 
+				+ semanticStopwatch.elapsed(TimeUnit.MILLISECONDS) + "," + hybridStopwatch.elapsed(TimeUnit.MILLISECONDS) + 
+				"," + semanticExtractor.getQBFCount() + 
 				"," + sigLocation.getAbsolutePath() + "\n");
 
 		writer.flush();
@@ -92,6 +103,9 @@ public class SemanticOnlyComparison implements Experiment {
 		System.out.println(starIterExperiment.getStarSize() + "," + starIterExperiment.getIteratedSize() + 
 				"," + semanticModule.size());
 
+
+		System.out.println("Hybrid time:" + hybridStopwatch.elapsed(TimeUnit.MILLISECONDS));
+		System.out.println("Semantic time:" + semanticStopwatch.elapsed(TimeUnit.MILLISECONDS));
 		System.out.println();
 		//System.out.println("Signature:" + refsig);
 
@@ -105,6 +119,8 @@ public class SemanticOnlyComparison implements Experiment {
 		//			System.out.println(ax);
 		//		}
 
+		
+		System.out.println("QBF checks: " + semanticExtractor.getQBFCount());
 		Set<OWLEntity> qbfSig = ModuleUtils.getClassAndRoleNamesInSet(semanticModule);
 		qbfSig.addAll(refsig);
 
@@ -139,42 +155,31 @@ public class SemanticOnlyComparison implements Experiment {
 
 
 	public static void main(String[] args) throws IOException, OWLOntologyCreationException {
-
-		//		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/semantic-only/test.krss");
-
-		int role = 0;
-		int size = 100;
-		int num = 185;
-
-		String[] sigs = {
-				"nci-equiv-sig"
-		};
-
-
-
- 
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/paperexample.krss");
-		ModuleUtils.remapIRIs(ont, "X");
-		OWLDataFactory factory = OWLManager.getOWLDataFactory();
-		System.out.println(ont);
-		Set<OWLEntity> sig = new HashSet<OWLEntity>();
-		sig.add(factory.getOWLClass(IRI.create("X#Malignt_U_T_Neoplasm ")));
-		sig.add(factory.getOWLClass(IRI.create("X#Renal_Pelvis_and_U")));
-		sig.add(factory.getOWLClass(IRI.create("X#Benign_U_T_Neoplasm")));
-		SemanticOnlyComparison compare = new SemanticOnlyComparison(ont, null);
-		System.out.println("Sig size: " + sig.size());
-		System.out.println(sig);
-		//System.out.println(sig);
-		compare.performExperiment(sig);
-		compare.printMetrics();
-
-		new AMEXvsSTAR(ont).performExperiment(sig);;
 		
+		OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/qbf-only/" + "Thesaurus_08.09d.OWL-QBF");
+		SignatureGenerator gen = new SignatureGenerator(ontology.getLogicalAxioms());
 		
+		for(OWLLogicalAxiom ax : ontology.getLogicalAxioms()){
+			if(!ModuleUtils.isInclusionOrEquation(ax)){
+				System.out.println(ax);
+			}
+		}
+		
+		SemanticOnlyComparison compare = new SemanticOnlyComparison(ontology, null);
+		for (int i = 0; i < 10; i++) {
+			compare.performExperiment(gen.generateRandomSignature(1000));
+			compare.printMetrics();
+		}
+
+		
+	}
+	
+		
+	
 		
 //		System.out.println(SemanticOnlyComparison.total);
 //		System.out.println(SemanticOnlyComparison.differences.size());
 
 
-	}
+	
 }

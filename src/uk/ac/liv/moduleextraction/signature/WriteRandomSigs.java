@@ -73,13 +73,14 @@ public class WriteRandomSigs {
 	}
 
 	public static void main(String[] args) {
-		File ontloc = new File(ModulePaths.getOntologyLocation() + "/NCI/Profile/NCI-star.owl");
+		File ontloc = new File(ModulePaths.getOntologyLocation() + "/qbf-only/" + "Thesaurus_08.09d.OWL-QBF");
+
 		int[] intervals = {100,250,500,750,1000};
-		double[] roles = {0,25,50,75,100};
+		double[] roles = {0,50,100};
 		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath());
 		WriteRandomSigs writer = new WriteRandomSigs(
 				ont, 
-				new File(ModulePaths.getSignatureLocation() + "/womo-new/RandomSignatures/" + ontloc.getName()));
+				new File(ModulePaths.getSignatureLocation() + "/qbf-only/RandomSignatures/" + ontloc.getName()));
 		
 		for(int i : intervals){
 			for(double r : roles){
