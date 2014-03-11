@@ -7,11 +7,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDisjointClassesAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
 
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 import uk.ac.liv.ontologyutils.axioms.AxiomStructureInspector;
@@ -43,7 +50,11 @@ public class AxiomDependencies extends HashMap<OWLLogicalAxiom, DependencySet>{
 
 	private void calculateDependencies(){
 		for(Iterator<OWLLogicalAxiom> it = sortedAxioms.iterator(); it.hasNext();){
-			updateDependenciesWith(it.next());
+			OWLLogicalAxiom nextAxiom = it.next();
+			/* No dependencies for non-terminological axioms */
+			if(ModuleUtils.isInclusionOrEquation(nextAxiom)){
+				updateDependenciesWith(nextAxiom);
+			}
 		}	
 	}
 
@@ -53,6 +64,7 @@ public class AxiomDependencies extends HashMap<OWLLogicalAxiom, DependencySet>{
 
 		DependencySet axiomDeps = new DependencySet();
 
+		
 		addImmediateDependencies(definition,axiomDeps);
 		updateFromDefinition(name, definition, axiomDeps);
 
@@ -94,15 +106,30 @@ public class AxiomDependencies extends HashMap<OWLLogicalAxiom, DependencySet>{
 	}
 
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/axiomdep.krss");
+		//Construct expressive axioms
+		OWLDataFactory f = OWLManager.getOWLDataFactory();
+		OWLClass a = f.getOWLClass(IRI.create("X#A"));
+		OWLClass b = f.getOWLClass(IRI.create("X#B"));
+		OWLObjectProperty r = f.getOWLObjectProperty(IRI.create("X#r"));
+		OWLObjectProperty s = f.getOWLObjectProperty(IRI.create("X#s"));
+		OWLObjectPropertyRangeAxiom range = f.getOWLObjectPropertyRangeAxiom(r, b);
+		OWLDisjointClassesAxiom disjoint1 = f.getOWLDisjointClassesAxiom(a,b);
+		OWLSubObjectPropertyOfAxiom roleInc = f.getOWLSubObjectPropertyOfAxiom(r, s);
+		
+		OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms("TestData/dependencies/simple-dependencies.krss");
+		
+		Set<OWLLogicalAxiom> inputOntology = ontology.getLogicalAxioms();
+		inputOntology.add(disjoint1);
+		inputOntology.add(range);
+		inputOntology.add(roleInc);
+		
+		AxiomDefinitorialDepth d = new AxiomDefinitorialDepth(inputOntology);
 
-		AxiomDefinitorialDepth d = new AxiomDefinitorialDepth(ont);
-		List<OWLLogicalAxiom> dtSorted = d.getDefinitorialSortedList();
-		for(OWLLogicalAxiom axiom : dtSorted){
-			System.out.println(axiom);
+		for(OWLLogicalAxiom ax : d.getDefinitorialSortedList()){
+			System.out.println(d.lookup(ax) + ":" + ax);
 		}
-		AxiomDependencies depends = new AxiomDependencies(ont);
-
-		System.out.println(depends);
+			
+		AxiomDependencies depend = new AxiomDependencies(inputOntology);
+		System.out.println(depend);
 	}
 }

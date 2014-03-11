@@ -5,30 +5,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
-import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
-import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
 import uk.ac.liv.moduleextraction.checkers.ELAxiomChainCollector;
 import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
-import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
-import uk.ac.liv.moduleextraction.experiments.SemanticOnlyComparison;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
-import uk.ac.liv.moduleextraction.qbf.SemanticSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.SeparabilityAxiomLocator;
-import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 public class SemanticOnlyExtractor implements Extractor {
@@ -49,7 +36,6 @@ public class SemanticOnlyExtractor implements Extractor {
 	public SemanticOnlyExtractor(Set<OWLLogicalAxiom> ontology){
 		this.dependT = new AxiomDependencies(ontology);
 		this.axiomStore = new DefinitorialAxiomStore(dependT.getDefinitorialSortedAxioms());
-//		this.axiomStore = new DefinitorialAxiomStore(ontology);
 		this.inseparableChecker = new InseperableChecker();
 		this.chainCollector = new ELAxiomChainCollector();
 		this.lhsExtractor = new ExtendedLHSSigExtractor();
@@ -63,8 +49,8 @@ public class SemanticOnlyExtractor implements Extractor {
 	private OWLLogicalAxiom findSeparableAxiom(boolean[] terminology)
 			throws IOException, QBFSolverException {
 
-		SemanticSeparabilityAxiomLocator search = 
-				new SemanticSeparabilityAxiomLocator(axiomStore.getSubsetAsArray(terminology),sigUnionSigM,dependT);
+		SeparabilityAxiomLocator search = 
+				new SeparabilityAxiomLocator(axiomStore.getSubsetAsArray(terminology),sigUnionSigM,dependT);
 
 		OWLLogicalAxiom insepAxiom = search.getInseperableAxiom();
 		qbfChecks += search.getCheckCount();

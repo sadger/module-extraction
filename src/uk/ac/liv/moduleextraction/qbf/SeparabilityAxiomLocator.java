@@ -12,7 +12,6 @@ import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
-import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 public class SeparabilityAxiomLocator {

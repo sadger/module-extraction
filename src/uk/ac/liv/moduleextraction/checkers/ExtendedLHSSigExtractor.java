@@ -48,7 +48,7 @@ public class ExtendedLHSSigExtractor {
 		for (int i = 0; i < terminology.length; i++) {
 			if(terminology[i]){
 				OWLLogicalAxiom axiom = axiomStore.getAxiom(i);
-				if(!isInclusionOrEquation(axiom)){
+				if(!ModuleUtils.isInclusionOrEquation(axiom)){
 					lhsSigT.add(axiom);
 				}
 				else{
@@ -117,10 +117,6 @@ public class ExtendedLHSSigExtractor {
 
 		return toAddToLhs;
 
-	}
-
-	private boolean isInclusionOrEquation(OWLLogicalAxiom axiom){
-		return (axiom.getAxiomType() == AxiomType.SUBCLASS_OF || axiom.getAxiomType() == AxiomType.EQUIVALENT_CLASSES);
 	}
 
 	public static void main(String[] args) {
