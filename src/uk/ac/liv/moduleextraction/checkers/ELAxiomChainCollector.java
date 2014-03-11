@@ -42,9 +42,7 @@ public class ELAxiomChainCollector {
 
 				}
 			}
-			
 		}
-
 
 		return chain;
 
@@ -54,7 +52,7 @@ public class ELAxiomChainCollector {
 		OWLClass axiomName = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
 		ELValidator validator = new ELValidator();
 
-		if( !sigUnionSigM.contains(axiomName) || !validator.isELAxiom(axiom)){
+		if(!validator.isELAxiom(axiom) || !sigUnionSigM.contains(axiomName)){
 			return false;
 		}
 		else{
@@ -66,28 +64,6 @@ public class ELAxiomChainCollector {
 
 	}
 	
-//	public static void main(String[] args) {
-//		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/axiomdep.krss");
-//		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-//		AxiomDependencies dep = new AxiomDependencies(ont);
-//		ELAxiomChainCollector chain = new ELAxiomChainCollector();
-//		Set<OWLEntity> sig = gen.generateRandomSignature(3);
-//		System.out.println(ont);
-//		System.out.println("Sig: " + sig);
-//		
-//		ArrayList<OWLLogicalAxiom> depsorted = dep.getDefinitorialSortedAxioms();
-//		
-//		
-//		for (int i = depsorted.size()-1; i >= 0 ; i--) {
-//			OWLLogicalAxiom axiom = depsorted.get(i);
-//			if(chain.hasELSyntacticDependency(axiom, dep, sig)){
-//				System.out.println("Has dep: " +  axiom);
-//				sig.addAll(axiom.getSignature());
-//			}
-//		}
-		
-			
-		
-//	}
+
 }
 

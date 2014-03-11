@@ -19,7 +19,6 @@ import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
 import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
-import uk.ac.liv.moduleextraction.checkers.LHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.qbf.SeparabilityAxiomLocator;
@@ -34,7 +33,7 @@ public class SemanticRuleExtractor implements Extractor{
 	private SyntacticDependencyChecker syntacticDependencyChecker;
 	private DefinitorialAxiomStore axiomStore;
 	
-	private ExtendedLHSSigExtractor eLHSExtractor;
+	private ExtendedLHSSigExtractor lhsExtractor;
 	private InseperableChecker inseperableChecker;
 	
 	private long syntacticChecks = 0; // A syntactic iteration (total checks = this + qbfchecks)
@@ -58,7 +57,7 @@ public class SemanticRuleExtractor implements Extractor{
 		
 		syntacticDependencyChecker = new SyntacticDependencyChecker();
 		
-		eLHSExtractor = new ExtendedLHSSigExtractor();
+		lhsExtractor = new ExtendedLHSSigExtractor();
 		inseperableChecker = new InseperableChecker();
 	}
 	
@@ -114,8 +113,7 @@ public class SemanticRuleExtractor implements Extractor{
 	private void applyRules(boolean[] terminology) throws IOException, QBFSolverException{
 		applySyntacticRule(terminology);
 		
-		HashSet<OWLLogicalAxiom> lhsSigT = eLHSExtractor.getLHSSigAxioms(axiomStore.getSubsetAsList(terminology), sigUnionSigM, dependencies);
-		//HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(axiomStore.getSubsetAsList(terminology),sigUnionSigM,dependT);
+		HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(axiomStore.getSubsetAsList(terminology), sigUnionSigM, dependencies);
 		
 		qbfChecks++;
 		if(inseperableChecker.isSeperableFromEmptySet(lhsSigT, sigUnionSigM)){
