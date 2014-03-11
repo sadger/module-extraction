@@ -1,6 +1,7 @@
 package dependencies;
 
 import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 
 import org.junit.BeforeClass;
@@ -8,10 +9,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import extractions.ExtractionTests;
 import utils.FileHash;
 
 @RunWith(Suite.class)
-@SuiteClasses({DependencyGeneration.class, AxiomDependencyGeneration.class, CompareDependencies.class})
+@SuiteClasses({DependencyGeneration.class, AxiomDependencyGeneration.class, CompareDependencies.class, ExpressiveAxiomDepth.class})
 public class SyntacticDependencyTests {
 
 	@BeforeClass
