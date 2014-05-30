@@ -23,13 +23,15 @@ public class SigManager {
 	private File directory;
 
 	public SigManager(File directory) {
-		if(!directory.exists()){
-			directory.mkdir();
-		}
+
 		this.directory = directory;
+		//System.out.println("Sig Manager @ " + directory.getAbsolutePath());
 	}
 
 	public void writeFile(Set<OWLEntity> signature, String name) throws IOException{
+		if(!directory.exists()){
+			directory.mkdir();
+		}
 		File signatureFile = new File(directory.getAbsolutePath()+ "/" + name);
 		if (signatureFile.exists())
 			signatureFile.delete();

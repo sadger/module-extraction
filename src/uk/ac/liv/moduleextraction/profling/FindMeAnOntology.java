@@ -17,6 +17,7 @@ import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.EquivalentToTerminologyChecker;
 import uk.ac.liv.ontologyutils.ontologies.TerminologyChecker;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
+import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 public class FindMeAnOntology {
 
@@ -38,7 +39,7 @@ public class FindMeAnOntology {
 		System.out.println("Name,Expressiveness,LogicalAxioms,Inclusions,Equivalences, Repeated Inclusions, Repeated Equivalances, SharedNames, Concepts, Roles");
 		for(File f: ontologyFiles){
 			if(f.isFile()){
-//				System.out.println(f.getName());
+				System.out.println(f.getName());
 				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
 				profileOntology(f.getName(), ont);
 //				System.out.println();
@@ -54,6 +55,8 @@ public class FindMeAnOntology {
 		String express = checker.getDescriptionLogicName();
 		
         String shortName = fileName.substring(Math.max(0, fileName.length() - 20));
+        
+        System.out.println(elvalidator.isELOntology(ModuleUtils.getCoreAxioms(ont)));
 //		AxiomTypeProfile p = new AxiomTypeProfile(ont);
 //		ExpressionTypeProfiler exp = new ExpressionTypeProfiler();
 //		p.printMetrics();
@@ -81,7 +84,7 @@ public class FindMeAnOntology {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, OWLOntologyStorageException {
 
-	FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/NCI/Profile"));
+	FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/Ana"));
 	find.profileOntologies();
 			
 	}
