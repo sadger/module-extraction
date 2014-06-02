@@ -23,7 +23,7 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Sets;
 
 import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
-import uk.ac.liv.moduleextraction.extractor.SemanticOnlyExtractor;
+import uk.ac.liv.moduleextraction.extractor.OneDepletingModuleExtractor;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
@@ -31,14 +31,14 @@ import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
-public class SemanticOnlyComparison implements Experiment {
+public class OneDepletingComparison implements Experiment {
 
 
 	private File originalLocation;
 	private OWLOntology ontology;
-	private NewIteratingExperiment starIterExperiment;
+	private HybridExtractorExperiment starIterExperiment;
 	private File sigLocation;
-	private SemanticOnlyExtractor semanticExtractor;
+	private OneDepletingModuleExtractor semanticExtractor;
 	private Set<OWLLogicalAxiom> semanticModule;
 	private Set<OWLEntity> refsig;
 	static Set<OWLLogicalAxiom> differences = new HashSet<OWLLogicalAxiom>();
@@ -46,7 +46,7 @@ public class SemanticOnlyComparison implements Experiment {
 	private Stopwatch semanticStopwatch;
 	private Stopwatch hybridStopwatch;
 
-	public SemanticOnlyComparison(OWLOntology ont, File originalLocation) {
+	public OneDepletingComparison(OWLOntology ont, File originalLocation) {
 		this.ontology = ont;
 		this.originalLocation = originalLocation;
 	}
@@ -55,7 +55,7 @@ public class SemanticOnlyComparison implements Experiment {
 	public void performExperiment(Set<OWLEntity> signature) {
 		this.refsig = signature;
 		starIterExperiment = 
-				new NewIteratingExperiment(ontology,originalLocation);
+				new HybridExtractorExperiment(ontology,originalLocation);
 
 		hybridStopwatch = new Stopwatch().start();
 		starIterExperiment.performExperiment(signature);
@@ -65,7 +65,7 @@ public class SemanticOnlyComparison implements Experiment {
 
 
 		semanticStopwatch = new Stopwatch().start();
-		semanticExtractor = new SemanticOnlyExtractor(hybridModule);
+		semanticExtractor = new OneDepletingModuleExtractor(hybridModule);
 		semanticModule = semanticExtractor.extractModule(signature);
 		semanticStopwatch.stop();
 
@@ -441,7 +441,7 @@ public class SemanticOnlyComparison implements Experiment {
 			
 
 
-			SemanticOnlyComparison compareNCIFull = new SemanticOnlyComparison(ontology, null);
+			OneDepletingComparison compareNCIFull = new OneDepletingComparison(ontology, null);
 
 			
 			Set<OWLLogicalAxiom> fullModule = compareNCIFull.get1DepletingModule();

@@ -14,7 +14,7 @@ public class EquivalentToTerminologyExtractor implements Extractor {
 
 	private EquivalentToTerminologyProcessor processor;
 	private Set<OWLLogicalAxiom> module;
-	private SemanticRuleExtractor extractor;
+	private AMEX extractor;
 	
 	private long timeTaken = 0;
 	
@@ -22,7 +22,7 @@ public class EquivalentToTerminologyExtractor implements Extractor {
 		try {
 			processor = new EquivalentToTerminologyProcessor(equivalentToTerm);
 			OWLOntology newOnt = processor.getConvertedOntology();
-			extractor = new SemanticRuleExtractor(newOnt);
+			extractor = new AMEX(newOnt);
 		} catch (OWLOntologyCreationException e) {
 			e.printStackTrace();
 		} catch (NotEquivalentToTerminologyException e) {

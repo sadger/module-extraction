@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import uk.ac.liv.moduleextraction.extractor.SemanticRuleExtractor;
+import uk.ac.liv.moduleextraction.extractor.AMEX;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
@@ -120,7 +120,7 @@ public class QBFSolver {
 	public static void main(String[] args) throws IOException {
 
 			OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
-			SemanticRuleExtractor extract = new SemanticRuleExtractor(ont);
+			AMEX extract = new AMEX(ont);
 			SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
 			ont.getOWLOntologyManager().removeOntology(ont);
 			

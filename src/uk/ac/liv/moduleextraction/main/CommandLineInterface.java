@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.liv.moduleextraction.extractor.EquivalentToTerminologyExtractor;
 import uk.ac.liv.moduleextraction.extractor.Extractor;
-import uk.ac.liv.moduleextraction.extractor.SemanticRuleExtractor;
+import uk.ac.liv.moduleextraction.extractor.AMEX;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
 import uk.ac.liv.ontologyutils.ontologies.EquivalentToTerminologyChecker;
@@ -120,7 +120,7 @@ public class CommandLineInterface {
 	
 					
 					if(termChecker.isTerminology(ontology)){
-						moduleExtractor = new SemanticRuleExtractor(ontology);
+						moduleExtractor = new AMEX(ontology);
 					}
 					else if(equivChecker.isEquivalentToTerminology(ontology)){
 						moduleExtractor = new EquivalentToTerminologyExtractor(ontology);

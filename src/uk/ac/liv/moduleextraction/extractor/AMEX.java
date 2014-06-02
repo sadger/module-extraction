@@ -25,7 +25,7 @@ import uk.ac.liv.moduleextraction.qbf.SeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
-public class SemanticRuleExtractor implements Extractor{
+public class AMEX implements Extractor{
 
 	private AxiomDependencies dependencies;
 	private Set<OWLLogicalAxiom> module;
@@ -42,15 +42,15 @@ public class SemanticRuleExtractor implements Extractor{
 	private long separabilityChecks = 0; // Number of times we need to search for a separability causing axiom
 	
 	
-	private Logger logger = LoggerFactory.getLogger(SemanticRuleExtractor.class);
+	private Logger logger = LoggerFactory.getLogger(AMEX.class);
 			
 
 	
-	public SemanticRuleExtractor(OWLOntology ontology) {
+	public AMEX(OWLOntology ontology) {
 		this(ontology.getLogicalAxioms());
 	}
 	
-	public SemanticRuleExtractor(Set<OWLLogicalAxiom> ontology){
+	public AMEX(Set<OWLLogicalAxiom> ontology){
 
 		dependencies = new AxiomDependencies(ontology);
 		axiomStore = new DefinitorialAxiomStore(dependencies.getDefinitorialSortedAxioms());

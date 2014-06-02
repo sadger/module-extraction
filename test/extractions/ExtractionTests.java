@@ -17,7 +17,7 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 
-import uk.ac.liv.moduleextraction.extractor.SemanticRuleExtractor;
+import uk.ac.liv.moduleextraction.extractor.AMEX;
 
 public class ExtractionTests {
 	
@@ -84,7 +84,7 @@ public class ExtractionTests {
 		signature.add(a);
 		signature.add(d);
 		
-		SemanticRuleExtractor extractor = new SemanticRuleExtractor(inputOntology);
+		AMEX extractor = new AMEX(inputOntology);
 		
 		HashSet<OWLLogicalAxiom> expectedModule = new HashSet<OWLLogicalAxiom>();
 		expectedModule.add(asub1);
@@ -115,7 +115,7 @@ public class ExtractionTests {
 		signature.add(a);
 		signature.add(r);
 		
-		SemanticRuleExtractor extractor = new SemanticRuleExtractor(inputOntology);
+		AMEX extractor = new AMEX(inputOntology);
 		
 		HashSet<OWLLogicalAxiom> expectedModule = new HashSet<OWLLogicalAxiom>();
 		expectedModule.add(asub1);
@@ -145,7 +145,7 @@ public class ExtractionTests {
 		signature.add(a2);
 		signature.add(a);
 		
-		SemanticRuleExtractor extractor = new SemanticRuleExtractor(inputOntology);
+		AMEX extractor = new AMEX(inputOntology);
 		
 		HashSet<OWLLogicalAxiom> expectedModule = new HashSet<OWLLogicalAxiom>();
 		expectedModule.add(a1axiom);
@@ -205,7 +205,7 @@ public class ExtractionTests {
 		
 
 		//Extraction testing 
-		SemanticRuleExtractor extractor = new SemanticRuleExtractor(ontology);
+		AMEX extractor = new AMEX(ontology);
 		assertTrue("Module extraction",extractor.extractModule(signature).equals(expectedModule));
 		
 		

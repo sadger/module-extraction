@@ -127,7 +127,7 @@ public class MultipleExperiments {
 		for(int i : intervals){
 			multi.runExperiments(ont, 
 					new File(ModulePaths.getSignatureLocation() + "/NCI-Latest/" + ontLoc.getName() + "/role-" + rolepct + "/size-" + i),
-					new NewIteratingExperiment(ont, ontLoc));
+					new HybridExtractorExperiment(ont, ontLoc));
 		}
 
 	

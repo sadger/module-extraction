@@ -10,16 +10,16 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import uk.ac.liv.moduleextraction.extractor.NewIteratingExtractor;
+import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor;
 import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
 
-public class IteratingModuleInspector implements Experiment {
+public class HybridModuleInspector implements Experiment {
 
 	OWLOntology ontology;
 	int unsupportedCount;
 	private Set<OWLLogicalAxiom> module;
 
-	IteratingModuleInspector(OWLOntology ontology){
+	HybridModuleInspector(OWLOntology ontology){
 		this.ontology = ontology;
 	}
 	
@@ -27,7 +27,7 @@ public class IteratingModuleInspector implements Experiment {
 	public void performExperiment(Set<OWLEntity> signature) {
 		unsupportedCount = 0;
 		SupportedAxiomVerifier validator = new SupportedAxiomVerifier();
-		NewIteratingExtractor extractor = new NewIteratingExtractor(ontology);
+		HybridModuleExtractor extractor = new HybridModuleExtractor(ontology);
 		module = extractor.extractModule(signature);
 		
 		for(OWLLogicalAxiom axiom : module){

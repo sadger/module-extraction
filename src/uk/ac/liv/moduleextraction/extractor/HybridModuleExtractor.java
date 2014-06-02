@@ -31,7 +31,7 @@ import uk.ac.liv.ontologyutils.util.ModuleUtils;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
-public class NewIteratingExtractor implements Extractor {
+public class HybridModuleExtractor implements Extractor {
 
 	private OWLOntology ontology;
 	private OWLOntologyManager manager;
@@ -39,7 +39,7 @@ public class NewIteratingExtractor implements Extractor {
 	private int amexExtrations = 0;
 	private OntologyCycleVerifier cycleVerifier;
 
-	public NewIteratingExtractor(OWLOntology ont) {
+	public HybridModuleExtractor(OWLOntology ont) {
 		this.ontology = ont;
 		this.manager = ont.getOWLOntologyManager();
 	}

@@ -15,7 +15,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import com.google.common.base.Stopwatch;
 
-import uk.ac.liv.moduleextraction.extractor.NewIteratingExtractor;
+import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
@@ -23,10 +23,10 @@ import uk.ac.liv.ontologyutils.util.ModuleUtils;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
-public class NewIteratingExperiment implements Experiment {
+public class HybridExtractorExperiment implements Experiment {
 
 	private SyntacticLocalityModuleExtractor starExtractor;
-	private NewIteratingExtractor iteratingExtractor;
+	private HybridModuleExtractor iteratingExtractor;
 	private int starSize = 0;
 	private int itSize = 0;
 	private Set<OWLLogicalAxiom> starModule;
@@ -38,12 +38,12 @@ public class NewIteratingExperiment implements Experiment {
 	private File sigLocation;
 
 
-	public NewIteratingExperiment(OWLOntology ont, File originalLocation) {
+	public HybridExtractorExperiment(OWLOntology ont, File originalLocation) {
 		this.ontology = ont;
 		this.location = originalLocation;
 		OWLOntologyManager manager = ont.getOWLOntologyManager();
 		this.starExtractor = new SyntacticLocalityModuleExtractor(manager, ont, ModuleType.STAR);
-		this.iteratingExtractor = new NewIteratingExtractor(ont);
+		this.iteratingExtractor = new HybridModuleExtractor(ont);
 	}
 
 
@@ -119,7 +119,7 @@ public class NewIteratingExperiment implements Experiment {
 	public static void main(String[] args) {
 		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_14.05d.owl");
 		System.out.println("Loaded");
-		NewIteratingExperiment iterating = new  NewIteratingExperiment(ont, null);
+		HybridExtractorExperiment iterating = new  HybridExtractorExperiment(ont, null);
 		SignatureGenerator gen = new SignatureGenerator(ModuleUtils.getCoreAxioms(ont));
 		
 		for (int i = 0; i < 10; i++) {

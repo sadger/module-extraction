@@ -18,7 +18,7 @@ import uk.ac.liv.moduleextraction.qbf.SeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
-public class SemanticOnlyExtractor implements Extractor {
+public class OneDepletingModuleExtractor implements Extractor {
 
 	private DefinitorialAxiomStore axiomStore;
 	private Set<OWLLogicalAxiom> module;
@@ -29,11 +29,11 @@ public class SemanticOnlyExtractor implements Extractor {
 	private AxiomDependencies dependT;
 	private ExtendedLHSSigExtractor lhsExtractor;
 
-	public SemanticOnlyExtractor(OWLOntology ontology) {
+	public OneDepletingModuleExtractor(OWLOntology ontology) {
 		this(ontology.getLogicalAxioms());
 	}
 
-	public SemanticOnlyExtractor(Set<OWLLogicalAxiom> ontology){
+	public OneDepletingModuleExtractor(Set<OWLLogicalAxiom> ontology){
 		this.dependT = new AxiomDependencies(ontology);
 		this.axiomStore = new DefinitorialAxiomStore(dependT.getDefinitorialSortedAxioms());
 		this.inseparableChecker = new InseperableChecker();
