@@ -117,38 +117,20 @@ public class MultipleExperiments {
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
 
 
-		File ontLoc = new File(ModulePaths.getOntologyLocation() + "/NCI-star.owl");
+		File ontLoc = new File(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_14.05d.owl");
 		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontLoc.getAbsolutePath());
 
 		MultipleExperiments multi = new MultipleExperiments();
 		int[] intervals = {100,250,500,750,1000};
-		String rolepct = args[0];
+		String rolepct = "50";
 		
 		for(int i : intervals){
 			multi.runExperiments(ont, 
-					new File(ModulePaths.getSignatureLocation() + "/RandomSignatures/" + ontLoc.getName() + "/role-" + rolepct + "/size-" + i),
-					new SemanticOnlyComparison(ont, ontLoc));
+					new File(ModulePaths.getSignatureLocation() + "/NCI-Latest/" + ontLoc.getName() + "/role-" + rolepct + "/size-" + i),
+					new NewIteratingExperiment(ont, ontLoc));
 		}
 
-		
-		ontLoc = new File(ModulePaths.getOntologyLocation() + "/NCI-star-inc.owl");
-		ont = OntologyLoader.loadOntologyAllAxioms(ontLoc.getAbsolutePath());
-		
-		for(int i : intervals){
-			multi.runExperiments(ont, 
-					new File(ModulePaths.getSignatureLocation() + "/RandomSignatures/" + ontLoc.getName() + "/role-" + rolepct + "/size-" + i),
-					new SemanticOnlyComparison(ont, ontLoc));
-		}
-		
-		
-		ontLoc = new File(ModulePaths.getOntologyLocation() + "/NCI-star-equiv.owl");
-		ont = OntologyLoader.loadOntologyAllAxioms(ontLoc.getAbsolutePath());
-		
-		for(int i : intervals){
-			multi.runExperiments(ont, 
-					new File(ModulePaths.getSignatureLocation() + "/RandomSignatures/" + ontLoc.getName() + "/role-" + rolepct + "/size-" + i),
-					new SemanticOnlyComparison(ont, ontLoc));
-		}
+	
 		
 
 	}

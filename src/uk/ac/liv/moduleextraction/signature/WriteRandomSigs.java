@@ -73,18 +73,19 @@ public class WriteRandomSigs {
 	}
 
 	public static void main(String[] args) {
-		File ontloc = new File("/users/loco/wgatens/ecai-testing/Ontologies/" + "NCI-star-equiv.owl");
+		File ontloc = new File(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_14.05d.owl");
+		
 
 		int[] intervals = {100,250,500,750,1000};
-		double[] roles = {0,50,100};
+		double[] roles = {50};
 		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath());
 		WriteRandomSigs writer = new WriteRandomSigs(
 				ont, 
-				new File("/users/loco/wgatens/ecai-testing/Signatures/" + "/RandomSignatures/" + ontloc.getName()));
+				new File(ModulePaths.getSignatureLocation() + "/NCI-Latest/" + ontloc.getName()));
 		
 		for(int i : intervals){
 			for(double r : roles){
-				writer.writeSignatureWithRoles(i, r, 200);
+				writer.writeSignatureWithRoles(i, r, 25);
 			}
 		}
 

@@ -14,6 +14,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
+import com.google.common.collect.Sets;
+
 import uk.ac.liv.moduleextraction.checkers.MeaninglessEquivalenceChecker;
 import uk.ac.liv.moduleextraction.experiments.OntologyFilters;
 import uk.ac.liv.moduleextraction.experiments.RepeatedEqualitiesFilter;
@@ -23,6 +25,7 @@ import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.axioms.AxiomStructureInspector;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
+import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
@@ -34,6 +37,7 @@ public class NewIteratingExtractor implements Extractor {
 	private OWLOntologyManager manager;
 	private int starExtractions = 0;
 	private int amexExtrations = 0;
+	private OntologyCycleVerifier cycleVerifier;
 
 	public NewIteratingExtractor(OWLOntology ont) {
 		this.ontology = ont;
@@ -49,27 +53,39 @@ public class NewIteratingExtractor implements Extractor {
 			int starSize = module.size();
 
 
-			MeaninglessEquivalenceChecker checker = new MeaninglessEquivalenceChecker(module);
-			Set<OWLLogicalAxiom> meaningless = checker.getMeaninglessEquivalances();
-			module.removeAll(meaningless);
+//			MeaninglessEquivalenceChecker checker = new MeaninglessEquivalenceChecker(module);
+//			Set<OWLLogicalAxiom> meaningless = checker.getMeaninglessEquivalances();
+//			module.removeAll(meaningless);
 			
+		
 
 			Set<OWLLogicalAxiom> unsupportedAxioms = getUnsupportedAxioms(module);
 			module.removeAll(unsupportedAxioms);
+
+			cycleVerifier = new OntologyCycleVerifier(module);
+			if(cycleVerifier.isCyclic()){
+				unsupportedAxioms.addAll(cycleVerifier.getCycleCausingAxioms());
+			}
+			
+			module.removeAll(cycleVerifier.getCycleCausingAxioms());
+			
+			
 			module  = extractSemanticModule(createOntologyFromLogicalAxioms(module), unsupportedAxioms, origSig);
 			
-			checker = new MeaninglessEquivalenceChecker(module);
-			meaningless = checker.getMeaninglessEquivalances();
-			if(meaningless.size()  > 0){
-				System.out.println("ARFY");
-			}
-			module.removeAll(meaningless);
+//			checker = new MeaninglessEquivalenceChecker(module);
+//			meaningless = checker.getMeaninglessEquivalances();
+//			if(meaningless.size()  > 0){
+//				System.out.println("ARFY");
+//			}
+//			module.removeAll(meaningless);
 
 
 			if(module.size() < starSize){
 				int amexSize = module.size();
 				module = extractStarModule(createOntologyFromLogicalAxioms(module), origSig);
 				sizeChanged = (module.size() < amexSize);
+				
+		
 
 			}
 			else{
