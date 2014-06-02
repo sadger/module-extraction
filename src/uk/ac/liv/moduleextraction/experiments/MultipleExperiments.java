@@ -51,7 +51,7 @@ public class MultipleExperiments {
 				if(!experimentLocation.exists()){
 					experimentLocation.mkdir();
 				}
-				
+
 				if(new File(experimentLocation.getAbsolutePath() + "/experiment-results").exists()){
 					System.out.println("Experiment results already exists - skipping");
 					continue;
@@ -117,23 +117,54 @@ public class MultipleExperiments {
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
 
 
-		File ontLoc = new File(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_14.05d.owl");
+		File ontLoc = new File(ModulePaths.getOntologyLocation() + "/NCI/Profile/Thesaurus_14.05d.owl-core");
 		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontLoc.getAbsolutePath());
 
 		MultipleExperiments multi = new MultipleExperiments();
 		int[] intervals = {100,250,500,750,1000};
-		String rolepct = "50";
-		
+		int[] rolepct = {0,50,100};
+
 		for(int i : intervals){
-			multi.runExperiments(ont, 
-					new File(ModulePaths.getSignatureLocation() + "/NCI-Latest/" + ontLoc.getName() + "/role-" + rolepct + "/size-" + i),
-					new HybridExtractorExperiment(ont, ontLoc));
+			for(int r : rolepct){
+				multi.runExperiments(ont, 
+						new File(ModulePaths.getSignatureLocation() + "/NCI-Latest/RandomSignatures/" + ontLoc.getName() + "/role-" + r + "/size-" + i),
+						new HybridExtractorExperiment(ont, ontLoc));
+			}
+
 		}
 
-	
-		
+		ont = null;
+
+		ontLoc = new File(ModulePaths.getOntologyLocation() + "/NCI/Profile/Thesaurus_14.05d.owl-sub");
+		ont = OntologyLoader.loadOntologyAllAxioms(ontLoc.getAbsolutePath());
+
+
+		for(int i : intervals){
+			for(int r : rolepct){
+				multi.runExperiments(ont, 
+						new File(ModulePaths.getSignatureLocation() + "/NCI-Latest/RandomSignatures/" + ontLoc.getName() + "/role-" + r + "/size-" + i),
+						new HybridExtractorExperiment(ont, ontLoc));
+			}
+		}
+
+		ont = null;
+
+		ontLoc = new File(ModulePaths.getOntologyLocation() + "/NCI/Profile/Thesaurus_14.05d.owl-equiv");
+		ont = OntologyLoader.loadOntologyAllAxioms(ontLoc.getAbsolutePath());
+
+
+		for(int i : intervals){
+			for(int r : rolepct){
+				multi.runExperiments(ont, 
+						new File(ModulePaths.getSignatureLocation() + "/NCI-Latest/RandomSignatures/" + ontLoc.getName() + "/role-" + r + "/size-" + i),
+						new HybridExtractorExperiment(ont, ontLoc));
+			}
+		}
+
+
 
 	}
+
 
 
 

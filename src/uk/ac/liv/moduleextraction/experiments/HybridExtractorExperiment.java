@@ -117,12 +117,13 @@ public class HybridExtractorExperiment implements Experiment {
 	}
 
 	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_14.05d.owl");
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/NCI/Profile/Thesaurus_14.05d.owl-core");
 		System.out.println("Loaded");
 		HybridExtractorExperiment iterating = new  HybridExtractorExperiment(ont, null);
-		SignatureGenerator gen = new SignatureGenerator(ModuleUtils.getCoreAxioms(ont));
+		OneDepletingComparison compare = new OneDepletingComparison(ont, null);
+		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
 		
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 100; i++) {
 			iterating.performExperiment(gen.generateRandomSignature(1000));
 			iterating.printMetrics();
 		}
