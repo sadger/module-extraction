@@ -116,7 +116,6 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 		if(inseparableChecker.isSeperableFromEmptySet(lhs,sigUnionSigM)){
 			OWLLogicalAxiom axiom = findSeparableAxiom(terminology);
 			module.add(axiom);
-			System.out.println("Added axiom");
 			removeAxiom(terminology, axiom);
 			sigUnionSigM.addAll(axiom.getSignature());
 			qbfChecks += inseparableChecker.getTestCount();
@@ -124,20 +123,20 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 		}
 	}
 
-	private void moveELChainsToModule(List<OWLLogicalAxiom> allAxioms, boolean[] terminology, DefinitorialAxiomStore axiomStore){
+	private void moveELChainsToModule(List<OWLLogicalAxiom> acyclicAxioms, boolean[] terminology, DefinitorialAxiomStore axiomStore){
 		boolean change = true;
 		while(change){
 			change = false;
-			for (int i = 0; i < allAxioms.size(); i++) {
-				OWLLogicalAxiom chosenAxiom = allAxioms.get(i);
+			for (int i = 0; i < acyclicAxioms.size(); i++) {
+				OWLLogicalAxiom chosenAxiom = acyclicAxioms.get(i);
 				if(chainCollector.hasELSyntacticDependency(chosenAxiom, dependT, sigUnionSigM)){
 					change = true;
 					ArrayList<OWLLogicalAxiom> chain = 
-							chainCollector.collectELAxiomChain(allAxioms, i, terminology, axiomStore, dependT, sigUnionSigM);
+							chainCollector.collectELAxiomChain(acyclicAxioms, i, terminology, axiomStore, dependT, sigUnionSigM);
 					
 					module.addAll(chain);
-					System.out.println("Added chain");
-					allAxioms.removeAll(chain);
+					acyclicAxioms.removeAll(chain);
+					System.out.println("Adding chain: " +  chain.size() + " remaning: " + allAxioms.size());
 				}
 			}
 

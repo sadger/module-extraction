@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream.GetField;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +33,7 @@ public class HybridExtractorExperiment implements Experiment {
 	private Set<OWLLogicalAxiom> starModule;
 	private Set<OWLLogicalAxiom> itModule;
 	private OWLOntology ontology;
-	Stopwatch iteratedWatch;
+	Stopwatch hybridWatch;
 	Stopwatch starWatch;
 	private File location;
 	private File sigLocation;
@@ -62,12 +63,12 @@ public class HybridExtractorExperiment implements Experiment {
 		starSize = starModule.size();
 
 
-		iteratedWatch = new Stopwatch().start();
+		hybridWatch = new Stopwatch().start();
 		//And then the iterated one 
 		itModule = iteratingExtractor.extractModule(signature);
 		itSize = itModule.size();
 		//		
-		iteratedWatch.stop();
+		hybridWatch.stop();
 
 	}
 
@@ -86,6 +87,14 @@ public class HybridExtractorExperiment implements Experiment {
 	public Set<OWLLogicalAxiom> getStarModule(){
 		return starModule;
 	}
+	
+	public Stopwatch getHybridWatch() {
+		return hybridWatch;
+	}
+	
+	public Stopwatch getStarWatch() {
+		return starWatch;
+	}
 
 
 	public void performExperiment(Set<OWLEntity> signature, File signatureLocation){
@@ -102,7 +111,7 @@ public class HybridExtractorExperiment implements Experiment {
 		writer.write("StarSize, IteratedSize, Difference, StarExtractions, AmexExtractions, StarTime, IteratedTime, OntLocation, SigLocation" + "\n");
 		writer.write(starSize + "," + itSize + "," + ((starSize == itSize) ? "0" : "1") + "," +
 				iteratingExtractor.getStarExtractions() + "," + iteratingExtractor.getAmexExtrations() + "," + 
-				+ starWatch.elapsed(TimeUnit.MILLISECONDS) + "," + iteratedWatch.elapsed(TimeUnit.MILLISECONDS) + ","
+				+ starWatch.elapsed(TimeUnit.MILLISECONDS) + "," + hybridWatch.elapsed(TimeUnit.MILLISECONDS) + ","
 				+ location.getAbsolutePath() + "," + sigLocation.getAbsolutePath() + "\n");
 		writer.flush();
 		writer.close();
@@ -110,10 +119,11 @@ public class HybridExtractorExperiment implements Experiment {
 	}
 	
 	public void printMetrics(){
-		System.out.print("StarSize, IteratedSize, Difference, StarExtractions, AmexExtractions, StarTime, IteratedTime" + "\n");
+		System.out.print("StarSize, IteratedSize, Difference, StarExtractions, AmexExtractions, StarTime, HybridTime" + "\n");
 		System.out.print(starSize + "," + itSize + "," + ((starSize == itSize) ? "0" : "1") + "," +
-				iteratingExtractor.getStarExtractions() + "," + iteratingExtractor.getAmexExtrations() + "," + 
-				+ starWatch.elapsed(TimeUnit.MILLISECONDS) + "," + iteratedWatch.elapsed(TimeUnit.MILLISECONDS) + "\n");
+				iteratingExtractor.getStarExtractions() + "," + iteratingExtractor.getAmexExtrations() 
+				+ "," + 	starWatch.toString() + "," + hybridWatch.toString() + "\n");
+
 	}
 
 	public static void main(String[] args) {
@@ -122,6 +132,7 @@ public class HybridExtractorExperiment implements Experiment {
 		HybridExtractorExperiment iterating = new  HybridExtractorExperiment(ont, null);
 		OneDepletingComparison compare = new OneDepletingComparison(ont, null);
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+		
 		
 		for (int i = 0; i < 100; i++) {
 			iterating.performExperiment(gen.generateRandomSignature(1000));
