@@ -12,6 +12,7 @@ import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
+import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 public class SeparabilityAxiomLocator {
@@ -19,7 +20,7 @@ public class SeparabilityAxiomLocator {
 	Logger logger = LoggerFactory.getLogger(SeparabilityAxiomLocator.class);
 
 	/* Semantic Checking */
-	private ExtendedLHSSigExtractor lhsExtractor = new ExtendedLHSSigExtractor();
+	protected ExtendedLHSSigExtractor lhsExtractor = new ExtendedLHSSigExtractor();
 	private InseperableChecker insepChecker = new InseperableChecker();
 
 	private Set<OWLEntity> sigUnionSigM;
@@ -49,10 +50,8 @@ public class SeparabilityAxiomLocator {
 
 			Collection<OWLLogicalAxiom> toCheck = null;
          
+        	toCheck = getCheckingSet(Arrays.asList(W), sigUnionSigM, dependT);
 
-        	toCheck = lhsExtractor.getLHSSigAxioms(Arrays.asList(W), sigUnionSigM, dependT);
-
-	
 			checkCount++;
 
 			/* If inseperable */
@@ -83,6 +82,10 @@ public class SeparabilityAxiomLocator {
 		}
 		
 		return  axiomList[W.length];
+	}
+	
+	public HashSet <OWLLogicalAxiom> getCheckingSet(List<OWLLogicalAxiom> axioms, Set<OWLEntity> sigUnionSigM, AxiomDependencies dependT){
+		return lhsExtractor.getLHSSigAxioms(axioms, sigUnionSigM, dependT);
 	}
 
 	public long getCheckCount(){

@@ -69,13 +69,20 @@ public class ExtendedLHSSigExtractor {
 		HashSet<OWLLogicalAxiom> lhsSigT = new HashSet<OWLLogicalAxiom>();
 		this.dependencies = depends;
 
-
 		generateSignatureDependencies(sortedOntology, sigUnionSigM);
+		Set<OWLClass> sharedOrRepeated = getSharedOrRepeatedNames(sortedOntology);
+
 		for(OWLLogicalAxiom axiom : sortedOntology){
-			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
-			if(sigUnionSigM.contains(name) || isInSigDependencies(name)){
+			if(!ModuleUtils.isInclusionOrEquation(axiom)){
 				lhsSigT.add(axiom);
 			}
+			else{
+				OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
+				if(sigUnionSigM.contains(name) || isInSigDependencies(name) || sharedOrRepeated.contains(name)){
+					lhsSigT.add(axiom);
+				}
+			}
+
 		}
 		return lhsSigT;
 	}
