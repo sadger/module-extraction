@@ -11,6 +11,7 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor;
+import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor.CycleRemovalMethod;
 import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
 
 public class HybridModuleInspector implements Experiment {
@@ -27,7 +28,7 @@ public class HybridModuleInspector implements Experiment {
 	public void performExperiment(Set<OWLEntity> signature) {
 		unsupportedCount = 0;
 		SupportedAxiomVerifier validator = new SupportedAxiomVerifier();
-		HybridModuleExtractor extractor = new HybridModuleExtractor(ontology);
+		HybridModuleExtractor extractor = new HybridModuleExtractor(ontology, CycleRemovalMethod.IMPROVED);
 		module = extractor.extractModule(signature);
 		
 		for(OWLLogicalAxiom axiom : module){

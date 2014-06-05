@@ -60,7 +60,6 @@ public class OneDepletingComparison implements Experiment {
 
 		starAndHybridExperiment.performExperiment(signature);
 
-		System.out.println(starAndHybridExperiment.getStarModule().size());
 		
 		Set<OWLLogicalAxiom> hybridModule = starAndHybridExperiment.getHybridModule();
 
@@ -115,8 +114,12 @@ public class OneDepletingComparison implements Experiment {
 		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/NCI/Profile/Thesaurus_14.05d.owl-core");
 		OneDepletingComparison compare = new OneDepletingComparison(ont, null);
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		compare.performExperiment(gen.generateRandomSignature(100));
-		compare.printMetrics();
+		
+		for (int i = 0; i < 50; i++) {
+			compare.performExperiment(gen.generateRandomSignature(30));
+			compare.printMetrics();
+		}
+	
 	}
 }
 

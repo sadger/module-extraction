@@ -17,6 +17,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import com.google.common.base.Stopwatch;
 
 import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor;
+import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor.CycleRemovalMethod;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
@@ -44,7 +45,7 @@ public class HybridExtractorExperiment implements Experiment {
 		this.location = originalLocation;
 		OWLOntologyManager manager = ont.getOWLOntologyManager();
 		this.starExtractor = new SyntacticLocalityModuleExtractor(manager, ont, ModuleType.STAR);
-		this.iteratingExtractor = new HybridModuleExtractor(ont);
+		this.iteratingExtractor = new HybridModuleExtractor(ont, CycleRemovalMethod.NAIVE);
 	}
 
 

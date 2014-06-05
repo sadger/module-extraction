@@ -136,7 +136,6 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 					
 					module.addAll(chain);
 					acyclicAxioms.removeAll(chain);
-					System.out.println("Adding chain: " +  chain.size() + " remaning: " + allAxioms.size());
 				}
 			}
 
@@ -158,33 +157,33 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 
 	
 	public static void main(String[] args) {
-		//OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/cycles/cycle-test2.krss");
-		OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/NCI/Profile/Thesaurus_14.05d.owl-core");
-		System.out.println("Loaded");
-		ModuleUtils.remapIRIs(ontology, "X");
-	
-		OWLDataFactory factory = OWLManager.getOWLDataFactory();
-		
-		OWLClass a = factory.getOWLClass(IRI.create("X#A"));
-		OWLClass b = factory.getOWLClass(IRI.create("X#B"));
-		OWLClass bprime = factory.getOWLClass(IRI.create("X#B'"));
-		OWLClass c = factory.getOWLClass(IRI.create("X#C"));
-		OWLClass d = factory.getOWLClass(IRI.create("X#D"));		
-		OWLClass x = factory.getOWLClass(IRI.create("X#X"));
-		OWLClass y = factory.getOWLClass(IRI.create("X#Y"));
-		
-		Set<OWLEntity> sig = new HashSet<OWLEntity>();
-		sig.add(a);
-		sig.add(bprime);
-		
-		SignatureGenerator gen = new SignatureGenerator(ontology.getLogicalAxioms());
-		sig = gen.generateRandomSignature(100);
-		System.out.println(sig);
-		CyclicOneDepletingModuleExtractor onedep = new CyclicOneDepletingModuleExtractor(ontology);
-		HybridModuleExtractor hybrid = new HybridModuleExtractor(ontology);
-	
-		System.out.println("1-dep:  " + onedep.extractModule(sig).size());
-		System.out.println("Hybrid: " + hybrid.extractModule(sig).size());
+//		//OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/cycles/cycle-test2.krss");
+//		OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/NCI/Profile/Thesaurus_14.05d.owl-core");
+//		System.out.println("Loaded");
+//		ModuleUtils.remapIRIs(ontology, "X");
+//	
+//		OWLDataFactory factory = OWLManager.getOWLDataFactory();
+//		
+//		OWLClass a = factory.getOWLClass(IRI.create("X#A"));
+//		OWLClass b = factory.getOWLClass(IRI.create("X#B"));
+//		OWLClass bprime = factory.getOWLClass(IRI.create("X#B'"));
+//		OWLClass c = factory.getOWLClass(IRI.create("X#C"));
+//		OWLClass d = factory.getOWLClass(IRI.create("X#D"));		
+//		OWLClass x = factory.getOWLClass(IRI.create("X#X"));
+//		OWLClass y = factory.getOWLClass(IRI.create("X#Y"));
+//		
+//		Set<OWLEntity> sig = new HashSet<OWLEntity>();
+//		sig.add(a);
+//		sig.add(bprime);
+//		
+//		SignatureGenerator gen = new SignatureGenerator(ontology.getLogicalAxioms());
+//		sig = gen.generateRandomSignature(100);
+//		System.out.println(sig);
+//		CyclicOneDepletingModuleExtractor onedep = new CyclicOneDepletingModuleExtractor(ontology);
+//		HybridModuleExtractor hybrid = new HybridModuleExtractor(ontology);
+//	
+//		System.out.println("1-dep:  " + onedep.extractModule(sig).size());
+//		System.out.println("Hybrid: " + hybrid.extractModule(sig).size());
 		
 		
 	}

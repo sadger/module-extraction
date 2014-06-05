@@ -81,11 +81,11 @@ public class WriteRandomSigs {
 		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath());
 		WriteRandomSigs writer = new WriteRandomSigs(
 				ont, 
-				new File(ModulePaths.getSignatureLocation() + "/NCI-Latest/RandomSignatures/" + ontloc.getName()));
+				new File(ModulePaths.getSignatureLocation() + "/NCI-Latest/OneDepleting/" + ontloc.getName()));
 		
 		for(int i : intervals){
 			for(double r : roles){
-				writer.writeSignatureWithRoles(i, r, 1000);
+				writer.writeSignatureWithRoles(i, r, 200);
 			}
 		}
 

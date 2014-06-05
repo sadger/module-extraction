@@ -38,11 +38,23 @@ public class HybridModuleExtractor implements Extractor {
 	private int starExtractions = 0;
 	private int amexExtrations = 0;
 	private OntologyCycleVerifier cycleVerifier;
+	private CycleRemovalMethod method;
 
-	public HybridModuleExtractor(OWLOntology ont) {
+	public enum CycleRemovalMethod{
+		NAIVE,
+		IMPROVED,
+	}
+	
+	public HybridModuleExtractor(OWLOntology ont, CycleRemovalMethod method) {
 		this.ontology = ont;
 		this.manager = ont.getOWLOntologyManager();
+		this.method = method;
 	}
+	
+	public CycleRemovalMethod getCycleRemovalMethod(){
+		return method;
+	}
+	
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) {
 
@@ -64,11 +76,18 @@ public class HybridModuleExtractor implements Extractor {
 
 			cycleVerifier = new OntologyCycleVerifier(module);
 			if(cycleVerifier.isCyclic()){
-				unsupportedAxioms.addAll(cycleVerifier.getCycleCausingAxioms());
+				Set<OWLLogicalAxiom> cycleCausing = null;
+				
+				if(method == CycleRemovalMethod.NAIVE){
+					 cycleCausing = cycleVerifier.getCycleCausingAxioms();
+				}
+				else if(method == CycleRemovalMethod.IMPROVED){
+					cycleCausing =  cycleVerifier.getBetterCycleCausingAxioms();
+				}
+				
+				unsupportedAxioms.addAll(cycleCausing);
+				module.removeAll(cycleCausing);
 			}
-			
-			module.removeAll(cycleVerifier.getCycleCausingAxioms());
-			
 			
 			module  = extractSemanticModule(createOntologyFromLogicalAxioms(module), unsupportedAxioms, origSig);
 			
@@ -175,26 +194,5 @@ public class HybridModuleExtractor implements Extractor {
 		return amexExtrations;
 	}
 
-	public static void main(String[] args) {
-		//		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms("/LOCAL/wgatens/Ontologies/" + "/semantic-only/examples/meaningless.krss");
-		//		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		//		Set<OWLEntity> signature;
-		//		Set<OWLLogicalAxiom> module = new NewIteratingExtractor(ont).extractModule(gen.generateRandomSignature(2));
-		//		System.out.println(module);
-		OWLDataFactory factory = OWLManager.getOWLDataFactory();
-		OWLClass top = factory.getOWLThing();
-		for(File f: new File("/LOCAL/wgatens/Ontologies/" + "/semantic-only/EL").listFiles()){
-			if(f.isFile()){
-				System.out.println(f.getName());
-				OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
-				for(OWLLogicalAxiom axiom : ontology.getLogicalAxioms()){
-
-					if(axiom.getSignature().contains(top)){
-						System.out.println(axiom);
-					}
-				}
-			}
-		}
-	}
 
 }
