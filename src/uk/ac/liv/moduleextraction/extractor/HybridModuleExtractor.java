@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -24,6 +25,7 @@ import uk.ac.liv.moduleextraction.experiments.SharedNameFilter.RemovalMethod;
 import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.axioms.AxiomStructureInspector;
+import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
@@ -73,6 +75,8 @@ public class HybridModuleExtractor implements Extractor {
 
 			Set<OWLLogicalAxiom> unsupportedAxioms = getUnsupportedAxioms(module);
 			module.removeAll(unsupportedAxioms);
+ 
+		
 
 			cycleVerifier = new OntologyCycleVerifier(module);
 			if(cycleVerifier.isCyclic()){

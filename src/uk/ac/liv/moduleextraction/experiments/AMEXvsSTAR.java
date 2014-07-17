@@ -58,7 +58,6 @@ public class AMEXvsSTAR implements Experiment {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results", false));
 		writer.write("Syntactic Size,Semantic Size, ModulesSame, SemSubsetOfStar, StarSubsetSem, InSemButNotStar, InStarButNotSem" + "\n");
 		
-		
 		writer.write(syntacticModule.size() + "," + semanticModule.size() + "," 
 		+ semanticModule.equals(syntacticModule) + "," + syntacticModule.containsAll(semanticModule) + "," + semanticModule.containsAll(syntacticModule) + ",");
 		

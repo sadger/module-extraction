@@ -37,7 +37,7 @@ public class OneDepletingComparison implements Experiment {
 
 	private File originalLocation;
 	private File sigLocation;
-	
+
 	private OWLOntology ontology;
 	private Set<OWLEntity> refsig;
 
@@ -60,7 +60,7 @@ public class OneDepletingComparison implements Experiment {
 
 		starAndHybridExperiment.performExperiment(signature);
 
-		
+
 		Set<OWLLogicalAxiom> hybridModule = starAndHybridExperiment.getHybridModule();
 
 		oneDepletingStopwatch = new Stopwatch().start();
@@ -70,7 +70,7 @@ public class OneDepletingComparison implements Experiment {
 
 
 	}
-	
+
 	public Set<OWLLogicalAxiom> get1DepletingModule(){
 		return oneDepletingModule;
 	}
@@ -90,7 +90,7 @@ public class OneDepletingComparison implements Experiment {
 
 		int qbfSmaller = (oneDepletingModule.size() < starAndHybridExperiment.getHybridModule().size()) ? 1 : 0;
 
-		writer.write("StarSize, HybridSize, QBFSize, QBFSmaller, TimeHybrid, TimeQBF, SignatureLocation" + "\n");
+		writer.write("StarSize, HybridSize, QBFSize, QBFSmaller, TimeQBF, TimeHybrid, SignatureLocation" + "\n");
 		writer.write(starAndHybridExperiment.getStarSize() + "," + starAndHybridExperiment.getIteratedSize() + 
 				"," + oneDepletingModule.size() + "," + String.valueOf(qbfSmaller) + "," 
 				+ oneDepletingStopwatch.elapsed(TimeUnit.MILLISECONDS) + "," + starAndHybridExperiment.getHybridWatch().elapsed(TimeUnit.MILLISECONDS) + 
@@ -102,28 +102,66 @@ public class OneDepletingComparison implements Experiment {
 	}
 
 	public void printMetrics() throws IOException{
-		System.out.println("============================================================================");
+	
 		System.out.println("StarSize, HybridSize, QBFSize");
 		System.out.println(starAndHybridExperiment.getStarSize() + "," + starAndHybridExperiment.getIteratedSize() + 
 				"," + oneDepletingModule.size());
 		System.out.println("Time hybrid: " + starAndHybridExperiment.getHybridWatch().toString());
 		System.out.println("Time 1-dep: " + oneDepletingStopwatch.toString());
-	}
 	
+		refsig.retainAll(ModuleUtils.getClassAndRoleNamesInSet(starAndHybridExperiment.getHybridModule()));
+		System.out.println("Σ ∩ sig(hybrid) = "  + (refsig.isEmpty() ? "∅"  : refsig));
+		
+//		System.out.println("1-depleting");
+//		for(OWLLogicalAxiom axiom : oneDepletingModule){
+//			System.out.println(axiom);
+//		}
+//		
+		Set<OWLLogicalAxiom> hybridM = starAndHybridExperiment.getHybridModule();
+		hybridM.removeAll(oneDepletingModule);
+		System.out.println("Hybrid\\1-depleting");
+		for(OWLLogicalAxiom axiom : hybridM){
+			System.out.println(axiom);
+		}
+		System.out.println();
+		
+	
+		System.out.println();
+		
+		System.out.println("============================================================================");
+	}
+
 	public static void main(String[] args) throws IOException {
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/NCI/Profile/Thesaurus_14.05d.owl-core");
+
+		String ontologyName = "Thesaurus_14.05d.owl-sub";
+		int rolepct = 0;
+		int sigsize = 100;
+		int[] exprs = {183, 127, 162};
+
+	
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms("/users/loco/wgatens/ecai-testing/Ontologies/" + ontologyName);
+
 		OneDepletingComparison compare = new OneDepletingComparison(ont, null);
 		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		
-		for (int i = 0; i < 50; i++) {
-			compare.performExperiment(gen.generateRandomSignature(30));
+
+
+		SigManager man = new SigManager(new File("/users/loco/wgatens/ecai-testing/Signatures/OneDepleting/" 
+				+ ontologyName + "/role-" + rolepct + "/" + "size-" + sigsize));
+
+
+		for(int e : exprs){
+			String experiment = "random_" + sigsize + "_" + rolepct + "-" + e;
+			Set<OWLEntity> sig = man.readFile(experiment);
+			compare.performExperiment(sig);
 			compare.printMetrics();
 		}
-	
+
+
+
 	}
 }
 
-	
+
 
 
 

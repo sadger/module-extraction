@@ -18,6 +18,7 @@ import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.checkers.ELAxiomChainCollector;
 import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
+import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.qbf.CyclicSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.qbf.SeparabilityAxiomLocator;
@@ -77,11 +78,15 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 		boolean[] terminology = axiomStore.allAxiomsAsBoolean();
 		allAxioms = axiomStore.getSubsetAsList(terminology);
 		
+		SupportedExpressivenessFilter filter = new SupportedExpressivenessFilter();
+		allAxioms.removeAll(filter.getUnsupportedAxioms(allAxioms));
+		
 		OntologyCycleVerifier verifier = new OntologyCycleVerifier(allAxioms);
 
 		cycleCausing = verifier.getCycleCausingAxioms();
 
-		// All axioms is now the acyclic subset of the ontology
+		/* All axioms is now the acyclic subset of the ontology 
+		after removing unsupported or cycle causing axioms */
 		allAxioms.removeAll(cycleCausing);
 
 		dependT = new AxiomDependencies(new HashSet<OWLLogicalAxiom>(allAxioms));

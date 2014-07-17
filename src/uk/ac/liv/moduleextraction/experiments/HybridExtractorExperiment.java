@@ -5,10 +5,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream.GetField;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -127,19 +131,26 @@ public class HybridExtractorExperiment implements Experiment {
 
 	}
 
-	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/NCI/Profile/Thesaurus_14.05d.owl-core");
-		System.out.println("Loaded");
-		HybridExtractorExperiment iterating = new  HybridExtractorExperiment(ont, null);
-		OneDepletingComparison compare = new OneDepletingComparison(ont, null);
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+	public static void main(String[] args) throws IOException {
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/examples/cyclicdiff2.krss");
+		System.out.println(ont);
+		ModuleUtils.remapIRIs(ont, "X");
+	
+		OWLDataFactory f = ont.getOWLOntologyManager().getOWLDataFactory();
 		
+		Set<OWLEntity> sig = new HashSet<OWLEntity>();
+		OWLClass a = f.getOWLClass(IRI.create("X#A"));
+		OWLClass b = f.getOWLClass(IRI.create("X#B"));
+		OWLClass c = f.getOWLClass(IRI.create("X#C"));
+		sig.add(c);
+		sig.add(b);
 		
-		for (int i = 0; i < 100; i++) {
-			iterating.performExperiment(gen.generateRandomSignature(1000));
-			iterating.printMetrics();
-		}
-
+		System.out.println("Sig: " + sig);
+		
+		OneDepletingComparison expr = new OneDepletingComparison(ont, null);
+		expr.performExperiment(sig);
+		expr.printMetrics();
+		
 	}
 
 

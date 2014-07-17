@@ -1,8 +1,13 @@
 package uk.ac.liv.moduleextraction.experiments;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
@@ -24,7 +29,7 @@ public class MultipleExperiments {
 
 	private Experiment experiment;
 
-	public void runExperiments(OWLOntology ontology, File signaturesLocation, Experiment experimentType) throws IOException{
+	public void runExperiments(File signaturesLocation, Experiment experimentType) throws IOException{
 		this.experiment = experimentType;
 
 		Experiment experiment = experimentType;
@@ -37,9 +42,6 @@ public class MultipleExperiments {
 		File newResultFolder = copyDirectoryStructure(signaturesLocation, "Signatures",new File(ModulePaths.getResultLocation()));
 
 
-
-
-
 		int experimentCount = 1;
 		for(File f : files){
 			if(f.isFile()){
@@ -48,9 +50,7 @@ public class MultipleExperiments {
 				experimentCount++;
 				//New folder in result location - same name as sig file
 				File experimentLocation = new File(newResultFolder.getAbsoluteFile() + "/" + f.getName());
-				if(!experimentLocation.exists()){
-					experimentLocation.mkdir();
-				}
+
 
 				if(new File(experimentLocation.getAbsolutePath() + "/experiment-results").exists()){
 					System.out.println("Experiment results already exists - skipping");
@@ -67,6 +67,65 @@ public class MultipleExperiments {
 
 				//Write any metrics
 				experiment.writeMetrics(experimentLocation);
+			}
+		}
+	}
+
+	/** Signature location is a list of directories whos subdirectories are all signature files size-100,size-250... etc. */
+	public void runAlternatingExperiments(File signaturesLocation, Experiment experiment) throws IOException{
+		this.experiment  = experiment;
+		File[] signaturedirs = signaturesLocation.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.isDirectory();
+			}
+		});
+
+		signaturedirs = signaturesLocation.listFiles();
+
+		Arrays.sort(signaturedirs); 
+
+		ArrayList<File>[] mapping = new ArrayList[signaturedirs.length];
+		int i = 0;
+		int max = 0;
+		for(File f : signaturedirs){
+			List<File> siglisting = Arrays.asList(f.listFiles());
+			max = Math.max(max, siglisting.size());
+			mapping[i++] = new ArrayList<File>(siglisting);
+		}
+
+
+		int experimentCount = 1;
+		for (int j2 = 0; j2 < max; j2++) {
+			for (int j = 0; j < mapping.length; j++) {
+				ArrayList<File> files = mapping[j];
+				Collections.sort(files);
+				if(files.size() >= j2){
+					System.out.println("Experiment: " + experimentCount++);
+					
+					File signature = files.get(j2);
+					
+					File experimentLocation = copyDirectoryStructure(signature,"Signatures", new File(ModulePaths.getResultLocation()));
+					experimentLocation = new File(experimentLocation.getAbsolutePath() + "/" + signature.getName());
+	
+					if(new File(experimentLocation.getAbsolutePath() + "/experiment-results").exists()){
+						System.out.println("Experiment results already exists - skipping");
+						continue;
+					}
+					if(!experimentLocation.exists()){
+						experimentLocation.mkdir();
+					}
+
+					SigManager manager = new SigManager(signature.getParentFile());
+					Set<OWLEntity> sig  = manager.readFile(signature.getName());
+					experiment.performExperiment(sig,signature);
+
+					manager.writeFile(sig, "signature");
+					experimentCount++;
+
+					experiment.writeMetrics(experimentLocation);
+
+				}
 
 			}
 		}
@@ -100,10 +159,10 @@ public class MultipleExperiments {
 		}
 
 		File targetFile = new File(target);
+
 		//Name the folder by experiment
 		String newFolderName = targetFile.getName() + "-" + experiment.getClass().getSimpleName();
 		targetFile = new File(targetFile.getParent() + "/" + newFolderName);
-
 
 		if(!targetFile.exists()){
 			System.out.println("Making directory: " + targetFile.getAbsolutePath());
@@ -114,47 +173,14 @@ public class MultipleExperiments {
 		return targetFile;
 	} 
 
-	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException {
-	
+	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException, InterruptedException {
 
 
-		File ontLoc = new File(ModulePaths.getOntologyLocation() + "/Thesaurus_14.05d.owl-core");
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontLoc.getAbsolutePath());
+		OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/examples/lhs.krss");
+		File sigs = new File("/users/loco/wgatens/ecai-testing/Signatures/OneDepleting/Thesaurus_14.05d.owl-QBF/role-0");
 
-		MultipleExperiments multi = new MultipleExperiments();
-		int[] intervals = {100,250,500,750,1000};
-		String rolepct = args[0];
+		new MultipleExperiments().runAlternatingExperiments(sigs, new AMEXvsSTAR(ontology));
 
-		for(int i : intervals){
-			multi.runExperiments(ont, 
-					new File(ModulePaths.getSignatureLocation() + "/OneDepleting/" + ontLoc.getName() + "/role-" + rolepct + "/size-" + i),
-					new OneDepletingComparison(ont, ontLoc));
-
-		}
-
-		ont = null;
-
-		ontLoc = new File(ModulePaths.getOntologyLocation() + "/Thesaurus_14.05d.owl-sub");
-		ont = OntologyLoader.loadOntologyAllAxioms(ontLoc.getAbsolutePath());
-
-
-		for(int i : intervals){
-				multi.runExperiments(ont, 
-						new File(ModulePaths.getSignatureLocation() + "/OneDepleting/" + ontLoc.getName() + "/role-" + rolepct + "/size-" + i),
-						new OneDepletingComparison(ont, ontLoc));
-		}
-
-		ont = null;
-
-		ontLoc = new File(ModulePaths.getOntologyLocation() + "/hesaurus_14.05d.owl-equiv");
-		ont = OntologyLoader.loadOntologyAllAxioms(ontLoc.getAbsolutePath());
-
-
-		for(int i : intervals){
-				multi.runExperiments(ont, 
-						new File(ModulePaths.getSignatureLocation() + "/OneDepleting/" + ontLoc.getName() + "/role-" + rolepct + "/size-" + i),
-						new OneDepletingComparison(ont, ontLoc));
-		}
 
 
 
