@@ -100,30 +100,5 @@ public class AcylicNotTerminologyExtractor implements Extractor {
 		return null;
 	}
 
-	public static void main(String[] args) {
-	OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_09.07e.OWL");
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-		AcylicNotTerminologyExtractor extractor = new AcylicNotTerminologyExtractor(ont, RemovalStrategy.REMOVE_SUBSUMPTIONS);
-		AcylicNotTerminologyExtractor extractor2 = new AcylicNotTerminologyExtractor(ont, RemovalStrategy.REMOVE_EQUALITIES);
-		
-		System.out.println(ont.getLogicalAxiomCount());
-		for (int i = 0; i < 1000; i++) {
-			Set<OWLEntity> siggy = gen.generateRandomSignature(50);
-			Set<OWLLogicalAxiom> mod1 = extractor.extractModule(siggy);
-			Set<OWLLogicalAxiom> mod2 = extractor2.extractModule(siggy);
-			
-			mod1.removeAll(mod2);
-			
-			System.out.println(mod1);
-			
-			System.out.println("------------------");
-		}
-		
-
-	
-		
-	
-		
-	}
 	
 }

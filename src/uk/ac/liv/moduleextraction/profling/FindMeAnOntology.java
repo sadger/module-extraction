@@ -3,8 +3,10 @@ package uk.ac.liv.moduleextraction.profling;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Set;
 
 import org.semanticweb.owlapi.model.AxiomType;
+import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
@@ -15,6 +17,7 @@ import uk.ac.liv.ontologyutils.expressions.ALCValidator;
 import uk.ac.liv.ontologyutils.expressions.ELValidator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.EquivalentToTerminologyChecker;
+import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
 import uk.ac.liv.ontologyutils.ontologies.TerminologyChecker;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
@@ -36,10 +39,11 @@ public class FindMeAnOntology {
 
 		File[] ontologyFiles = ontologyDirectory.listFiles();
 		Collections.sort(Arrays.asList(ontologyFiles));
-		System.out.println("Name,Expressiveness,LogicalAxioms,Inclusions,Equivalences, Repeated Inclusions, Repeated Equivalances, SharedNames, Concepts, Roles");
+		System.out.println("Name,Expressiveness,LogicalAxioms,Inclusions,Equivalences, "
+				+ "Repeated Inclusions, Repeated Equivalances, SharedNames, Concepts, "
+				+ "Roles, CoreEL, CoreCyclic");
 		for(File f: ontologyFiles){
 			if(f.isFile()){
-				System.out.println(f.getName());
 				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
 				profileOntology(f.getName(), ont);
 //				System.out.println();
@@ -55,21 +59,10 @@ public class FindMeAnOntology {
 		String express = checker.getDescriptionLogicName();
 		
         String shortName = fileName.substring(Math.max(0, fileName.length() - 20));
-        
-        System.out.println(elvalidator.isELOntology(ModuleUtils.getCoreAxioms(ont)));
-//		AxiomTypeProfile p = new AxiomTypeProfile(ont);
-//		ExpressionTypeProfiler exp = new ExpressionTypeProfiler();
-//		p.printMetrics();
-//		System.out.println();
-//		exp.profileOntology(ont);
-//	
-//		System.out.println("Class in sig: " + ont.getClassesInSignature().size());
-//		System.out.println("Roles in sig: " + ont.getObjectPropertiesInSignature().size());
-//		System.out.println("Sig size: " + ont.getSignature().size());
-//		System.out.println("");	
-//		
-        
-
+        Set<OWLLogicalAxiom> core = ModuleUtils.getCoreAxioms(ont);
+//        System.out.println("Core");
+//        System.out.println("EL?:" + elvalidator.isELOntology(core));
+        OntologyCycleVerifier verifier = new OntologyCycleVerifier(core);
 
 		
 		AxiomStructureInspector inspector = new AxiomStructureInspector(ont);
@@ -77,14 +70,16 @@ public class FindMeAnOntology {
 		System.out.println(shortName + "," + express + ","+ ont.getLogicalAxiomCount() + "," + ont.getAxiomCount(AxiomType.SUBCLASS_OF) + "," + 
 		ont.getAxiomCount(AxiomType.EQUIVALENT_CLASSES) + "," + inspector.countNamesWithRepeatedInclusions() +
 		"," + inspector.countNamesWithRepeatedEqualities() + "," + inspector.getSharedNames().size() 
-		+ "," + ont.getClassesInSignature().size() + "," + ont.getObjectPropertiesInSignature().size());
+		+ "," + ont.getClassesInSignature().size() + "," + ont.getObjectPropertiesInSignature().size() 
+		+ "," + elvalidator.isELOntology(core) + "," + verifier.isCyclic());
 
+		
 
 	}
 
 	public static void main(String[] args) throws OWLOntologyCreationException, OWLOntologyStorageException {
 
-	FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/Ana"));
+	FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/Bioportal"));
 	find.profileOntologies();
 			
 	}
@@ -94,4 +89,3 @@ public class FindMeAnOntology {
 
 }
 
-	

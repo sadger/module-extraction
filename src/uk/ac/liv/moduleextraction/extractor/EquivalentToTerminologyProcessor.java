@@ -141,16 +141,4 @@ public class EquivalentToTerminologyProcessor {
 
 	
 	
-	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "/moduletest/equiv.krss");
-		System.out.println(ont.getLogicalAxioms());
-		try {
-			EquivalentToTerminologyProcessor extractor = new EquivalentToTerminologyProcessor(ont);
-			extractor.getConvertedOntology();
-		} catch (NotEquivalentToTerminologyException e) {
-			e.printStackTrace();
-		} catch (OWLOntologyCreationException e) {
-			e.printStackTrace();
-		}
-	}
 }

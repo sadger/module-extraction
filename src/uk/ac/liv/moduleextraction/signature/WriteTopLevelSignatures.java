@@ -55,10 +55,5 @@ public class WriteTopLevelSignatures {
 		return topLevelClasses;
 	}
 	
-	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntologyInclusionsAndEqualities(ModulePaths.getOntologyLocation() + "nci-08.09d-terminology.owl");
-		WriteTopLevelSignatures t = new WriteTopLevelSignatures(ont, new File(ModulePaths.getSignatureLocation() + "/NCI-Kinds"));
-		t.writeSignatures();
-		
-	}
+	
 }

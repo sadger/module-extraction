@@ -32,7 +32,7 @@ public class ReloadExperimentFromDisk {
 	}
 
 	private Set<OWLLogicalAxiom> restoreOntology(String ontLocation){
-		OWLOntology ontology = OntologyLoader.loadOntologyInclusionsAndEqualities(EXPERIMENT_LOCATION + "/" + ontLocation);
+		OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(EXPERIMENT_LOCATION + "/" + ontLocation);
 		if(ontology == null)
 			System.err.println("Ontology " + ontLocation + " not found");
 		
