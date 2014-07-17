@@ -1,5 +1,6 @@
 package uk.ac.liv.moduleextraction.experiments;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,10 +16,11 @@ public class SupportedExpressivenessFilter implements SupportedFilter {
 	}
 
 	@Override
-	public Set<OWLLogicalAxiom> getUnsupportedAxioms(Set<OWLLogicalAxiom> axioms) {
+	public Set<OWLLogicalAxiom> getUnsupportedAxioms(Collection<OWLLogicalAxiom> axioms) {
 		HashSet<OWLLogicalAxiom> unsupported = new HashSet<OWLLogicalAxiom>();
 		SupportedAxiomVerifier verifier = new SupportedAxiomVerifier();
 		for(OWLLogicalAxiom axiom : axioms){
+			
 			if(!verifier.isSupportedAxiom(axiom)){
 				unsupported.add(axiom);
 			}

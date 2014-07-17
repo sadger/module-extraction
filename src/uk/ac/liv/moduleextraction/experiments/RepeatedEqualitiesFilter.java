@@ -1,5 +1,6 @@
 package uk.ac.liv.moduleextraction.experiments;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public class RepeatedEqualitiesFilter implements SupportedFilter{
 	}
 
 	@Override
-	public Set<OWLLogicalAxiom> getUnsupportedAxioms(Set<OWLLogicalAxiom> axioms) {
+	public Set<OWLLogicalAxiom> getUnsupportedAxioms(Collection<OWLLogicalAxiom> axioms) {
 		Set<OWLLogicalAxiom> unsupported = new HashSet<OWLLogicalAxiom>();
 		for(OWLClass repeated : inspector.getNamesWithRepeatedEqualities()){
 			Set<OWLLogicalAxiom> repeatedEqualities = new HashSet<OWLLogicalAxiom>(inspector.getDefinitions(repeated));
