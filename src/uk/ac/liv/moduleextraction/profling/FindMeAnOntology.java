@@ -1,6 +1,9 @@
 package uk.ac.liv.moduleextraction.profling;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
@@ -30,34 +33,56 @@ public class FindMeAnOntology {
 	EquivalentToTerminologyChecker equivTermChecker = new EquivalentToTerminologyChecker();
 	private File ontologyDirectory;
 	int termCount = 0;
+	private BufferedWriter writer;
+	private String file;
 
-	public FindMeAnOntology(File ontologyDirectory) {
+	public FindMeAnOntology(File ontologyDirectory, String file) {
 		this.ontologyDirectory = ontologyDirectory;
+		this.file = file;
 	}
 
-	public void profileOntologies(){
-
+	public void profileOntologies() throws IOException{
+		System.gc();
+		writer = new BufferedWriter(new FileWriter(ModulePaths.getResultLocation() + "/" + file, false));
 		File[] ontologyFiles = ontologyDirectory.listFiles();
 		Collections.sort(Arrays.asList(ontologyFiles));
-		System.out.println("Name,Expressiveness,LogicalAxioms,Inclusions,Equivalences, "
+		writer.write("Name,Expressiveness,LogicalAxioms,Inclusions,Equivalences, "
 				+ "Repeated Inclusions, Repeated Equivalances, SharedNames, Concepts, "
-				+ "Roles, CoreEL, CoreCyclic");
+				+ "Roles, CoreEL, CoreCyclic, Location\n");
 		for(File f: ontologyFiles){
 			if(f.isFile()){
-				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
-				profileOntology(f.getName(), ont);
+				OWLOntology ont = null;
+				try{
+					ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
+					if(ont != null){
+						System.out.println(f.getName());
+						profileOntology(f, ont);
+						ont.getOWLOntologyManager().removeOntology(ont);
+						writer.flush();
+					}
+				}
+				catch(NullPointerException ioe){
+					System.out.println("Oh so null");
+				}
+
+
+				ont = null;
 //				System.out.println();
 
 
 			}
 		}
+
+		writer.close();
+
 	}
 
-	private void profileOntology(String fileName,OWLOntology ont){
+	private void profileOntology(File location,OWLOntology ont) throws IOException{
 //		System.out.println("Logical Axiom Count: " + ont.getLogicalAxiomCount());
 		DLExpressivityChecker checker = new DLExpressivityChecker(Collections.singleton(ont));
 		String express = checker.getDescriptionLogicName();
 		
+		String fileName = location.getName();
         String shortName = fileName.substring(Math.max(0, fileName.length() - 20));
         Set<OWLLogicalAxiom> core = ModuleUtils.getCoreAxioms(ont);
 //        System.out.println("Core");
@@ -67,11 +92,13 @@ public class FindMeAnOntology {
 		
 		AxiomStructureInspector inspector = new AxiomStructureInspector(ont);
 		
-		System.out.println(shortName + "," + express + ","+ ont.getLogicalAxiomCount() + "," + ont.getAxiomCount(AxiomType.SUBCLASS_OF) + "," + 
+		
+		writer.write(shortName + "," + express + ","+ ont.getLogicalAxiomCount() + "," + ont.getAxiomCount(AxiomType.SUBCLASS_OF) + "," + 
 		ont.getAxiomCount(AxiomType.EQUIVALENT_CLASSES) + "," + inspector.countNamesWithRepeatedInclusions() +
 		"," + inspector.countNamesWithRepeatedEqualities() + "," + inspector.getSharedNames().size() 
 		+ "," + ont.getClassesInSignature().size() + "," + ont.getObjectPropertiesInSignature().size() 
-		+ "," + elvalidator.isELOntology(core) + "," + verifier.isCyclic());
+		+ "," + elvalidator.isELOntology(core) + "," + verifier.isCyclic() + "," + location.getAbsolutePath());
+		writer.write('\n');
 
 		
 
@@ -79,8 +106,12 @@ public class FindMeAnOntology {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, OWLOntologyStorageException {
 
-	FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/Bioportal"));
-	find.profileOntologies();
+	FindMeAnOntology find = new FindMeAnOntology(new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All"), "corpus-profile.csv");
+	try {
+		find.profileOntologies();
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
 			
 	}
 

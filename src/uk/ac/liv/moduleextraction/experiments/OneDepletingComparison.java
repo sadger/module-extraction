@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
@@ -31,6 +32,8 @@ import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
+import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
+import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
 public class OneDepletingComparison implements Experiment {
 
@@ -133,28 +136,29 @@ public class OneDepletingComparison implements Experiment {
 
 	public static void main(String[] args) throws IOException {
 
-		String ontologyName = "Thesaurus_14.05d.owl-sub";
-		int rolepct = 0;
-		int sigsize = 100;
-		int[] exprs = {183, 127, 162};
 
 	
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms("/users/loco/wgatens/ecai-testing/Ontologies/" + ontologyName);
-
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/examples/universal.krss");
+		System.out.println(ont.getLogicalAxioms());
 		OneDepletingComparison compare = new OneDepletingComparison(ont, null);
-		SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+		ModuleUtils.remapIRIs(ont, "X");
+		OWLDataFactory f = ont.getOWLOntologyManager().getOWLDataFactory();
+		OWLClass a = f.getOWLClass(IRI.create("X#A"));
+		OWLObjectProperty r = f.getOWLObjectProperty(IRI.create("X#r"));
+		
+		Set<OWLEntity> sig = new HashSet<OWLEntity>();
+		sig.add(a);
+		sig.add(r);
+		
+		
+		Set<OWLAxiom> top = new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.TOP).extract(sig);
+		Set<OWLAxiom> bot = new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.BOT).extract(sig);
+		
+		System.out.println(top);
+		System.out.println(bot);
+		compare.performExperiment(sig);
+		compare.printMetrics();
 
-
-		SigManager man = new SigManager(new File("/users/loco/wgatens/ecai-testing/Signatures/OneDepleting/" 
-				+ ontologyName + "/role-" + rolepct + "/" + "size-" + sigsize));
-
-
-		for(int e : exprs){
-			String experiment = "random_" + sigsize + "_" + rolepct + "-" + e;
-			Set<OWLEntity> sig = man.readFile(experiment);
-			compare.performExperiment(sig);
-			compare.printMetrics();
-		}
 
 
 

@@ -150,7 +150,7 @@ public class QBFFileWriter {
 		if(!signature.isEmpty()){
 			writer.write("a ");
 			for(OWLEntity ent : signature){
-				PropositionalFormula clsAsVar = convertor.convert(ent);
+				PropositionalFormula clsAsVar = ent.accept(convertor);
 				Integer associatedNumber = numberMap.get(clsAsVar);
 				/* 
 				 * If there is no mapping for the entity it no longer
@@ -169,7 +169,7 @@ public class QBFFileWriter {
 		if(!classesNotInSignature.isEmpty()){
 			writer.write("e ");
 			for(OWLEntity ent : classesNotInSignature){
-				PropositionalFormula clsAsVar = convertor.convert(ent);
+				PropositionalFormula clsAsVar = ent.accept(convertor);
 				
 				/* 
 				 * If there is no mapping for the entity it no longer
