@@ -22,8 +22,8 @@ public class AxiomTypes {
 
 
 	public static void main(String[] args) {
-		try {
-			ArrayList<File> files = ModuleUtils.getListAsFiles(new File(ModulePaths.getResultLocation() + "/small-location.txt"));
+		//	ArrayList<File> files = ModuleUtils.getListAsFiles(new File(ModulePaths.getResultLocation() + "/small-location.txt"));
+			File[] files = new File("/LOCAL/wgatens/Ontologies//OWL-Corpus-All/qbf-only").listFiles();
 			int i = 1;
 			Set<AxiomType<?>> types = new HashSet<AxiomType<?>>();
 			for(File f : files){
@@ -35,10 +35,10 @@ public class AxiomTypes {
 					for(OWLLogicalAxiom axiom : ont.getLogicalAxioms()){
 						SupportedAxiomVerifier verifier = new SupportedAxiomVerifier();
 						AxiomType<?> type = axiom.getAxiomType();
-						if(axiom.accept(new OneDepletingSupportedAxiomVerifier())){
+						if(!axiom.accept(new OneDepletingSupportedAxiomVerifier())){
 							System.out.println(axiom.getAxiomType());
 							System.out.println(axiom);
-							System.out.println(axiom.accept(new ALCAxiomToPropositionalConvertor()));
+						//	System.out.println(axiom.accept(new ALCAxiomToPropositionalConvertor()));
 							types.add(type);
 						}
 					}
@@ -51,8 +51,5 @@ public class AxiomTypes {
 			for(AxiomType<?> type : types){
 				System.out.println(type);
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 }

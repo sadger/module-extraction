@@ -1,5 +1,6 @@
 package uk.ac.liv.moduleextraction.extractor;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -24,6 +26,8 @@ import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.qbf.SeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
+import uk.ac.liv.ontologyutils.axioms.OneDepletingSupportedAxiomVerifier;
+import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
 import uk.ac.liv.ontologyutils.caching.AxiomMetricStore;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
@@ -77,10 +81,10 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 
 		boolean[] terminology = axiomStore.allAxiomsAsBoolean();
 		allAxioms = axiomStore.getSubsetAsList(terminology);
-		
+
 		SupportedExpressivenessFilter filter = new SupportedExpressivenessFilter();
 		allAxioms.removeAll(filter.getUnsupportedAxioms(allAxioms));
-		
+
 		OntologyCycleVerifier verifier = new OntologyCycleVerifier(allAxioms);
 
 		cycleCausing = verifier.getCycleCausingAxioms();
@@ -88,10 +92,13 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 		/* All axioms is now the acyclic subset of the ontology 
 		after removing unsupported or cycle causing axioms */
 		allAxioms.removeAll(cycleCausing);
+		
+		verifier = new OntologyCycleVerifier(allAxioms);
+		System.out.println(verifier.isCyclic());
 
 		dependT = new AxiomDependencies(new HashSet<OWLLogicalAxiom>(allAxioms));
 		acyclicAxioms = dependT.getDefinitorialSortedAxioms();
-		
+
 		module = existingModule;
 		sigUnionSigM = ModuleUtils.getClassAndRoleNamesInSet(existingModule);
 		sigUnionSigM.addAll(signature);
@@ -110,14 +117,11 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 	}
 
 	public void applyRules(boolean[] terminology) throws IOException, QBFSolverException{
-
-
-
 		moveELChainsToModule(acyclicAxioms, terminology, axiomStore);	
-		
+
 		Set<OWLLogicalAxiom> lhs = lhsExtractor.getLHSSigAxioms(acyclicAxioms, sigUnionSigM, dependT);
 		lhs.addAll(cycleCausing);
-		
+
 		if(inseparableChecker.isSeperableFromEmptySet(lhs,sigUnionSigM)){
 			OWLLogicalAxiom axiom = findSeparableAxiom(terminology);
 			module.add(axiom);
@@ -138,7 +142,7 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 					change = true;
 					ArrayList<OWLLogicalAxiom> chain = 
 							chainCollector.collectELAxiomChain(acyclicAxioms, i, terminology, axiomStore, dependT, sigUnionSigM);
-					
+
 					module.addAll(chain);
 					acyclicAxioms.removeAll(chain);
 				}
@@ -152,7 +156,7 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 	public long getQBFCount(){
 		return qbfChecks;
 	}
-	
+
 	public void removeAxiom(boolean[] terminology, OWLLogicalAxiom axiom){
 		axiomStore.removeAxiom(terminology, axiom);
 		allAxioms.remove(axiom);
@@ -160,37 +164,26 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 		acyclicAxioms.remove(axiom);
 	}
 
-	
+
 	public static void main(String[] args) {
-//		//OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/cycles/cycle-test2.krss");
-//		OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/NCI/Profile/Thesaurus_14.05d.owl-core");
-//		System.out.println("Loaded");
-//		ModuleUtils.remapIRIs(ontology, "X");
-//	
-//		OWLDataFactory factory = OWLManager.getOWLDataFactory();
-//		
-//		OWLClass a = factory.getOWLClass(IRI.create("X#A"));
-//		OWLClass b = factory.getOWLClass(IRI.create("X#B"));
-//		OWLClass bprime = factory.getOWLClass(IRI.create("X#B'"));
-//		OWLClass c = factory.getOWLClass(IRI.create("X#C"));
-//		OWLClass d = factory.getOWLClass(IRI.create("X#D"));		
-//		OWLClass x = factory.getOWLClass(IRI.create("X#X"));
-//		OWLClass y = factory.getOWLClass(IRI.create("X#Y"));
-//		
-//		Set<OWLEntity> sig = new HashSet<OWLEntity>();
-//		sig.add(a);
-//		sig.add(bprime);
-//		
-//		SignatureGenerator gen = new SignatureGenerator(ontology.getLogicalAxioms());
-//		sig = gen.generateRandomSignature(100);
-//		System.out.println(sig);
-//		CyclicOneDepletingModuleExtractor onedep = new CyclicOneDepletingModuleExtractor(ontology);
-//		HybridModuleExtractor hybrid = new HybridModuleExtractor(ontology);
-//	
-//		System.out.println("1-dep:  " + onedep.extractModule(sig).size());
-//		System.out.println("Hybrid: " + hybrid.extractModule(sig).size());
+
+			File[] files = new File("/LOCAL/wgatens/Ontologies//OWL-Corpus-All/qbf-only").listFiles();
+//			for(File f : files){
+//				//	System.out.println(i++);
+//				if(f.exists()){
+					File f = files[2];
+					System.out.print(f.getName() + ": ");
+					OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
+					System.out.println(ont.getLogicalAxiomCount());
+					CyclicOneDepletingModuleExtractor mod = new CyclicOneDepletingModuleExtractor(ont);
+					Set<OWLLogicalAxiom> subset = ModuleUtils.generateRandomAxioms(ont.getLogicalAxioms(), 10);
+					for(OWLLogicalAxiom sub : subset){
+						System.out.println(mod.extractModule(sub.getSignature()).size());
+					}
+//				}
+//			}
 		
-		
+
 	}
 
 
