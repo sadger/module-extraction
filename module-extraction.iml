@@ -41,15 +41,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$JAR_LOCATION$/owlapi-bin.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$JAR_LOCATION$/slf4j-api-1.7.2.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -60,6 +51,15 @@
       <library>
         <CLASSES>
           <root url="jar://$JAR_LOCATION$/slf4j-simple-1.7.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$JAR_LOCATION$/owlapi-distribution-3.5.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
