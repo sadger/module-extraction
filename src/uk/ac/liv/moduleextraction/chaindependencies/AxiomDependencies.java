@@ -1,5 +1,6 @@
 package uk.ac.liv.moduleextraction.chaindependencies;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -106,30 +107,10 @@ public class AxiomDependencies extends HashMap<OWLLogicalAxiom, DependencySet>{
 	}
 
 	public static void main(String[] args) {
-		//Construct expressive axioms
-		OWLDataFactory f = OWLManager.getOWLDataFactory();
-		OWLClass a = f.getOWLClass(IRI.create("X#A"));
-		OWLClass b = f.getOWLClass(IRI.create("X#B"));
-		OWLObjectProperty r = f.getOWLObjectProperty(IRI.create("X#r"));
-		OWLObjectProperty s = f.getOWLObjectProperty(IRI.create("X#s"));
-		OWLObjectPropertyRangeAxiom range = f.getOWLObjectPropertyRangeAxiom(r, b);
-		OWLDisjointClassesAxiom disjoint1 = f.getOWLDisjointClassesAxiom(a,b);
-		OWLSubObjectPropertyOfAxiom roleInc = f.getOWLSubObjectPropertyOfAxiom(r, s);
-		
-		OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms("TestData/dependencies/simple-dependencies.krss");
-		
-		Set<OWLLogicalAxiom> inputOntology = ontology.getLogicalAxioms();
-		inputOntology.add(disjoint1);
-		inputOntology.add(range);
-		inputOntology.add(roleInc);
-		
-		AxiomDefinitorialDepth d = new AxiomDefinitorialDepth(inputOntology);
+        File f = new File(ModulePaths.getOntologyLocation() + "/top.krss");
+        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
+        AxiomDependencies dep = new AxiomDependencies(ont.getLogicalAxioms());
+        System.out.println(dep);
 
-		for(OWLLogicalAxiom ax : d.getDefinitorialSortedList()){
-			System.out.println(d.lookup(ax) + ":" + ax);
-		}
-			
-		AxiomDependencies depend = new AxiomDependencies(inputOntology);
-		System.out.println(depend);
 	}
 }

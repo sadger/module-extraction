@@ -1,5 +1,6 @@
 package uk.ac.liv.moduleextraction.chaindependencies;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,119 +22,126 @@ import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
-/***
- * Definitorial depth calculator for ontologies with potentially 
- * shared names and repeated axioms. For repeated axioms 
- * repeated(A) = A <> C, A <> D is given the max depth of all 
- * such axioms depend(A <> X) max(repeated)  
+/**
+ * Definitorial depth calculator for ontologies with potentially
+ * shared names and repeated axioms. For repeated axioms
+ * repeated(A) = A <> C, A <> D is given the max depth of all
+ * such axioms depend(A <> X) max(repeated)
  */
 public class AxiomDefinitorialDepth {
 
 
-	private Set<OWLLogicalAxiom> logicalAxioms;
-	private HashMap<OWLLogicalAxiom, Integer> definitorialDepth;
-	private HashMap<OWLClass, Set<OWLClass>> immediateDependencies;
-	private int max = 0;
-	private Set<OWLLogicalAxiom> expressiveAxioms;
-	private OWLDataFactory factory;
+    private Set<OWLLogicalAxiom> logicalAxioms;
+    private HashMap<OWLLogicalAxiom, Integer> definitorialDepth;
+    private HashMap<OWLClass, Set<OWLClass>> immediateDependencies;
+    private int max = 0;
+    private Set<OWLLogicalAxiom> expressiveAxioms;
+    private OWLDataFactory factory;
 
-	public AxiomDefinitorialDepth(OWLOntology ontology) {
-		this(ontology.getLogicalAxioms());
-	}
+    public AxiomDefinitorialDepth(OWLOntology ontology) {
+        this(ontology.getLogicalAxioms());
+    }
 
-	public int lookup(OWLLogicalAxiom ax) {
-		return definitorialDepth.get(ax);
-	}
+    public int lookup(OWLLogicalAxiom ax) {
+        return definitorialDepth.get(ax);
+    }
 
-	public AxiomDefinitorialDepth(Set<OWLLogicalAxiom> axioms) {
-		this.factory = OWLManager.getOWLDataFactory();
-		this.logicalAxioms = axioms;
-		this.definitorialDepth = new HashMap<OWLLogicalAxiom, Integer>(axioms.size());
-		this.immediateDependencies = new HashMap<OWLClass, Set<OWLClass>>();
-		this.expressiveAxioms = new HashSet<OWLLogicalAxiom>();
-		populateImmediateDependencies();
-		System.out.println(immediateDependencies);
-		generateDefinitorialDepths();
-		assignExpressiveAxiomsValue();
+    public AxiomDefinitorialDepth(Set<OWLLogicalAxiom> axioms) {
+        this.factory = OWLManager.getOWLDataFactory();
+        this.logicalAxioms = axioms;
+        this.definitorialDepth = new HashMap<OWLLogicalAxiom, Integer>(axioms.size());
+        this.immediateDependencies = new HashMap<OWLClass, Set<OWLClass>>();
+        this.expressiveAxioms = new HashSet<OWLLogicalAxiom>();
+        populateImmediateDependencies();
 
-	}
+        generateDefinitorialDepths();
+        assignExpressiveAxiomsValue();
+        System.out.println(immediateDependencies);
+        System.out.println(definitorialDepth);
 
-	public ArrayList<OWLLogicalAxiom> getDefinitorialSortedList(){
-		ArrayList<OWLLogicalAxiom> sortedAxioms = new ArrayList<OWLLogicalAxiom>(logicalAxioms);
-		Collections.sort(sortedAxioms, new FullAxiomComparator(definitorialDepth));
+    }
 
-		return sortedAxioms;
-	}
+    public ArrayList<OWLLogicalAxiom> getDefinitorialSortedList() {
+        ArrayList<OWLLogicalAxiom> sortedAxioms = new ArrayList<OWLLogicalAxiom>(logicalAxioms);
+        Collections.sort(sortedAxioms, new FullAxiomComparator(definitorialDepth));
 
-	private void populateImmediateDependencies() {
-		for(OWLLogicalAxiom axiom : logicalAxioms){
-			System.out.println(axiom);
-			if(ModuleUtils.isInclusionOrEquation(axiom)){
-				OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
-				OWLClassExpression definiton = AxiomSplitter.getDefinitionofAxiom(axiom);
-				Set<OWLClass> currentDepedencies = immediateDependencies.get(name);
-				Set<OWLClass> definitionClasses = definiton.getClassesInSignature();
-				//Dependencies don't consider TOP or BOTTOM constructs
-				definitionClasses.remove(factory.getOWLThing());
-				definitionClasses.remove(factory.getOWLNothing());
-				if(currentDepedencies == null){
-					immediateDependencies.put(name,definitionClasses);
-				}
-				else{
-					currentDepedencies.addAll(definitionClasses);
-				}
-			}
-			else{
-				expressiveAxioms.add(axiom);
-			}
-		}
+        return sortedAxioms;
+    }
 
-	}
+    private void populateImmediateDependencies() {
+        for (OWLLogicalAxiom axiom : logicalAxioms) {
+            System.out.println(axiom);
+            if (ModuleUtils.isInclusionOrEquation(axiom)) {
+                OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
+                OWLClassExpression definiton = AxiomSplitter.getDefinitionofAxiom(axiom);
+                Set<OWLClass> currentDepedencies = immediateDependencies.get(name);
+                Set<OWLClass> definitionClasses = definiton.getClassesInSignature();
+                //Dependencies don't consider TOP or BOTTOM constructs
+//                definitionClasses.remove(factory.getOWLThing());
+//                definitionClasses.remove(factory.getOWLNothing());
+                if (currentDepedencies == null) {
+                    immediateDependencies.put(name, definitionClasses);
+                } else {
+                    currentDepedencies.addAll(definitionClasses);
+                }
+            } else {
+                expressiveAxioms.add(axiom);
+            }
+        }
 
-	private void generateDefinitorialDepths(){
-		for(OWLLogicalAxiom axiom : logicalAxioms){
-			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
-			System.out.println(axiom); System.out.println(name);
-			definitorialDepth.put(axiom, calculateDepth(name));
-		}
-	}
+    }
 
-	private int calculateDepth(OWLClass name) {
-		if(immediateDependencies.get(name) == null){
-			return 0;
-		}
-		else{
-			HashSet<Integer> depths = new HashSet<Integer>();
-			for(OWLClass dep : immediateDependencies.get(name)){
-				if(definitorialDepth.get(dep) == null){
-					depths.add(calculateDepth(dep));
-				}
-				else{
-					depths.add(definitorialDepth.get(dep));
-				}
-				
-			}
-			System.out.println(depths);
-			int result =  1 + Collections.max(depths);
-			max = Math.max(max, result);
+    private void generateDefinitorialDepths() {
+        ArrayList<OWLLogicalAxiom> listaxioms = new ArrayList<OWLLogicalAxiom>(logicalAxioms);
+        Collections.shuffle(listaxioms);
+        for (OWLLogicalAxiom axiom : listaxioms) {
+            System.out.println("Depth for:" + axiom);
+            OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
+            definitorialDepth.put(axiom, calculateDepth(name));
+        }
+    }
 
-			return result;
-		}	
-	}
+    /** Names can be recalculated which may be expensive
+     *  maybe instead store definitorial depth for concept names again */
+    private int calculateDepth(OWLClass name) {
+        if (immediateDependencies.get(name) == null) {
+            return 0;
+        } else {
+            HashSet<Integer> depths = new HashSet<Integer>();
+            for (OWLClass dep : immediateDependencies.get(name)) {
+                if(dep.isOWLNothing() || dep.isOWLThing()){
+                    depths.add(0);
+                }
+                else{
+                    depths.add(calculateDepth(dep));
+                }
+            }
+            System.out.println(depths);
+            int result = 1 + Collections.max(depths);
+            max = Math.max(max, result);
 
-	/*
-	 * Expressive axioms often cannot be realised in terms of definitioral depth
-	 * (role inclusions) or can create depth cycles (disjointness axioms). So
-	 * we assign any non-inclusion or equation to be MAX+1 depth of any other
-	 * axiom in the ontology;
-	 */
-	private void assignExpressiveAxiomsValue() {
-		int expressiveValue = max + 1;
-		for(OWLLogicalAxiom axiom : expressiveAxioms){
-			definitorialDepth.put(axiom, expressiveValue);
-		}
-	}
+            return result;
+        }
+    }
 
+    /*
+     * Expressive axioms often cannot be realised in terms of definitioral depth
+     * (role inclusions) or can create depth cycles (disjointness axioms). So
+     * we assign any non-inclusion or equation to be MAX+1 depth of any other
+     * axiom in the ontology;
+     */
+    private void assignExpressiveAxiomsValue() {
+        int expressiveValue = max + 1;
+        for (OWLLogicalAxiom axiom : expressiveAxioms) {
+            definitorialDepth.put(axiom, expressiveValue);
+        }
+    }
 
+    public static void main(String[] args) {
+        File f = new File(ModulePaths.getOntologyLocation() + "/top.krss");
+        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
+        AxiomDefinitorialDepth dep = new AxiomDefinitorialDepth(ont.getLogicalAxioms());
+        System.out.println(dep.getDefinitorialSortedList());
 
+    }
 }
