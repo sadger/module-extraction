@@ -7,11 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -23,12 +18,7 @@ import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
 import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.qbf.CyclicSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
-import uk.ac.liv.moduleextraction.qbf.SeparabilityAxiomLocator;
-import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
-import uk.ac.liv.ontologyutils.axioms.OneDepletingSupportedAxiomVerifier;
-import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
-import uk.ac.liv.ontologyutils.caching.AxiomMetricStore;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
@@ -36,20 +26,20 @@ import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 public class CyclicOneDepletingModuleExtractor implements Extractor {
 
-	private DefinitorialAxiomStore axiomStore;
+	private final DefinitorialAxiomStore axiomStore;
 	private Set<OWLLogicalAxiom> module;
 	private Set<OWLEntity> sigUnionSigM;
-	private InseperableChecker inseparableChecker;
+	private final InseperableChecker inseparableChecker;
 	private long qbfChecks = 0;
-	private ELAxiomChainCollector chainCollector;
+	private final ELAxiomChainCollector chainCollector;
 	private AxiomDependencies dependT;
-	private ExtendedLHSSigExtractor lhsExtractor;
-	List<OWLLogicalAxiom> allAxioms;
+	private final ExtendedLHSSigExtractor lhsExtractor;
+	private List<OWLLogicalAxiom> allAxioms;
 	private Set<OWLLogicalAxiom> cycleCausing;
 	private Set<OWLLogicalAxiom> expressive;
 	private ArrayList<OWLLogicalAxiom> acyclicAxioms;
 
-	public CyclicOneDepletingModuleExtractor(OWLOntology ontology) {
+	private CyclicOneDepletingModuleExtractor(OWLOntology ontology) {
 		this(ontology.getLogicalAxioms());
 	}
 
@@ -118,18 +108,15 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 		return module;
 	}
 
-	public void applyRules(boolean[] terminology) throws IOException, QBFSolverException{
+	void applyRules(boolean[] terminology) throws IOException, QBFSolverException{
 		moveELChainsToModule(acyclicAxioms, terminology, axiomStore);	
 
-		
 		Set<OWLLogicalAxiom> lhs = lhsExtractor.getLHSSigAxioms(acyclicAxioms, sigUnionSigM, dependT);
-		
-	
 		lhs.addAll(cycleCausing);
 		lhs.addAll(expressive);
 
 		if(inseparableChecker.isSeperableFromEmptySet(lhs,sigUnionSigM)){
-			OWLLogicalAxiom axiom = findSeparableAxiom(terminology);
+            OWLLogicalAxiom axiom = findSeparableAxiom(terminology);
 			module.add(axiom);
 			removeAxiom(terminology, axiom);
 			sigUnionSigM.addAll(axiom.getSignature());
@@ -163,11 +150,12 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 		return qbfChecks;
 	}
 
-	public void removeAxiom(boolean[] terminology, OWLLogicalAxiom axiom){
+	void removeAxiom(boolean[] terminology, OWLLogicalAxiom axiom){
 		axiomStore.removeAxiom(terminology, axiom);
 		allAxioms.remove(axiom);
 		cycleCausing.remove(axiom);
 		acyclicAxioms.remove(axiom);
+        expressive.remove(axiom);
 	}
 
 
@@ -177,7 +165,7 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 		//			for(File f : files){
 		//				//	System.out.println(i++);
 		//			if(f.exists()){
-		File f = new File(ModulePaths.getOntologyLocation() + "OWL-Corpus-All/qbf-only/5bef3885-eef0-4497-888e-7ff5bef673e5_graphy.owl-QBF");
+		File f = new File(ModulePaths.getOntologyLocation() + "5bef3885-eef0-4497-888e-7ff5bef673e5_graphy.owl-QBF");
 
 		System.out.print(f.getName() + ": ");
 

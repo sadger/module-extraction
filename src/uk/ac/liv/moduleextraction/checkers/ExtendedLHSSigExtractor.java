@@ -23,6 +23,7 @@ import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 import uk.ac.liv.ontologyutils.axioms.AxiomStructureInspector;
+import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
@@ -33,7 +34,7 @@ public class ExtendedLHSSigExtractor {
 	private Set<OWLEntity> signatureDependencies = new HashSet<OWLEntity>();
 
 	AxiomDependencies dependencies;
-
+    SupportedAxiomVerifier verifier = new SupportedAxiomVerifier();
 
 
 	public HashSet<OWLLogicalAxiom> getLHSSigAxioms(boolean[] terminology,
@@ -48,7 +49,7 @@ public class ExtendedLHSSigExtractor {
 		for (int i = 0; i < terminology.length; i++) {
 			if(terminology[i]){
 				OWLLogicalAxiom axiom = axiomStore.getAxiom(i);
-				if(!ModuleUtils.isInclusionOrEquation(axiom)){
+                if(!verifier.isSupportedAxiom(axiom)){
 					lhsSigT.add(axiom);
 				}
 				else{
@@ -73,7 +74,7 @@ public class ExtendedLHSSigExtractor {
 		Set<OWLClass> sharedOrRepeated = getSharedOrRepeatedNames(sortedOntology);
 
 		for(OWLLogicalAxiom axiom : sortedOntology){
-			if(!ModuleUtils.isInclusionOrEquation(axiom)){
+			if(!verifier.isSupportedAxiom(axiom)){
 				lhsSigT.add(axiom);
 			}
 			else{
