@@ -56,8 +56,6 @@ public class AxiomDefinitorialDepth {
 
         generateDefinitorialDepths();
         assignExpressiveAxiomsValue();
-        System.out.println(immediateDependencies);
-        System.out.println(definitorialDepth);
 
     }
 
@@ -70,7 +68,6 @@ public class AxiomDefinitorialDepth {
 
     private void populateImmediateDependencies() {
         for (OWLLogicalAxiom axiom : logicalAxioms) {
-            System.out.println(axiom);
             if (ModuleUtils.isInclusionOrEquation(axiom)) {
                 OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
                 OWLClassExpression definiton = AxiomSplitter.getDefinitionofAxiom(axiom);
@@ -95,7 +92,6 @@ public class AxiomDefinitorialDepth {
         ArrayList<OWLLogicalAxiom> listaxioms = new ArrayList<OWLLogicalAxiom>(logicalAxioms);
         Collections.shuffle(listaxioms);
         for (OWLLogicalAxiom axiom : listaxioms) {
-            System.out.println("Depth for:" + axiom);
             OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
             definitorialDepth.put(axiom, calculateDepth(name));
         }
@@ -116,7 +112,6 @@ public class AxiomDefinitorialDepth {
                     depths.add(calculateDepth(dep));
                 }
             }
-            System.out.println(depths);
             int result = 1 + Collections.max(depths);
             max = Math.max(max, result);
 
@@ -138,7 +133,7 @@ public class AxiomDefinitorialDepth {
     }
 
     public static void main(String[] args) {
-        File f = new File(ModulePaths.getOntologyLocation() + "/top.krss");
+        File f = new File(ModulePaths.getOntologyLocation() + "/examples/top.krss");
         OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
         AxiomDefinitorialDepth dep = new AxiomDefinitorialDepth(ont.getLogicalAxioms());
         System.out.println(dep.getDefinitorialSortedList());
