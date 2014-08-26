@@ -139,7 +139,7 @@ public class HybridModuleExtractor implements Extractor {
 
 	public Set<OWLLogicalAxiom> extractStarModule(OWLOntology ontology, Set<OWLEntity> signature){
 		SyntacticLocalityModuleExtractor 
-		extractor = new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.STAR);
+		extractor = new SyntacticLocalityModuleExtractor(OWLManager.createOWLOntologyManager(), ontology, ModuleType.STAR);
 
 		Set<OWLLogicalAxiom> module = ModuleUtils.getLogicalAxioms(extractor.extract(signature));
 		manager.removeOntology(ontology);
@@ -163,8 +163,6 @@ public class HybridModuleExtractor implements Extractor {
 	}
 
 
-
-
 	private Set<OWLLogicalAxiom> extractSemanticModule(OWLOntology ontology, Set<OWLLogicalAxiom> existingmodule, Set<OWLEntity> signature){
 		EquivalentToTerminologyExtractor extractor = new EquivalentToTerminologyExtractor(ontology);
 		Set<OWLLogicalAxiom> module = extractor.extractModule(existingmodule, signature);
@@ -175,22 +173,6 @@ public class HybridModuleExtractor implements Extractor {
 		return module;
 	}
 
-
-
-
-	public static OWLOntology createOntology(Set<OWLLogicalAxiom> axioms) {
-		Set<OWLAxiom> newOntAxioms = new HashSet<OWLAxiom>();
-		newOntAxioms.addAll(axioms);
-		OWLOntology ont = null;
-		try {
-			ont = OWLManager.createOWLOntologyManager().createOntology(newOntAxioms);
-		} catch (OWLOntologyCreationException e) {
-			e.printStackTrace();
-		}
-
-		return ont;
-
-	}
 	public int getStarExtractions() {
 		return starExtractions;
 	}

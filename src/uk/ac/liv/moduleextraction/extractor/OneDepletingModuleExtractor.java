@@ -18,13 +18,7 @@ public class OneDepletingModuleExtractor implements Extractor {
 	}
 	
 	public OneDepletingModuleExtractor(Set<OWLLogicalAxiom> axioms){;
-		OntologyCycleVerifier verifier = new OntologyCycleVerifier(ModuleUtils.getSupportedAxioms(axioms));
-		if(verifier.isCyclic()){
 			extractor = new CyclicOneDepletingModuleExtractor(axioms);
-		}
-		else{
-			extractor = new AcyclicOneDepletingModuleExtractor(axioms);
-		}
 	}
 	
 	@Override

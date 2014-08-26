@@ -47,8 +47,8 @@ public class HybridExtractorExperiment implements Experiment {
 	public HybridExtractorExperiment(OWLOntology ont, File originalLocation) {
 		this.ontology = ont;
 		this.location = originalLocation;
-		OWLOntologyManager manager = ont.getOWLOntologyManager();
-		this.starExtractor = new SyntacticLocalityModuleExtractor(manager, ont, ModuleType.STAR);
+	
+		this.starExtractor = new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.STAR);
 		this.iteratingExtractor = new HybridModuleExtractor(ont, CycleRemovalMethod.NAIVE);
 	}
 

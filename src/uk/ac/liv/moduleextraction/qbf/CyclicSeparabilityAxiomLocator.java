@@ -20,20 +20,8 @@ public class CyclicSeparabilityAxiomLocator extends SeparabilityAxiomLocator {
 	
 	@Override
 	public HashSet<OWLLogicalAxiom> getCheckingSet(List<OWLLogicalAxiom> axioms, Set<OWLEntity> sigUnionSigM, AxiomDependencies dependT) {
-		HashSet<OWLLogicalAxiom> checkingSet = new HashSet<OWLLogicalAxiom>(axioms);
-		Set<OWLLogicalAxiom> cycleCausingAxioms = new HashSet<OWLLogicalAxiom>();
-		
-		for(OWLLogicalAxiom axiom : axioms){
-			if(cycleCausing.contains(axiom)){
-				cycleCausingAxioms.add(axiom);
-			}
-		}
-		//Remove cyclic causing to extract LHS
-		checkingSet.removeAll(cycleCausingAxioms);
-		checkingSet = lhsExtractor.getLHSSigAxioms(axioms, sigUnionSigM, dependT);
-		//Re-add them again
-		checkingSet.addAll(cycleCausingAxioms);
-		
+		//For expressive logics LHS is harder to compute so just use everything for now
+		HashSet<OWLLogicalAxiom> checkingSet = new HashSet<OWLLogicalAxiom>(axioms);		
 		return checkingSet;
 	}
 

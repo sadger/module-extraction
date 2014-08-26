@@ -12,6 +12,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ontologyutils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/propositional"/>
 	<classpathentry kind="var" path="JAR_LOCATION/junit-4.11.jar"/>
-	<classpathentry kind="var" path="JAR_LOCATION/owlapi-distribution-3.5.0.jar"/>
+	<classpathentry kind="lib" path="/home/staffd/loco/wgatens/Programs/Jars/owlapi-distribution-3.5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

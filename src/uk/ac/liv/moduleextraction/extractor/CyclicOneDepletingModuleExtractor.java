@@ -23,6 +23,8 @@ import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
+import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
+import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
 public class CyclicOneDepletingModuleExtractor implements Extractor {
 
@@ -35,7 +37,7 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 	private AxiomDependencies dependT;
 	private final ExtendedLHSSigExtractor lhsExtractor;
 	private List<OWLLogicalAxiom> allAxioms;
-	private Set<OWLLogicalAxiom> cycleCausing;
+	private Set<OWLLogicalAxiom> cycleCausing = new HashSet<OWLLogicalAxiom>();
 	private Set<OWLLogicalAxiom> expressive;
 	private ArrayList<OWLLogicalAxiom> acyclicAxioms;
 
@@ -79,24 +81,23 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 
 		//Can only determine if there is a cycle after removing any expressive axioms
 		OntologyCycleVerifier verifier = new OntologyCycleVerifier(allAxioms);
-
-		cycleCausing = verifier.getCycleCausingAxioms();
-
-		/* All axioms is now the acyclic subset of the ontology 
-		after removing unsupported or cycle causing axioms */
-		allAxioms.removeAll(cycleCausing);
-
+		if(verifier.isCyclic()){
+			cycleCausing = verifier.getCycleCausingAxioms();
+			/* All axioms is now the acyclic subset of the ontology 
+			after removing unsupported or cycle causing axioms */
+			allAxioms.removeAll(cycleCausing);
+		}
 
 		dependT = new AxiomDependencies(new HashSet<OWLLogicalAxiom>(allAxioms));
 		acyclicAxioms = dependT.getDefinitorialSortedAxioms();
 
-		
+
 		module = existingModule;
 		sigUnionSigM = ModuleUtils.getClassAndRoleNamesInSet(existingModule);
 		sigUnionSigM.addAll(signature);
 
 		try {
-
+			//Apply the rules to everything
 			applyRules(terminology);
 
 		} catch (IOException e) {
@@ -111,12 +112,8 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 	void applyRules(boolean[] terminology) throws IOException, QBFSolverException{
 		moveELChainsToModule(acyclicAxioms, terminology, axiomStore);	
 
-		Set<OWLLogicalAxiom> lhs = lhsExtractor.getLHSSigAxioms(acyclicAxioms, sigUnionSigM, dependT);
-		lhs.addAll(cycleCausing);
-		lhs.addAll(expressive);
-
-		if(inseparableChecker.isSeperableFromEmptySet(lhs,sigUnionSigM)){
-            OWLLogicalAxiom axiom = findSeparableAxiom(terminology);
+		if(inseparableChecker.isSeperableFromEmptySet(axiomStore.getSubsetAsList(terminology),sigUnionSigM)){
+			OWLLogicalAxiom axiom = findSeparableAxiom(terminology);
 			module.add(axiom);
 			removeAxiom(terminology, axiom);
 			sigUnionSigM.addAll(axiom.getSignature());
@@ -155,34 +152,29 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 		allAxioms.remove(axiom);
 		cycleCausing.remove(axiom);
 		acyclicAxioms.remove(axiom);
-        expressive.remove(axiom);
+		expressive.remove(axiom);
 	}
 
 
 	public static void main(String[] args) {
 
 		File[] files = new File("/LOCAL/wgatens/Ontologies//OWL-Corpus-All/qbf-only").listFiles();
-		//			for(File f : files){
-		//				//	System.out.println(i++);
-		//			if(f.exists()){
-		File f = new File(ModulePaths.getOntologyLocation() + "5bef3885-eef0-4497-888e-7ff5bef673e5_graphy.owl-QBF");
-
-		System.out.print(f.getName() + ": ");
-
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
-		OntologyCycleVerifier verifier = new OntologyCycleVerifier(ModuleUtils.getCoreAxioms(ont));
-		System.out.println(verifier.isCyclic());
-		System.out.println(ont.getLogicalAxiomCount());
-		CyclicOneDepletingModuleExtractor mod = new CyclicOneDepletingModuleExtractor(ont);
-		Set<OWLLogicalAxiom> subset = ModuleUtils.generateRandomAxioms(ont.getLogicalAxioms(), 10);
-		for(OWLLogicalAxiom sub : subset){
-			System.out.println(mod.extractModule(sub.getSignature()).size());
+		int i = 1;
+//		String name = "07752c0c-5724-4e83-80f3-ba0d58da9373_L_v315.owl-QBF";
+//		File f = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/" + name);
+//		System.out.println(f.exists());
+		for(File f : files){
+			System.out.println("Expr: " + i++);
+			if(f.exists()){
+				System.out.print(f.getName() + ": ");
+				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
+				new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.STAR);
+				
+			}
 		}
+		
+
 	}
-	//			}
-
-
-	//	}
 
 
 

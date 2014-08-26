@@ -13,7 +13,9 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
+import uk.ac.liv.moduleextraction.extractor.CyclicOneDepletingModuleExtractor;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
+import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
@@ -54,23 +56,40 @@ public class WriteAxiomSignatures {
 	
 	public static void main(String[] args) throws OWLOntologyCreationException {
 		
-		try{
-			BufferedReader br = new BufferedReader(new FileReader(ModulePaths.getSignatureLocation() + "NewIteratingExperiments/acyclic-supported-no-nci"));
-			String line;
-			while ((line = br.readLine()) != null) {
-			   File ontologyLocation = new File(line);
-			   System.out.println(ontologyLocation.getName());
-			   OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ontologyLocation.getAbsolutePath());
-			   Set<OWLLogicalAxiom> subset = ModuleUtils.generateRandomAxioms(ModuleUtils.getCoreAxioms(ontology), 500);
-			   WriteAxiomSignatures writer = new WriteAxiomSignatures(subset, new File(ModulePaths.getSignatureLocation() + "/NewIteratingExperiments/CoreAxiomSignatures/" + ontologyLocation.getName()));
-			   writer.writeAxiomSignatures();
-			   ontology.getOWLOntologyManager().removeOntology(ontology);
-			}
-			br.close();
-		}catch(IOException e){
-			e.printStackTrace();
-		}
+//		try{
+//			BufferedReader br = new BufferedReader(new FileReader(ModulePaths.getSignatureLocation() + "NewIteratingExperiments/acyclic-supported-no-nci"));
+//			String line;
+//			while ((line = br.readLine()) != null) {
+//			   File ontologyLocation = new File(line);
+//			   System.out.println(ontologyLocation.getName());
+//			   OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ontologyLocation.getAbsolutePath());
+//			   Set<OWLLogicalAxiom> subset = ModuleUtils.generateRandomAxioms(ModuleUtils.getCoreAxioms(ontology), 500);
+//			   WriteAxiomSignatures writer = new WriteAxiomSignatures(subset, new File(ModulePaths.getSignatureLocation() + "/NewIteratingExperiments/CoreAxiomSignatures/" + ontologyLocation.getName()));
+//			   writer.writeAxiomSignatures();
+//			   ontology.getOWLOntologyManager().removeOntology(ontology);
+//			}
+//			br.close();
+//		}catch(IOException e){
+//			e.printStackTrace();
+//		}
 		
+		
+		File[] files = new File("/LOCAL/wgatens/Ontologies//OWL-Corpus-All/qbf-only").listFiles();
+		int i = 1;
+//		String name = "07752c0c-5724-4e83-80f3-ba0d58da9373_L_v315.owl-QBF";
+//		File f = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/" + name);
+//		System.out.println(f.exists());
+		for(File f : files){
+			System.out.println("Expr: " + i++);
+			if(f.exists()){
+				System.out.print(f.getName() + ": ");
+				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
+				 WriteAxiomSignatures writer = new WriteAxiomSignatures(ont, 
+						 new File(ModulePaths.getSignatureLocation() + "/onedepletingcomparison/AxiomSignatures/" + f.getName()));
+				   writer.writeAxiomSignatures();
+				   ont.getOWLOntologyManager().removeOntology(ont);
+			}
+		}
 
 
 

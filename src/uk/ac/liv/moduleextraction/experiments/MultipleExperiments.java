@@ -17,12 +17,16 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
+import uk.ac.liv.moduleextraction.extractor.CyclicOneDepletingModuleExtractor;
 import uk.ac.liv.moduleextraction.extractor.NotEquivalentToTerminologyException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.ontologyutils.expressions.ELValidator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
+import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
+import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
+import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
 public class MultipleExperiments {
 
@@ -120,10 +124,10 @@ public class MultipleExperiments {
 					Set<OWLEntity> sig  = manager.readFile(signature.getName());
 					experiment.performExperiment(sig,signature);
 
-					manager.writeFile(sig, "signature");
+					//manager.writeFile(sig, "signature");
 					experimentCount++;
 
-					experiment.writeMetrics(experimentLocation);
+					//experiment.writeMetrics(experimentLocation);
 
 				}
 
@@ -175,11 +179,21 @@ public class MultipleExperiments {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException, InterruptedException {
 
+		File[] files = new File("/LOCAL/wgatens/Ontologies//OWL-Corpus-All/qbf-only").listFiles();
+		for(File f : files){
+			if(f.exists()){
+				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
+				new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.STAR);
+				SyntacticLocalityModuleExtractor starExtractor = new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.STAR);
+				new MultipleExperiments().runExperiments(
+						new File(ModulePaths.getSignatureLocation() + "/onedepletingcomparison/AxiomSignatures/" + f.getName()), new HybridExtractorExperiment(ont, f));
 
-		OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/examples/lhs.krss");
-		File sigs = new File("/users/loco/wgatens/ecai-testing/Signatures/OneDepleting/Thesaurus_14.05d.owl-QBF/role-0");
+			}
+		}
 
-		new MultipleExperiments().runAlternatingExperiments(sigs, new AMEXvsSTAR(ontology));
+
+
+
 
 
 

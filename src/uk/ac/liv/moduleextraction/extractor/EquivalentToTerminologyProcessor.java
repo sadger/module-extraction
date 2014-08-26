@@ -63,7 +63,7 @@ public class EquivalentToTerminologyProcessor {
 	
 	public OWLOntology getConvertedOntology() throws OWLOntologyCreationException{
 		logger.debug("{}","Performing preprocessing on ontology");
-		OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
+		OWLOntologyManager ontologyManager = equivalentToTerminology.getOWLOntologyManager();
 		factory = OWLManager.getOWLDataFactory();
 		
 		OWLOntology convertedOntology = ontologyManager.createOntology();
