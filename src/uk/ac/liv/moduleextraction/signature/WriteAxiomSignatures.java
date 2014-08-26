@@ -74,7 +74,7 @@ public class WriteAxiomSignatures {
 //		}
 		
 		
-		File[] files = new File("/LOCAL/wgatens/Ontologies//OWL-Corpus-All/qbf-only").listFiles();
+		File[] files = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only").listFiles();
 		int i = 1;
 //		String name = "07752c0c-5724-4e83-80f3-ba0d58da9373_L_v315.owl-QBF";
 //		File f = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/" + name);

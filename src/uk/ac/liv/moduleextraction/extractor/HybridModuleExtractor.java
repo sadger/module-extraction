@@ -138,14 +138,9 @@ public class HybridModuleExtractor implements Extractor {
 	}
 
 	public Set<OWLLogicalAxiom> extractStarModule(OWLOntology ontology, Set<OWLEntity> signature){
-		SyntacticLocalityModuleExtractor 
-		extractor = new SyntacticLocalityModuleExtractor(OWLManager.createOWLOntologyManager(), ontology, ModuleType.STAR);
-
+		SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.STAR);
 		Set<OWLLogicalAxiom> module = ModuleUtils.getLogicalAxioms(extractor.extract(signature));
-		manager.removeOntology(ontology);
-
 		starExtractions++;
-		//		System.out.println("STAR: " + module.size());
 		return module;
 	}
 

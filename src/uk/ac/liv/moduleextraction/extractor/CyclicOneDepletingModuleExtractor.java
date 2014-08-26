@@ -15,6 +15,8 @@ import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.checkers.ELAxiomChainCollector;
 import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
+import uk.ac.liv.moduleextraction.experiments.HybridExtractorExperiment;
+import uk.ac.liv.moduleextraction.experiments.OneDepletingComparison;
 import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.qbf.CyclicSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
@@ -157,8 +159,8 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 
 
 	public static void main(String[] args) {
-
-		File[] files = new File("/LOCAL/wgatens/Ontologies//OWL-Corpus-All/qbf-only").listFiles();
+		
+		File[] files = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only").listFiles();
 		int i = 1;
 //		String name = "07752c0c-5724-4e83-80f3-ba0d58da9373_L_v315.owl-QBF";
 //		File f = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/" + name);
@@ -168,8 +170,7 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 			if(f.exists()){
 				System.out.print(f.getName() + ": ");
 				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
-				new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.STAR);
-				
+				new OneDepletingComparison(ont, f);
 			}
 		}
 		

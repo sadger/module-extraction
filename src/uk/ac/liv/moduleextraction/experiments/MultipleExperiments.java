@@ -179,18 +179,15 @@ public class MultipleExperiments {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException, InterruptedException {
 
-		File[] files = new File("/LOCAL/wgatens/Ontologies//OWL-Corpus-All/qbf-only").listFiles();
+		File[] files = new File(ModulePaths.getOntologyLocation() + "/" + "OWL-Corpus-All/qbf-only").listFiles();
 		for(File f : files){
 			if(f.exists()){
 				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
-				new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.STAR);
-				SyntacticLocalityModuleExtractor starExtractor = new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.STAR);
 				new MultipleExperiments().runExperiments(
-						new File(ModulePaths.getSignatureLocation() + "/onedepletingcomparison/AxiomSignatures/" + f.getName()), new HybridExtractorExperiment(ont, f));
+						new File(ModulePaths.getSignatureLocation() + "/onedepletingcomparison/AxiomSignatures/" + f.getName()), new OneDepletingComparison(ont, f));
 
 			}
 		}
-
 
 
 
