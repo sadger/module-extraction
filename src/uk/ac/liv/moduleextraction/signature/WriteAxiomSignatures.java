@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -12,6 +13,9 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+
+import com.clarkparsia.owlapi.modularity.locality.LocalityClass;
+import com.clarkparsia.owlapi.modularity.locality.SyntacticLocalityEvaluator;
 
 import uk.ac.liv.moduleextraction.extractor.CyclicOneDepletingModuleExtractor;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
@@ -76,9 +80,6 @@ public class WriteAxiomSignatures {
 		
 		File[] files = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only").listFiles();
 		int i = 1;
-//		String name = "07752c0c-5724-4e83-80f3-ba0d58da9373_L_v315.owl-QBF";
-//		File f = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/" + name);
-//		System.out.println(f.exists());
 		for(File f : files){
 			System.out.println("Expr: " + i++);
 			if(f.exists()){
@@ -90,6 +91,7 @@ public class WriteAxiomSignatures {
 				   ont.getOWLOntologyManager().removeOntology(ont);
 			}
 		}
+
 
 
 

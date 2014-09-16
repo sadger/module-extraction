@@ -20,6 +20,7 @@ import uk.ac.liv.moduleextraction.experiments.OneDepletingComparison;
 import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.qbf.CyclicSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
+import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
@@ -161,16 +162,19 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 	public static void main(String[] args) {
 		
 		File[] files = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only").listFiles();
+		System.out.println("Total files: " + files.length);
 		int i = 1;
 //		String name = "07752c0c-5724-4e83-80f3-ba0d58da9373_L_v315.owl-QBF";
 //		File f = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/" + name);
 //		System.out.println(f.exists());
 		for(File f : files){
 			System.out.println("Expr: " + i++);
-			if(f.exists()){
+			if(f.exists() && i == 336){
 				System.out.print(f.getName() + ": ");
 				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
-				new OneDepletingComparison(ont, f);
+				SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
+				new CyclicOneDepletingModuleExtractor(ont).extractModule(gen.generateRandomSignature(10));
+				ont.getOWLOntologyManager().removeOntology(ont);
 			}
 		}
 		

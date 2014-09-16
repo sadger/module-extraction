@@ -127,7 +127,7 @@ public class MultipleExperiments {
 					//manager.writeFile(sig, "signature");
 					experimentCount++;
 
-					//experiment.writeMetrics(experimentLocation);
+					experiment.writeMetrics(experimentLocation);
 
 				}
 
@@ -185,7 +185,8 @@ public class MultipleExperiments {
 				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
 				new MultipleExperiments().runExperiments(
 						new File(ModulePaths.getSignatureLocation() + "/onedepletingcomparison/AxiomSignatures/" + f.getName()), new OneDepletingComparison(ont, f));
-
+				ont.getOWLOntologyManager().removeOntology(ont);
+				ont = null;
 			}
 		}
 
