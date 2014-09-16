@@ -136,29 +136,19 @@ public class OneDepletingComparison implements Experiment {
 
 	public static void main(String[] args) throws IOException {
 
+		// axiom-331870650
+		///LOCAL/wgatens/Signatures/onedepletingcomparison/AxiomSignatures/04f14c93-17f9-41ed-b2df-958b2be7136d_graphy.owl-QBF
 
-	
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/examples/universal.krss");
-		System.out.println(ont.getLogicalAxioms());
-		OneDepletingComparison compare = new OneDepletingComparison(ont, null);
-		ModuleUtils.remapIRIs(ont, "X");
-		OWLDataFactory f = ont.getOWLOntologyManager().getOWLDataFactory();
-		OWLClass a = f.getOWLClass(IRI.create("X#A"));
-		OWLObjectProperty r = f.getOWLObjectProperty(IRI.create("X#r"));
+		File ontLoc = 
+				new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/04f14c93-17f9-41ed-b2df-958b2be7136d_graphy.owl-QBF");
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontLoc.getAbsolutePath());
 		
-		Set<OWLEntity> sig = new HashSet<OWLEntity>();
-		sig.add(a);
-		sig.add(r);
-		
-		
-		Set<OWLAxiom> top = new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.TOP).extract(sig);
-		Set<OWLAxiom> bot = new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.BOT).extract(sig);
-		
-		System.out.println(top);
-		System.out.println(bot);
-		compare.performExperiment(sig);
-		compare.printMetrics();
+		OneDepletingComparison comp = new OneDepletingComparison(ont, ontLoc);
+		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "/onedepletingcomparison/AxiomSignatures/" + ontLoc.getName()));
+		Set<OWLEntity> signature = man.readFile("axiom-331870650");
 
+		comp.performExperiment(signature);
+		comp.printMetrics();
 
 
 

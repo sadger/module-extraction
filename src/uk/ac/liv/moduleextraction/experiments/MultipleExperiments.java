@@ -182,6 +182,7 @@ public class MultipleExperiments {
 		File[] files = new File(ModulePaths.getOntologyLocation() + "/" + "OWL-Corpus-All/qbf-only").listFiles();
 		for(File f : files){
 			if(f.exists()){
+				System.out.println(f.getName());
 				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
 				new MultipleExperiments().runExperiments(
 						new File(ModulePaths.getSignatureLocation() + "/onedepletingcomparison/AxiomSignatures/" + f.getName()), new OneDepletingComparison(ont, f));
