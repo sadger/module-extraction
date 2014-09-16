@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
+import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.EquivalentToTerminologyChecker;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
@@ -26,7 +27,7 @@ import uk.ac.liv.ontologyutils.util.ModulePaths;
 public class EquivalentToTerminologyProcessor {
 
 	private Logger logger = LoggerFactory.getLogger(EquivalentToTerminologyProcessor.class);
-	
+
 
 	private static final String NEW_IRI_PREFIX = "http://www.csc.liv.ac.uk";
 	private OWLOntology equivalentToTerminology;
@@ -34,10 +35,10 @@ public class EquivalentToTerminologyProcessor {
 	private HashMap<OWLClass, OWLClass> renamingMap;
 	private HashSet<OWLLogicalAxiom> newAxioms = new HashSet<OWLLogicalAxiom>();
 	private OWLDataFactory factory;
-	
+
 	public EquivalentToTerminologyProcessor(OWLOntology ontology) throws NotEquivalentToTerminologyException, OWLOntologyCreationException {
 		EquivalentToTerminologyChecker equivToTermChecker = new EquivalentToTerminologyChecker();
-	
+
 		if(!equivToTermChecker.isEquivalentToTerminology(ontology)){
 			throw new NotEquivalentToTerminologyException();
 		}
@@ -46,7 +47,7 @@ public class EquivalentToTerminologyProcessor {
 		}		
 		countRepeatedAxioms();
 	}
-	
+
 	public void countRepeatedAxioms(){
 		repeatedAxioms = new HashMap<OWLClass, HashSet<OWLLogicalAxiom>>();
 		for(OWLLogicalAxiom axiom : equivalentToTerminology.getLogicalAxioms()){
@@ -60,16 +61,16 @@ public class EquivalentToTerminologyProcessor {
 			}
 		}
 	}
-	
+
 	public OWLOntology getConvertedOntology() throws OWLOntologyCreationException{
 		logger.debug("{}","Performing preprocessing on ontology");
 		OWLOntologyManager ontologyManager = equivalentToTerminology.getOWLOntologyManager();
 		factory = OWLManager.getOWLDataFactory();
-		
+
 		OWLOntology convertedOntology = ontologyManager.createOntology();
-		
+
 		renamingMap = new HashMap<OWLClass, OWLClass>();
-		
+
 		for(OWLClass cls : repeatedAxioms.keySet()){
 			HashSet<OWLLogicalAxiom> repeated = repeatedAxioms.get(cls);
 
@@ -84,14 +85,14 @@ public class EquivalentToTerminologyProcessor {
 
 					newNames.add(newClass);
 					renamingMap.put(newClass, nameOfRepeated);
-			
+
 					OWLSubClassOfAxiom replacementAxiom = factory.getOWLSubClassOfAxiom(newClass, definitionOfRepeated);
-					
+
 					ontologyManager.addAxiom(convertedOntology, replacementAxiom);
-					
+
 					index++;
 				}
-				
+
 				OWLSubClassOfAxiom newAxiom = factory.getOWLSubClassOfAxiom(cls,factory.getOWLObjectIntersectionOf(newNames));
 				newAxioms.add(newAxiom);
 				ontologyManager.addAxiom(convertedOntology, newAxiom);
@@ -101,44 +102,48 @@ public class EquivalentToTerminologyProcessor {
 			}
 		}
 		return convertedOntology;
-	
+
 	}
 
-	
-	
+
+
 	public Set<OWLLogicalAxiom> postProcessModule(Set<OWLLogicalAxiom> module){
 		logger.debug("{}","Performing postprocessing on module");
 		HashSet<OWLLogicalAxiom> toAdd = new HashSet<OWLLogicalAxiom>();
 		HashSet<OWLLogicalAxiom> toRemove = new HashSet<OWLLogicalAxiom>();
+		SupportedAxiomVerifier verifier = new SupportedAxiomVerifier();
 
-		
 		for(OWLLogicalAxiom axiom : module){
-			
-			if(newAxioms.contains(axiom)){
-				toRemove.add(axiom);
-			}
-			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
-			OWLClassExpression definition = AxiomSplitter.getDefinitionofAxiom(axiom);
-			
-		
-			if(renamingMap.keySet().contains(name)){
-				OWLSubClassOfAxiom revertedSubclass =
-						factory.getOWLSubClassOfAxiom(renamingMap.get(name), definition);
-				
-				toRemove.add(axiom);
-				toAdd.add(revertedSubclass);
+			//The axioms to remap and remove are terminological but ontology may
+			//contain non-terminological axioms through the hybrid approach
+			if(verifier.isSupportedAxiom(axiom)){
+				if(newAxioms.contains(axiom)){
+					toRemove.add(axiom);
+				}
+				OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
+				OWLClassExpression definition = AxiomSplitter.getDefinitionofAxiom(axiom);
 
+
+				if(renamingMap.keySet().contains(name)){
+					OWLSubClassOfAxiom revertedSubclass =
+							factory.getOWLSubClassOfAxiom(renamingMap.get(name), definition);
+
+					toRemove.add(axiom);
+					toAdd.add(revertedSubclass);
+
+				}
 			}
+
 
 		}
 		module.removeAll(toRemove);
 		module.addAll(toAdd);
-		
+
 		return module;
 	}
-	
 
 
-	
-	
+
+
+
 }
