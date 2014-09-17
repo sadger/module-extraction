@@ -81,7 +81,7 @@ public class EquivalentToTerminologyProcessor {
 					OWLClass nameOfRepeated = (OWLClass) AxiomSplitter.getNameofAxiom(repeatedAxiom);
 					OWLClassExpression definitionOfRepeated = AxiomSplitter.getDefinitionofAxiom(repeatedAxiom);
 					OWLClass newClass = 
-							factory.getOWLClass(IRI.create(NEW_IRI_PREFIX + "#RENAMED_" + nameOfRepeated.getIRI().getFragment() + "_" + index));
+							factory.getOWLClass(IRI.create(NEW_IRI_PREFIX + "#RENAMED_" + nameOfRepeated.getIRI() + "_" + index));
 
 					newNames.add(newClass);
 					renamingMap.put(newClass, nameOfRepeated);
