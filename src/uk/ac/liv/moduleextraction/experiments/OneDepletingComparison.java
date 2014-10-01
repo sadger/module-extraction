@@ -112,8 +112,10 @@ public class OneDepletingComparison implements Experiment {
 		System.out.println("Time hybrid: " + starAndHybridExperiment.getHybridWatch().toString());
 		System.out.println("Time 1-dep: " + oneDepletingStopwatch.toString());
 	
+		System.out.println("Σ: " + refsig);
 		refsig.retainAll(ModuleUtils.getClassAndRoleNamesInSet(starAndHybridExperiment.getHybridModule()));
 		System.out.println("Σ ∩ sig(hybrid) = "  + (refsig.isEmpty() ? "∅"  : refsig));
+
 		
 //		System.out.println("1-depleting");
 //		for(OWLLogicalAxiom axiom : oneDepletingModule){
@@ -121,6 +123,10 @@ public class OneDepletingComparison implements Experiment {
 //		}
 //		
 		Set<OWLLogicalAxiom> hybridM = starAndHybridExperiment.getHybridModule();
+        System.out.println("Hybrid");
+		for(OWLLogicalAxiom axiom : hybridM){
+			System.out.println(axiom);
+		}
 		hybridM.removeAll(oneDepletingModule);
 		System.out.println("Hybrid\\1-depleting");
 		for(OWLLogicalAxiom axiom : hybridM){
