@@ -78,14 +78,15 @@ public class MultipleExperiments {
 	/** Signature location is a list of directories whos subdirectories are all signature files size-100,size-250... etc. */
 	public void runAlternatingExperiments(File signaturesLocation, Experiment experiment) throws IOException{
 		this.experiment  = experiment;
-		File[] signaturedirs = signaturesLocation.listFiles(new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.isDirectory();
-			}
-		});
+		File[] signaturedirs;
+        signaturesLocation.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isDirectory();
+            }
+        });
 
-		signaturedirs = signaturesLocation.listFiles();
+        signaturedirs = signaturesLocation.listFiles();
 
 		Arrays.sort(signaturedirs); 
 
