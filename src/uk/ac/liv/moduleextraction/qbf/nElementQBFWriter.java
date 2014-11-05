@@ -4,10 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.*;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
@@ -51,8 +48,7 @@ public class nElementQBFWriter {
         this.classesNotInSignature = new HashSet<OWLEntity>();
         this.entityUnderAllInterpreations = new nEntityConvertor(domainSize);
         this.clauses = new ArrayList<SATSet>();
-        this.variables = new HashSet<Integer>()
-        ;
+        this.variables = new HashSet<Integer>();
         if (convertors == null){
             convertors = CacheBuilder.newBuilder().
                     build(new CacheLoader<Integer, nAxiomToSATMapping>() {
@@ -70,6 +66,7 @@ public class nElementQBFWriter {
 
         collectAndCountQBFClauses();
         populateSignatures();
+        generateQBFProblem();
     }
 
     private void populateSignatures() {
@@ -96,7 +93,11 @@ public class nElementQBFWriter {
     }
 
     public File generateQBFProblem() throws IOException{
-        return createQBFFile();
+        File qbf = createQBFFile();
+        System.out.println();
+        System.out.println("./sKizzo " + qbfFile.getAbsolutePath());
+        ModuleUtils.printFile(qbfFile);
+        return qbf;
     }
 
     private File createQBFFile() throws IOException {
@@ -178,13 +179,23 @@ public class nElementQBFWriter {
         }
     }
 
-
-
+    
 
     public static void main(String[] args) {
-        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/examples/newprop.owl");
+        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/NCI/Profile/NCI-star.owl");
+        Set<OWLLogicalAxiom> subset = ModuleUtils.generateRandomAxioms(ont.getLogicalAxioms(), 500);
+        System.out.println("LOADED");
+        OWLDataFactory f = ont.getOWLOntologyManager().getOWLDataFactory();
+//        ModuleUtils.remapIRIs(ont,"X");
+        HashSet<OWLEntity> signature = new HashSet<OWLEntity>();
+        OWLClass a = f.getOWLClass(IRI.create("X#A"));
+        OWLClass b = f.getOWLClass(IRI.create("X#B"));
+        OWLClass c = f.getOWLClass(IRI.create("X#C"));
+        OWLObjectProperty r = f.getOWLObjectProperty(IRI.create("X#r"));
+        signature.add(a);
+        signature.add(r);
         try {
-            new nElementQBFWriter(2,ont.getLogicalAxioms(),new HashSet<OWLEntity>());
+            new nElementQBFWriter(2,subset,signature);
         } catch (IOException e) {
             e.printStackTrace();
         }
