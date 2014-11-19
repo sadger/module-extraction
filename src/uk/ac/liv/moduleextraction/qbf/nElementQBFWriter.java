@@ -17,6 +17,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -28,7 +29,7 @@ public class nElementQBFWriter {
 
     private static OWLDataFactory factory = OWLManager.getOWLDataFactory();
     private final File qbfFile;
-    private final Set<OWLLogicalAxiom> ontology;
+    private final Collection<OWLLogicalAxiom> ontology;
     private final HashSet<OWLEntity> signature;
     private final HashSet<OWLEntity> classesNotInSignature;
     private final int DOMAIN_SIZE;
@@ -42,7 +43,7 @@ public class nElementQBFWriter {
 
     private boolean isUnsatisfiable = false;
 
-    public nElementQBFWriter(int domainSize, Set<OWLLogicalAxiom> ontology, Set<OWLEntity> signatureAndSigM) throws IOException, ExecutionException {
+    public nElementQBFWriter(int domainSize, Collection<OWLLogicalAxiom> ontology, Set<OWLEntity> signatureAndSigM) throws IOException, ExecutionException {
         this.DOMAIN_SIZE = domainSize;
         File directoryToWrite = new File("/tmp/");
         this.qbfFile = File.createTempFile("qbf", ".qdimacs",directoryToWrite);
@@ -66,13 +67,14 @@ public class nElementQBFWriter {
         this.mapper = convertors.get(DOMAIN_SIZE);
         collectClausesAndVariables();
         populateSignatures();
-        generateQBFProblem();
     }
 
     private void populateSignatures() {
         Set<OWLEntity> ontologyEntities = ModuleUtils.getClassAndRoleNamesInSet(ontology);
 
         signature.retainAll(ontologyEntities);
+        signature.remove(factory.getOWLThing());
+        signature.remove(factory.getOWLNothing());
 
         classesNotInSignature.addAll(ontologyEntities);
         classesNotInSignature.removeAll(signature);
@@ -82,11 +84,11 @@ public class nElementQBFWriter {
         classesNotInSignature.remove(factory.getOWLNothing());
     }
 
-    private boolean isUnsatisfiable(){
+    public boolean isUnsatisfiable(){
         return isUnsatisfiable;
     }
 
-    private boolean convertedClausesAreEmpty(){
+    public boolean convertedClausesAreEmpty(){
         return clauses.isEmpty();
     }
 
@@ -105,16 +107,14 @@ public class nElementQBFWriter {
                 clauses.addAll(clauseStore.getClauses());
                 variables.addAll(clauseStore.getVariables());
                 freshVariables.addAll(clauseStore.getFreshVariables());
-                System.out.println(clauseStore);
             }
         }
     }
 
     public File generateQBFProblem() throws IOException{
         File qbf = createQBFFile();
-        System.out.println();
-        System.out.println("./sKizzo " + qbfFile.getAbsolutePath());
-        ModuleUtils.printFile(qbfFile);
+//        System.out.println("./sKizzo " + qbfFile.getAbsolutePath());
+//        ModuleUtils.printFile(qbfFile);
         return qbf;
     }
 
@@ -144,7 +144,6 @@ public class nElementQBFWriter {
                 e.printStackTrace();
             }
         }
-
         return qbfFile;
     }
 
@@ -160,8 +159,10 @@ public class nElementQBFWriter {
             writer.write("a ");
             for(OWLEntity sigEnt : signature){
                 for(PropositionalFormula ent : sigEnt.accept(entityUnderAllInterpreations)){
-                    int entValue = mapper.lookupMapping(ent);
-                    writer.write(entValue + " ");
+                    Integer entValue = mapper.lookupMapping(ent);
+                    if(!(entValue == null)){
+                        writer.write(entValue + " ");
+                    }
                 }
             }
             writer.write("0");
@@ -173,9 +174,12 @@ public class nElementQBFWriter {
         if(!classesNotInSignature.isEmpty() || !freshVariables.isEmpty()){
             writer.write("e ");
             for(OWLEntity sigEnt : classesNotInSignature){
+
                 for(PropositionalFormula ent : sigEnt.accept(entityUnderAllInterpreations)){
-                    int entValue = mapper.lookupMapping(ent);
-                    writer.write(entValue + " ");
+                    Integer entValue = mapper.lookupMapping(ent);
+                    if(!(entValue == null)){
+                        writer.write(entValue + " ");
+                    }
                 }
             }
             for(Integer fresh : freshVariables){
@@ -199,7 +203,7 @@ public class nElementQBFWriter {
     
 
     public static void main(String[] args) {
-        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/examples/simple.krss");
+        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/examples/nbroken2.owl");
 
         System.out.println("LOADED");
 
@@ -214,16 +218,22 @@ public class nElementQBFWriter {
         OWLClass b = f.getOWLClass(IRI.create("X#B"));
         OWLClass c = f.getOWLClass(IRI.create("X#C"));
         OWLObjectProperty r = f.getOWLObjectProperty(IRI.create("X#r"));
-        signature.add(a);
-        signature.add(b);
         signature.add(r);
+        signature.add(c);
+        signature.add(f.getOWLThing());
 
         try {
-            new nElementQBFWriter(1,ont.getLogicalAxioms(),signature);
+            nElementQBFWriter writer = new nElementQBFWriter(1,ont.getLogicalAxioms(),signature);
+            File foo = writer.generateQBFProblem();
+            QBFSolver solver = new QBFSolver();
+            System.out.println(solver.isSatisfiable(foo));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
+        } catch (QBFSolverException e) {
+            e.printStackTrace();
         }
+
     }
 }

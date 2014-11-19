@@ -1,34 +1,31 @@
 package uk.ac.liv.moduleextraction.extractor;
 
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.*;
 import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.checkers.ELAxiomChainCollector;
-import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
+import uk.ac.liv.moduleextraction.checkers.NElementInseparableChecker;
 import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
-import uk.ac.liv.moduleextraction.qbf.CyclicSeparabilityAxiomLocator;
+import uk.ac.liv.moduleextraction.qbf.NElementSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
-import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
-public class CyclicOneDepletingModuleExtractor implements Extractor {
+public class NDepletingModuleExtractor implements Extractor {
 
 	private final DefinitorialAxiomStore axiomStore;
 	private Set<OWLLogicalAxiom> module;
 	private Set<OWLEntity> sigUnionSigM;
-	private final InseperableChecker inseparableChecker;
+	private final NElementInseparableChecker inseparableChecker;
 	private long qbfChecks = 0;
 	private final ELAxiomChainCollector chainCollector;
 	private AxiomDependencies dependT;
@@ -37,13 +34,16 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 	private Set<OWLLogicalAxiom> expressive;
 	private ArrayList<OWLLogicalAxiom> acyclicAxioms;
 
-	private CyclicOneDepletingModuleExtractor(OWLOntology ontology) {
-		this(ontology.getLogicalAxioms());
+	private final int DOMAIN_SIZE;
+
+	private NDepletingModuleExtractor(int domain_size, OWLOntology ontology) {
+		this(domain_size,ontology.getLogicalAxioms());
 	}
 
-	public CyclicOneDepletingModuleExtractor(Set<OWLLogicalAxiom> ontology){
+	public NDepletingModuleExtractor(int domain_size, Set<OWLLogicalAxiom> ontology){
+		this.DOMAIN_SIZE = domain_size;
 		this.axiomStore = new DefinitorialAxiomStore(ontology);
-		this.inseparableChecker = new InseperableChecker();
+		this.inseparableChecker = new NElementInseparableChecker(domain_size);
 		this.chainCollector = new ELAxiomChainCollector();
 	}
 
@@ -53,13 +53,13 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 	}
 
 	private OWLLogicalAxiom findSeparableAxiom(boolean[] terminology)
-			throws IOException, QBFSolverException {
+			throws IOException, QBFSolverException, ExecutionException {
 
-		CyclicSeparabilityAxiomLocator search = 
-				new CyclicSeparabilityAxiomLocator(axiomStore.getSubsetAsArray(terminology), sigUnionSigM, dependT);
+		NElementSeparabilityAxiomLocator locator =
+				new NElementSeparabilityAxiomLocator(DOMAIN_SIZE,axiomStore.getSubsetAsArray(terminology),sigUnionSigM);
 
-		OWLLogicalAxiom insepAxiom = search.getInseperableAxiom();
-		qbfChecks += search.getCheckCount();
+		OWLLogicalAxiom insepAxiom = locator.getSeparabilityCausingAxiom();
+		qbfChecks += locator.getCheckCount();
 
 		return insepAxiom;
 	}
@@ -99,15 +99,17 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 			e.printStackTrace();
 		} catch (QBFSolverException e) {
 			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
 		}
 
 		return module;
 	}
 
-	void applyRules(boolean[] terminology) throws IOException, QBFSolverException{
+	void applyRules(boolean[] terminology) throws IOException, QBFSolverException, ExecutionException {
 		moveELChainsToModule(acyclicAxioms, terminology, axiomStore);	
 
-		if(inseparableChecker.isSeperableFromEmptySet(axiomStore.getSubsetAsList(terminology),sigUnionSigM)){
+		if(inseparableChecker.isSeparableFromEmptySet(axiomStore.getSubsetAsList(terminology), sigUnionSigM)){
 			OWLLogicalAxiom axiom = findSeparableAxiom(terminology);
 			module.add(axiom);
 			removeAxiom(terminology, axiom);
@@ -137,7 +139,6 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 	}
 
 
-
 	public long getQBFCount(){
 		return qbfChecks;
 	}
@@ -150,30 +151,35 @@ public class CyclicOneDepletingModuleExtractor implements Extractor {
 		expressive.remove(axiom);
 	}
 
-
 	public static void main(String[] args) {
-		
-		File[] files = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only").listFiles();
-		System.out.println("Total files: " + files.length);
-		int i = 1;
-//		String name = "07752c0c-5724-4e83-80f3-ba0d58da9373_L_v315.owl-QBF";
-//		File f = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/" + name);
-//		System.out.println(f.exists());
-		for(File f : files){
-			System.out.println("Expr: " + i++);
-			if(f.exists() && i == 336){
-				System.out.print(f.getName() + ": ");
-				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
-				SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
-				new CyclicOneDepletingModuleExtractor(ont).extractModule(gen.generateRandomSignature(10));
-				ont.getOWLOntologyManager().removeOntology(ont);
-			}
+		//OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/examples/nbroken2.owl");
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/examples/nice.krss");
+		System.out.println("LOADED");
+
+		OWLDataFactory f = ont.getOWLOntologyManager().getOWLDataFactory();
+
+		ModuleUtils.remapIRIs(ont,"X");
+
+		for(OWLLogicalAxiom ax : ont.getLogicalAxioms()){
+			System.out.println(ax);
 		}
-		
+
+		HashSet<OWLEntity> signature = new HashSet<OWLEntity>();
+		OWLClass a = f.getOWLClass(IRI.create("X#A"));
+		OWLClass b = f.getOWLClass(IRI.create("X#B"));
+		OWLClass c = f.getOWLClass(IRI.create("X#C"));
+		OWLObjectProperty r = f.getOWLObjectProperty(IRI.create("X#r"));
+		signature.add(a);
+		//signature.add(b);
+		//signature.add(c);
+		signature.add(r);
+
+
+		NDepletingModuleExtractor one = new NDepletingModuleExtractor(2,ont.getLogicalAxioms());
+		System.out.println("M: " + one.extractModule(signature));
+
 
 	}
-
-
 
 
 
