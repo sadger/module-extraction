@@ -73,6 +73,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="DepQBF4J-0" level="project" />
   </component>
 </module>
-
