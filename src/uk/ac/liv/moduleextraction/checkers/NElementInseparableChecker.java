@@ -9,6 +9,7 @@ import uk.ac.liv.moduleextraction.qbf.nElementQBFWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -57,4 +58,7 @@ public class NElementInseparableChecker {
 	}
 
 
+	public LinkedHashMap<String,Long> getQBFMetrics() {
+		return new LinkedHashMap<String, Long>();
+	}
 }

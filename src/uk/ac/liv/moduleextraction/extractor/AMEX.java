@@ -1,29 +1,24 @@
 package uk.ac.liv.moduleextraction.extractor;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
-import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
-import uk.ac.liv.moduleextraction.chaindependencies.DefinitorialDepth;
 import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
-import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
+import uk.ac.liv.moduleextraction.checkers.NElementInseparableChecker;
 import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
+import uk.ac.liv.moduleextraction.qbf.OneElementSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
-import uk.ac.liv.moduleextraction.qbf.SeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 public class AMEX implements Extractor{
 
@@ -34,7 +29,7 @@ public class AMEX implements Extractor{
 	private DefinitorialAxiomStore axiomStore;
 	
 	private ExtendedLHSSigExtractor lhsExtractor;
-	private InseperableChecker inseperableChecker;
+	private NElementInseparableChecker oneElementInseparableChecker;
 	
 	private long syntacticChecks = 0; // A syntactic iteration (total checks = this + qbfchecks)
 	private long timeTaken = 0; //Time taken to setup and extract the module (ms)
@@ -58,7 +53,7 @@ public class AMEX implements Extractor{
 		syntacticDependencyChecker = new SyntacticDependencyChecker();
 		
 		lhsExtractor = new ExtendedLHSSigExtractor();
-		inseperableChecker = new InseperableChecker();
+		oneElementInseparableChecker = new NElementInseparableChecker(1);
 	}
 	
 	
@@ -73,7 +68,7 @@ public class AMEX implements Extractor{
 		syntacticChecks = 0; 
 		timeTaken = 0; 
 		qbfChecks = 0;
-		inseperableChecker.resetMetrics();
+//		inseperableChecker.resetMetrics();
 		separabilityChecks = 0;
 		
 		long startTime = System.currentTimeMillis();
@@ -87,8 +82,10 @@ public class AMEX implements Extractor{
 			e.printStackTrace();
 		} catch (QBFSolverException e) {
 			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
 		}
-		
+
 		timeTaken = System.currentTimeMillis() - startTime;
 		return module;
 	}
@@ -105,18 +102,18 @@ public class AMEX implements Extractor{
 
 
 	public LinkedHashMap<String, Long> getQBFMetrics() {
-		return inseperableChecker.getQBFMetrics();
+		return oneElementInseparableChecker.getQBFMetrics();
 	}
 
 	
 	
-	private void applyRules(boolean[] terminology) throws IOException, QBFSolverException{
+	private void applyRules(boolean[] terminology) throws IOException, QBFSolverException, ExecutionException {
 		applySyntacticRule(terminology);
 		
 		HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(axiomStore.getSubsetAsList(terminology), sigUnionSigM, dependencies);
 		
 		qbfChecks++;
-		if(inseperableChecker.isSeperableFromEmptySet(lhsSigT, sigUnionSigM)){
+		if(oneElementInseparableChecker.isSeparableFromEmptySet(lhsSigT, sigUnionSigM)){
 			OWLLogicalAxiom insepAxiom = findSeparableAxiom(terminology);
 			module.add(insepAxiom);
 			sigUnionSigM.addAll(insepAxiom.getSignature());
@@ -127,11 +124,14 @@ public class AMEX implements Extractor{
 
 
 	private OWLLogicalAxiom findSeparableAxiom(boolean[] terminology)
-			throws IOException, QBFSolverException {
+			throws IOException, QBFSolverException, ExecutionException {
 		
 		separabilityChecks++;
-		SeparabilityAxiomLocator search = new SeparabilityAxiomLocator(axiomStore.getSubsetAsArray(terminology),sigUnionSigM,dependencies);
-		OWLLogicalAxiom insepAxiom = search.getInseperableAxiom();
+
+		OneElementSeparabilityAxiomLocator search =
+				new OneElementSeparabilityAxiomLocator(axiomStore.getSubsetAsArray(terminology), sigUnionSigM, dependencies);
+
+		OWLLogicalAxiom insepAxiom = search.getSeparabilityCausingAxiom();
 		logger.debug("Adding (semantic): {}", insepAxiom);
 		qbfChecks += search.getCheckCount();
 		return insepAxiom;
