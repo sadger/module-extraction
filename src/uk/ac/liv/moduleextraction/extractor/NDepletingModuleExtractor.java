@@ -10,10 +10,11 @@ import uk.ac.liv.moduleextraction.checkers.NElementInseparableChecker;
 import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.qbf.NElementSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
-import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
+import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
+import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 import java.io.File;
@@ -23,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 public class NDepletingModuleExtractor implements Extractor {
 
@@ -156,34 +156,36 @@ public class NDepletingModuleExtractor implements Extractor {
 		expressive.remove(axiom);
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		//NDepletingModuleExtractor one = new NDepletingModuleExtractor(2,ont.getLogicalAxioms());
 
-		File dir = new File("/home/william/PhD/Ontologies/OWL-Corpus-All/qbf-only");
-		int i = 1;
-		for(File ontFile : dir.listFiles()){
-			if(ontFile.isFile()){
-						OWLOntology ontz = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
+		File dir = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only");
+//		for(File ontFile : dir.listFiles()){
+//			if(ontFile.isFile()){
+//				System.out.println2(ontFile.getName());
+		File ontFile = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/0a3f75bb-693b-4adb-b277-dc7fe493d3f4_DUL.owl-QBF");
+		OWLOntology ontz = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
 
-						HybridModuleExtractor extractor2 = new HybridModuleExtractor(ontz, HybridModuleExtractor.CycleRemovalMethod.NAIVE);
-						System.out.println("Size:" + ontz.getLogicalAxiomCount());
-						SignatureGenerator gen = new SignatureGenerator(ontz.getLogicalAxioms());
-						Stopwatch watchy = new Stopwatch().start();
-						for (int j = 0; j < 10; j++) {
-							Set<OWLEntity> sig = gen.generateRandomSignature(10);
-							Set<OWLLogicalAxiom> mod = extractor2.extractModule(sig);
-							NDepletingModuleExtractor extract = new NDepletingModuleExtractor(1,mod);
-							System.out.println(extract.extractModule(sig).size());
-						}
-						watchy.stop();
-						System.out.println("TIME:" + +watchy.elapsed(TimeUnit.MILLISECONDS));
+		HybridModuleExtractor extractor2 = new HybridModuleExtractor(ontz, HybridModuleExtractor.CycleRemovalMethod.NAIVE);
+		System.out.println("Size:" + ontz.getLogicalAxiomCount());
+		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "qbfspeed/" + ontFile.getName()));
+
+		Stopwatch watchy = new Stopwatch().start();
+		for (int j = 1; j <= 10; j++) {
+			Set<OWLEntity> sig = man.readFile("random10-" + j);
+			Set<OWLLogicalAxiom> mod = extractor2.extractModule(sig);
+			NDepletingModuleExtractor extract = new NDepletingModuleExtractor(1,mod);
+			System.out.println(extract.extractModule(sig).size());
+		}
+		watchy.stop();
+		System.out.println("TIME:" + watchy);
 
 			}
-		}
+//		}
 
-
-	}
+//
+//	}
 
 
 
