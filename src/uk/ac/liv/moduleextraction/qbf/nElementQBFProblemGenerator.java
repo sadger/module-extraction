@@ -1,10 +1,12 @@
 package uk.ac.liv.moduleextraction.qbf;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
+import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
@@ -13,22 +15,16 @@ import uk.ac.liv.propositional.nSeparability.ClauseStore;
 import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
 import uk.ac.liv.propositional.nSeparability.nEntityConvertor;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-/**
- * Created by william on 04/11/14.
- */
-public class nElementQBFWriter {
+
+public class nElementQBFProblemGenerator {
 
     private static OWLDataFactory factory = OWLManager.getOWLDataFactory();
-    private final File qbfFile;
     private final Collection<OWLLogicalAxiom> ontology;
     private final HashSet<OWLEntity> signature;
     private final HashSet<OWLEntity> classesNotInSignature;
@@ -41,12 +37,13 @@ public class nElementQBFWriter {
     private HashSet<Integer> freshVariables;
     private nEntityConvertor entityUnderAllInterpreations;
 
+    private HashSet<Integer> existentialVariables;
+    private HashSet<Integer> universalVariables;
+
     private boolean isUnsatisfiable = false;
 
-    public nElementQBFWriter(int domainSize, Collection<OWLLogicalAxiom> ontology, Set<OWLEntity> signatureAndSigM) throws IOException, ExecutionException {
+    public nElementQBFProblemGenerator(int domainSize, Collection<OWLLogicalAxiom> ontology, Set<OWLEntity> signatureAndSigM) throws IOException, ExecutionException {
         this.DOMAIN_SIZE = domainSize;
-        File directoryToWrite = new File("/tmp/");
-        this.qbfFile = File.createTempFile("qbf", ".qdimacs",directoryToWrite);
         this.ontology = ontology;
         this.signature = new HashSet<OWLEntity>(signatureAndSigM);
         this.classesNotInSignature = new HashSet<OWLEntity>();
@@ -54,6 +51,8 @@ public class nElementQBFWriter {
         this.clauses = new HashSet<int[]>();
         this.variables = new HashSet<Integer>();
         this.freshVariables = new HashSet<Integer>();
+        this.existentialVariables = new HashSet<Integer>();
+        this.universalVariables = new HashSet<Integer>();
         if (convertors == null){
             convertors = CacheBuilder.newBuilder().
                     build(new CacheLoader<Integer, nAxiomToClauseStore>() {
@@ -65,8 +64,29 @@ public class nElementQBFWriter {
         }
 
         this.mapper = convertors.get(DOMAIN_SIZE);
-        collectClausesAndVariables();
         populateSignatures();
+        collectClausesAndVariables();
+        generateQBFProblem();
+    }
+
+    public boolean isUnsatisfiable(){
+        return isUnsatisfiable;
+    }
+
+    public boolean convertedClausesAreEmpty(){
+        return clauses.isEmpty();
+    }
+
+    public HashSet<Integer> getUniversalVariables() {
+        return universalVariables;
+    }
+
+    public HashSet<Integer> getExistentialVariables() {
+        return existentialVariables;
+    }
+
+    public HashSet<int[]> getClauses() {
+        return clauses;
     }
 
     private void populateSignatures() {
@@ -84,13 +104,7 @@ public class nElementQBFWriter {
         classesNotInSignature.remove(factory.getOWLNothing());
     }
 
-    public boolean isUnsatisfiable(){
-        return isUnsatisfiable;
-    }
 
-    public boolean convertedClausesAreEmpty(){
-        return clauses.isEmpty();
-    }
 
     private void collectClausesAndVariables() {
         for(OWLLogicalAxiom axiom: ontology){
@@ -111,122 +125,69 @@ public class nElementQBFWriter {
         }
     }
 
-    public File generateQBFProblem() throws IOException{
-        File qbf = createQBFFile();
-//        System.out.println("./sKizzo " + qbfFile.getAbsolutePath());
-//        ModuleUtils.printFile(qbfFile);
-        return qbf;
-    }
-
-    private File createQBFFile() throws IOException {
-        if (!qbfFile.exists()) {
-            try {
-                qbfFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        BufferedWriter writer = new BufferedWriter(new FileWriter(qbfFile));
-
-        try{
-            writeHeaders(writer);
-            writeUniversalQuantifiers(writer);
-            writeExistentialQuantifiers(writer);
-            writeClauses(writer);
-        }
-        finally{
-            try {
-                writer.flush();
-                writer.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return qbfFile;
+    public void generateQBFProblem() throws IOException{
+        writeUniversalQuantifiers();
+        writeExistentialQuantifiers();
     }
 
 
-
-    private void writeHeaders(BufferedWriter writer) throws IOException {
-        writer.write("p cnf " + variables.size() + " " + clauses.size());
-        writer.newLine();
-    }
-
-    private void writeUniversalQuantifiers(BufferedWriter writer) throws IOException{
-        if(!signature.isEmpty()) {
-            writer.write("a ");
-            for(OWLEntity sigEnt : signature){
-                for(PropositionalFormula ent : sigEnt.accept(entityUnderAllInterpreations)){
-                    Integer entValue = mapper.lookupMapping(ent);
-                    if(!(entValue == null)){
-                        writer.write(entValue + " ");
-                    }
+    private void writeUniversalQuantifiers() throws IOException{
+        for(OWLEntity sigEnt : signature){
+            for(PropositionalFormula ent : sigEnt.accept(entityUnderAllInterpreations)){
+                Integer entValue = mapper.lookupMapping(ent);
+                if(!(entValue == null)){
+                    universalVariables.add(entValue);
                 }
             }
-            writer.write("0");
-            writer.newLine();
         }
     }
 
-    private void writeExistentialQuantifiers(BufferedWriter writer) throws IOException{
-        if(!classesNotInSignature.isEmpty() || !freshVariables.isEmpty()){
-            writer.write("e ");
-            for(OWLEntity sigEnt : classesNotInSignature){
-
-                for(PropositionalFormula ent : sigEnt.accept(entityUnderAllInterpreations)){
-                    Integer entValue = mapper.lookupMapping(ent);
-                    if(!(entValue == null)){
-                        writer.write(entValue + " ");
-                    }
+    private void writeExistentialQuantifiers() throws IOException{
+        for(OWLEntity sigEnt : classesNotInSignature){
+            for(PropositionalFormula ent : sigEnt.accept(entityUnderAllInterpreations)){
+                Integer entValue = mapper.lookupMapping(ent);
+                if(!(entValue == null)){
+                    existentialVariables.add(entValue);
                 }
             }
-            for(Integer fresh : freshVariables){
-                writer.write(fresh + " ");
-            }
-            writer.write("0");
-            writer.newLine();
         }
-    }
-
-    private void writeClauses(BufferedWriter writer) throws IOException{
-        for(int[] clause : clauses){
-            for(int var : clause){
-                writer.write(var + " ");
-            }
-            writer.write("0");
-            writer.newLine();
+        for(Integer fresh : freshVariables){
+            existentialVariables.add(fresh);
         }
     }
 
     
 
     public static void main(String[] args) {
-        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/examples/nbroken2.owl");
-
+        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/NCI/Profile/NCI-star.owl");
+        Set<OWLLogicalAxiom> subset = ModuleUtils.generateRandomAxioms(ont.getLogicalAxioms(),1000);
         System.out.println("LOADED");
 
         OWLDataFactory f = ont.getOWLOntologyManager().getOWLDataFactory();
-        ModuleUtils.remapIRIs(ont,"X");
-        for(OWLLogicalAxiom ax : ont.getLogicalAxioms()){
-            System.out.println(ax);
-        }
+       // ModuleUtils.remapIRIs(ont,"X");
+//        for(OWLLogicalAxiom ax : ont.getLogicalAxioms()){
+//            System.out.println(ax);
+//        }
+
+        SignatureGenerator gen = new SignatureGenerator(subset);
 
         HashSet<OWLEntity> signature = new HashSet<OWLEntity>();
         OWLClass a = f.getOWLClass(IRI.create("X#A"));
         OWLClass b = f.getOWLClass(IRI.create("X#B"));
         OWLClass c = f.getOWLClass(IRI.create("X#C"));
         OWLObjectProperty r = f.getOWLObjectProperty(IRI.create("X#r"));
-        signature.add(r);
-        signature.add(c);
+        signature.add(a);
+        signature.add(b);
         signature.add(f.getOWLThing());
 
         try {
-            nElementQBFWriter writer = new nElementQBFWriter(1,ont.getLogicalAxioms(),signature);
-            File foo = writer.generateQBFProblem();
-            QBFSolver solver = new QBFSolver();
-            System.out.println(solver.isSatisfiable(foo));
+            nElementQBFProblemGenerator writer = new nElementQBFProblemGenerator(2,subset,gen.generateRandomSignature(10));
+            DepQBFSolver solver = new DepQBFSolver(writer.getUniversalVariables(),writer.getExistentialVariables(),writer.getClauses());
+            Stopwatch stoppy = new Stopwatch().start();
+            System.out.println("SAT: " + solver.isSatisfiable());
+            stoppy.stop();
+            System.out.printf("Time: " + stoppy);
+            solver.delete();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {

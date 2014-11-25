@@ -2,11 +2,10 @@ package uk.ac.liv.moduleextraction.checkers;
 
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import uk.ac.liv.moduleextraction.qbf.QBFSolver;
+import uk.ac.liv.moduleextraction.qbf.DepQBFSolver;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
-import uk.ac.liv.moduleextraction.qbf.nElementQBFWriter;
+import uk.ac.liv.moduleextraction.qbf.nElementQBFProblemGenerator;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -28,8 +27,7 @@ public class NElementInseparableChecker {
 
 		/* If W is empty it IS the empty set so cannot be separable from itself */
 		if(!w.isEmpty()){
-			//Remove inverse roles from the QBF problem
-			nElementQBFWriter writer = new nElementQBFWriter(DOMAIN_ELEMENTS,w,signatureAndSigM);
+			nElementQBFProblemGenerator writer = new nElementQBFProblemGenerator(DOMAIN_ELEMENTS,w,signatureAndSigM);
 			
 			/* An empty clause set need not be checked - in fact the QBF solver complains about
 			 * and empty problem*/
@@ -42,9 +40,9 @@ public class NElementInseparableChecker {
 			}
 			else{
 				testCount++;
-				QBFSolver solver =  new QBFSolver();
-				File qbfProblem = writer.generateQBFProblem();
-				isInseparable = solver.isSatisfiable(qbfProblem);
+                DepQBFSolver solver = new DepQBFSolver(writer.getUniversalVariables(),writer.getExistentialVariables(),writer.getClauses());
+				isInseparable = solver.isSatisfiable();
+                solver.delete();
 			}
 	
 		}
