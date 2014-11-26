@@ -1,17 +1,14 @@
 package uk.ac.liv.moduleextraction.signature;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLOntology;
-
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
-import uk.ac.liv.ontologyutils.util.ModuleUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class WriteRandomSigs {
@@ -73,21 +70,16 @@ public class WriteRandomSigs {
 	}
 
 	public static void main(String[] args) {
-		File ontloc = new File("/users/loco/wgatens/ecai-testing/Ontologies/Thesaurus_14.05d.owl-QBF");
-				
-		
-		int[] intervals = {100,250,500,750,1000};
-		double[] roles = {0,50,100};
+		//File ontloc = new File("/users/loco/wgatens/ecai-testing/Ontologies/Thesaurus_14.05d.owl-QBF");
+
+		File ontloc = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/0a3f75bb-693b-4adb-b277-dc7fe493d3f4_DUL.owl-QBF");
+
 		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontloc.getAbsolutePath());
 		WriteRandomSigs writer = new WriteRandomSigs(
 				ont, 
-				new File("/users/loco/wgatens/ecai-testing/Signatures/" + "OneDepleting/" + ontloc.getName()));
-		
-		for(int i : intervals){
-			for(double r : roles){
-				writer.writeSignatureWithRoles(i, r, 200);
-			}
-		}
+				new File(ModulePaths.getSignatureLocation() + "qbfzoom/" + ontloc.getName()));
+
+		writer.writeSignature(10,10);
 
 		
 
