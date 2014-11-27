@@ -33,7 +33,7 @@ public class NElementSeparabilityAxiomLocator {
 		/* Represents the last axioms added or removed from the split test */
 
 		OWLLogicalAxiom[] lastAdded = getTopHalf(axiomList);
-		OWLLogicalAxiom[]lastRemoved = getBottomHalf(axiomList);
+		OWLLogicalAxiom[] lastRemoved = getBottomHalf(axiomList);
 
 		OWLLogicalAxiom[] W = lastAdded;
 
@@ -55,7 +55,7 @@ public class NElementSeparabilityAxiomLocator {
 				lastAdded = Arrays.copyOfRange(lastAdded, 0,lastAdded.length -lastRemoved.length);
 			}
 		}
-		
+
 		return axiomList[W.length];
 	}
 	
@@ -74,7 +74,7 @@ public class NElementSeparabilityAxiomLocator {
 		return result;
 	}
 
-	private OWLLogicalAxiom[] getTopHalf(OWLLogicalAxiom[] axiomList){
+	protected OWLLogicalAxiom[] getTopHalf(OWLLogicalAxiom[] axiomList){
 		int fromIndex = 0;
 		int toIndex = (int) Math.floor(axiomList.length/2);
 
@@ -82,7 +82,7 @@ public class NElementSeparabilityAxiomLocator {
 
 	}
 
-	private OWLLogicalAxiom[] getBottomHalf(OWLLogicalAxiom[] axiomList){
+	protected OWLLogicalAxiom[] getBottomHalf(OWLLogicalAxiom[] axiomList){
 		int fromIndex = (int) Math.floor(axiomList.length/2);
 		int toIndex = axiomList.length;
 
