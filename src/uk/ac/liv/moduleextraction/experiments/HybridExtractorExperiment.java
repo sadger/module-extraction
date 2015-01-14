@@ -1,33 +1,22 @@
 package uk.ac.liv.moduleextraction.experiments;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.ObjectInputStream.GetField;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-
 import com.google.common.base.Stopwatch;
-
+import org.semanticweb.owlapi.model.*;
 import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor;
 import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor.CycleRemovalMethod;
-import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class HybridExtractorExperiment implements Experiment {
 
@@ -100,6 +89,9 @@ public class HybridExtractorExperiment implements Experiment {
 	public Stopwatch getStarWatch() {
 		return starWatch;
 	}
+
+	public int getAMEXExtractions(){ return iteratingExtractor.getAmexExtrations(); }
+	public int getSTARExtractions(){ return iteratingExtractor.getStarExtractions(); }
 
 
 	public void performExperiment(Set<OWLEntity> signature, File signatureLocation){

@@ -5,10 +5,9 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.extractor.NDepletingModuleExtractor;
+import uk.ac.liv.ontologyutils.util.CSVWriter;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -68,20 +67,29 @@ public class NDepletingComparison implements Experiment {
 
 	@Override
 	public void writeMetrics(File experimentLocation) throws IOException {
+		int ndepletingSmaller = (nDepletingModule.size() < starAndHybridExperiment.getHybridModule().size()) ? 1 : 0;
 
-		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results", false));
+		CSVWriter csvWriter = new CSVWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results.csv");
+		csvWriter.addMetric("DomainSize", DOMAIN_SIZE);
+		csvWriter.addMetric("StarSize", starAndHybridExperiment.getStarSize());
+		csvWriter.addMetric("HybridSize", starAndHybridExperiment.getIteratedSize());
+		csvWriter.addMetric("NDepletingSize", nDepletingModule.size());
+		csvWriter.addMetric("NDepletingSmaller", ndepletingSmaller);
+		csvWriter.addMetric("TimeSTAR", starAndHybridExperiment.getStarWatch().elapsed(TimeUnit.MILLISECONDS));
+		csvWriter.addMetric("TimeHybrid", starAndHybridExperiment.getHybridWatch().elapsed(TimeUnit.MILLISECONDS));
+		csvWriter.addMetric("TimeNDepleting", nDepletingStopwatch.elapsed(TimeUnit.MILLISECONDS));
+		csvWriter.addMetric("SignatureLocation", sigLocation.getAbsolutePath());
 
-		int qbfSmaller = (nDepletingModule.size() < starAndHybridExperiment.getHybridModule().size()) ? 1 : 0;
+		csvWriter.writeCSVFile();
 
-		writer.write("StarSize, HybridSize, DomainSize, NDepletingSize, NDepletingSmaller, TimeNDepleting, TimeHybrid, SignatureLocation" + "\n");
-		writer.write(starAndHybridExperiment.getStarSize() + "," + starAndHybridExperiment.getIteratedSize() + 
-				"," + String.valueOf(DOMAIN_SIZE) + "," + nDepletingModule.size() + "," + String.valueOf(qbfSmaller) + ","
-				+ nDepletingStopwatch.elapsed(TimeUnit.MILLISECONDS) + "," + starAndHybridExperiment.getHybridWatch().elapsed(TimeUnit.MILLISECONDS) +
-				"," + sigLocation.getAbsolutePath() + "\n");
 
-		writer.flush();
-		writer.close();
+		CSVWriter additionalMetrics = new CSVWriter(experimentLocation.getAbsoluteFile() + "/" + "extra-metrics.csv");
+		additionalMetrics.addMetric("HybridSTARExtractions",1);
+		additionalMetrics.addMetric("HybridAMEXExtractions",1);
+		additionalMetrics.addMetric("HybridQBFChecks",1);
+		additionalMetrics.addMetric("NDepletingQBFChecks", 1);
 
+		csvWriter.writeCSVFile();
 	}
 
 

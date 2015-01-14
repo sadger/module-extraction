@@ -71,7 +71,7 @@ public class NDepletingModuleExtractor implements Extractor {
 
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature) {
-
+        resetMetrics();
 		boolean[] terminology = axiomStore.allAxiomsAsBoolean();
 		allAxioms = axiomStore.getSubsetAsList(terminology);
 
@@ -111,7 +111,11 @@ public class NDepletingModuleExtractor implements Extractor {
 		return module;
 	}
 
-	void applyRules(boolean[] terminology) throws IOException, QBFSolverException, ExecutionException {
+	private void resetMetrics() {
+		qbfChecks = 0;
+	}
+
+	private void applyRules(boolean[] terminology) throws IOException, QBFSolverException, ExecutionException {
 		moveELChainsToModule(acyclicAxioms, terminology, axiomStore);	
 
 		if(inseparableChecker.isSeparableFromEmptySet(axiomStore.getSubsetAsList(terminology), sigUnionSigM)){
