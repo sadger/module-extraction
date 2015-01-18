@@ -1,5 +1,6 @@
 package uk.ac.liv.moduleextraction.extractor;
 
+import com.google.common.base.Stopwatch;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -9,6 +10,7 @@ import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.NElementInseparableChecker;
 import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
+import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 import uk.ac.liv.moduleextraction.qbf.OneElementSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
@@ -19,6 +21,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class AMEX implements Extractor{
 
@@ -30,7 +33,8 @@ public class AMEX implements Extractor{
 	
 	private ExtendedLHSSigExtractor lhsExtractor;
 	private NElementInseparableChecker oneElementInseparableChecker;
-	
+	private ExtractionMetric.MetricBuilder metricBuilder;
+
 	private long syntacticChecks = 0; // A syntactic iteration (total checks = this + qbfchecks)
 	private long timeTaken = 0; //Time taken to setup and extract the module (ms)
 	private long qbfChecks = 0; //Total number of times we actually call the qbf solver
@@ -64,14 +68,10 @@ public class AMEX implements Extractor{
 	
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature) {
-		/* Reset all the metrics for new extraction */
-		syntacticChecks = 0; 
-		timeTaken = 0; 
-		qbfChecks = 0;
-//		inseperableChecker.resetMetrics();
-		separabilityChecks = 0;
-		
-		long startTime = System.currentTimeMillis();
+
+		metricBuilder = new ExtractionMetric.MetricBuilder(ExtractionMetric.ExtractionType.AMEX);
+
+		Stopwatch stopwatch = new Stopwatch().start();
 		boolean[] terminology = axiomStore.allAxiomsAsBoolean();
 		module = existingModule;
 		sigUnionSigM = ModuleUtils.getClassAndRoleNamesInSet(existingModule);
@@ -86,19 +86,30 @@ public class AMEX implements Extractor{
 			e.printStackTrace();
 		}
 
-		timeTaken = System.currentTimeMillis() - startTime;
+		stopwatch.stop();
+		timeTaken = stopwatch.elapsed(TimeUnit.MILLISECONDS);
 		return module;
 	}
-	
-	public LinkedHashMap<String, Long> getMetrics() {
-		LinkedHashMap<String, Long> metrics = new LinkedHashMap<String, Long>();
-		metrics.put("Module size", (long) module.size());
-		metrics.put("Time taken", timeTaken);
-		metrics.put("Syntactic Checks", syntacticChecks);
-		metrics.put("QBF Checks", qbfChecks);
-		metrics.put("Separability Checks", separabilityChecks);
-		return metrics;
+
+
+	public ExtractionMetric getMetrics(){
+		metricBuilder.moduleSize(module.size());
+		metricBuilder.timeTaken(timeTaken);
+		metricBuilder.qbfChecks(qbfChecks);
+		metricBuilder.separabilityCausingAxioms(separabilityChecks);
+		metricBuilder.syntacticChecks(syntacticChecks);
+		return metricBuilder.createMetric();
 	}
+
+//	public LinkedHashMap<String, Long> getMetrics() {
+//		LinkedHashMap<String, Long> metrics = new LinkedHashMap<String, Long>();
+//		metrics.put("Module size", (long) module.size());
+//		metrics.put("Time taken", timeTaken);
+//		metrics.put("Syntactic Checks", syntacticChecks);
+//		metrics.put("QBF Checks", qbfChecks);
+//		metrics.put("Separability Checks", separabilityChecks);
+//		return metrics;
+//	}
 
 
 	public LinkedHashMap<String, Long> getQBFMetrics() {

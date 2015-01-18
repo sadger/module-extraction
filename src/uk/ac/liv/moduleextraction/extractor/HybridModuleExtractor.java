@@ -1,37 +1,23 @@
 package uk.ac.liv.moduleextraction.extractor;
 
-import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-
-import com.google.common.collect.Sets;
-
-import uk.ac.liv.moduleextraction.checkers.MeaninglessEquivalenceChecker;
+import com.google.common.base.Stopwatch;
+import org.semanticweb.owlapi.model.*;
 import uk.ac.liv.moduleextraction.experiments.OntologyFilters;
 import uk.ac.liv.moduleextraction.experiments.RepeatedEqualitiesFilter;
 import uk.ac.liv.moduleextraction.experiments.SharedNameFilter;
 import uk.ac.liv.moduleextraction.experiments.SharedNameFilter.RemovalMethod;
 import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
-import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
+import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 import uk.ac.liv.ontologyutils.axioms.AxiomStructureInspector;
-import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
-import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class HybridModuleExtractor implements Extractor {
 
@@ -42,6 +28,8 @@ public class HybridModuleExtractor implements Extractor {
 	private OntologyCycleVerifier cycleVerifier;
 	private CycleRemovalMethod method;
 
+	private ArrayList<ExtractionMetric> iterationMetrics;
+
 	public enum CycleRemovalMethod{
 		NAIVE,
 		IMPROVED,
@@ -51,6 +39,7 @@ public class HybridModuleExtractor implements Extractor {
 		this.ontology = ont;
 		this.manager = ont.getOWLOntologyManager();
 		this.method = method;
+		this.iterationMetrics = new ArrayList<ExtractionMetric>();
 	}
 	
 	public CycleRemovalMethod getCycleRemovalMethod(){
@@ -66,17 +55,8 @@ public class HybridModuleExtractor implements Extractor {
 		do{
 			int starSize = module.size();
 
-
-//			MeaninglessEquivalenceChecker checker = new MeaninglessEquivalenceChecker(module);
-//			Set<OWLLogicalAxiom> meaningless = checker.getMeaninglessEquivalances();
-//			module.removeAll(meaningless);
-			
-		
-
 			Set<OWLLogicalAxiom> unsupportedAxioms = getUnsupportedAxioms(module);
 			module.removeAll(unsupportedAxioms);
- 
-		
 
 			cycleVerifier = new OntologyCycleVerifier(module);
 			if(cycleVerifier.isCyclic()){
@@ -94,13 +74,6 @@ public class HybridModuleExtractor implements Extractor {
 			}
 			
 			module  = extractSemanticModule(createOntologyFromLogicalAxioms(module), unsupportedAxioms, origSig);
-			
-//			checker = new MeaninglessEquivalenceChecker(module);
-//			meaningless = checker.getMeaninglessEquivalances();
-//			if(meaningless.size()  > 0){
-//				System.out.println("ARFY");
-//			}
-//			module.removeAll(meaningless);
 
 
 			if(module.size() < starSize){
@@ -108,7 +81,6 @@ public class HybridModuleExtractor implements Extractor {
 				module = extractStarModule(createOntologyFromLogicalAxioms(module), origSig);
 				sizeChanged = (module.size() < amexSize);
 				
-		
 
 			}
 			else{
@@ -119,6 +91,8 @@ public class HybridModuleExtractor implements Extractor {
 
 		return module;
 	}
+
+
 
 
 
@@ -139,8 +113,14 @@ public class HybridModuleExtractor implements Extractor {
 
 	public Set<OWLLogicalAxiom> extractStarModule(OWLOntology ontology, Set<OWLEntity> signature){
 		SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.STAR);
+		Stopwatch starwatch = new Stopwatch().start();
 		Set<OWLLogicalAxiom> module = ModuleUtils.getLogicalAxioms(extractor.extract(signature));
+		starwatch.stop();
 		starExtractions++;
+		ExtractionMetric.MetricBuilder builder = new ExtractionMetric.MetricBuilder(ExtractionMetric.ExtractionType.STAR);
+		builder.moduleSize(module.size());
+		builder.timeTaken(starwatch.elapsed(TimeUnit.MILLISECONDS));
+		iterationMetrics.add(builder.createMetric());
 		return module;
 	}
 
@@ -154,6 +134,7 @@ public class HybridModuleExtractor implements Extractor {
 			e.printStackTrace();
 		}
 
+
 		return ont;
 	}
 
@@ -165,7 +146,13 @@ public class HybridModuleExtractor implements Extractor {
 		manager.removeOntology(ontology);
 		amexExtrations++;
 		//		System.out.println("AMEX: " + module.size());
+		iterationMetrics.add(extractor.getMetrics());
 		return module;
+	}
+
+
+	public ArrayList<ExtractionMetric> getIterationMetrics() {
+		return iterationMetrics;
 	}
 
 	public int getStarExtractions() {

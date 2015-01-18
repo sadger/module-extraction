@@ -78,18 +78,16 @@ public class NDepletingComparison implements Experiment {
 		csvWriter.addMetric("TimeSTAR", starAndHybridExperiment.getStarWatch().elapsed(TimeUnit.MILLISECONDS));
 		csvWriter.addMetric("TimeHybrid", starAndHybridExperiment.getHybridWatch().elapsed(TimeUnit.MILLISECONDS));
 		csvWriter.addMetric("TimeNDepleting", nDepletingStopwatch.elapsed(TimeUnit.MILLISECONDS));
+		csvWriter.addMetric("HybridSTARExtractions",starAndHybridExperiment.getSTARExtractions());
+		csvWriter.addMetric("HybridAMEXExtractions",starAndHybridExperiment.getAMEXExtractions());
 		csvWriter.addMetric("SignatureLocation", sigLocation.getAbsolutePath());
 
 		csvWriter.writeCSVFile();
 
 
-		CSVWriter additionalMetrics = new CSVWriter(experimentLocation.getAbsoluteFile() + "/" + "extra-metrics.csv");
-		additionalMetrics.addMetric("HybridSTARExtractions",1);
-		additionalMetrics.addMetric("HybridAMEXExtractions",1);
-		additionalMetrics.addMetric("HybridQBFChecks",1);
-		additionalMetrics.addMetric("NDepletingQBFChecks", 1);
 
-		csvWriter.writeCSVFile();
+
+
 	}
 
 

@@ -1,13 +1,16 @@
 package uk.ac.liv.moduleextraction.extractor;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Set;
-
+import com.google.common.base.Stopwatch;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
+
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 
 public class EquivalentToTerminologyExtractor implements Extractor {
@@ -16,8 +19,8 @@ public class EquivalentToTerminologyExtractor implements Extractor {
 	private Set<OWLLogicalAxiom> module;
 	private AMEX extractor;
 	
-	private long timeTaken = 0;
-	
+	private long timeTaken;
+
 	public EquivalentToTerminologyExtractor(OWLOntology equivalentToTerm) {
 		try {
 			processor = new EquivalentToTerminologyProcessor(equivalentToTerm);
@@ -31,13 +34,12 @@ public class EquivalentToTerminologyExtractor implements Extractor {
 	}
 	
 	@Override
-	public Set<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature) {		
-		timeTaken = 0;
-		
-		long startTime = System.currentTimeMillis();
-		module =  extractor.extractModule(existingModule,signature);
+	public Set<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature) {
+		Stopwatch stopwatch = new Stopwatch().start();
+		module =  extractor.extractModule(existingModule, signature);
 		module = processor.postProcessModule(module);
-		timeTaken = System.currentTimeMillis() - startTime;
+		stopwatch.stop();
+		timeTaken = stopwatch.elapsed(TimeUnit.MILLISECONDS);
 		return module;
 	}
 
@@ -45,19 +47,19 @@ public class EquivalentToTerminologyExtractor implements Extractor {
 		return extractModule(new HashSet<OWLLogicalAxiom>(), signature);
 	}
 
-	
-	public LinkedHashMap<String, Long> getMetrics() {
-		LinkedHashMap<String, Long> metrics = new LinkedHashMap<String, Long>();
-		LinkedHashMap<String, Long> extractorMetrics = extractor.getMetrics();
-		
-		metrics.put("Module size", (long) module.size());
-		metrics.put("Time taken", timeTaken);
-		metrics.put("Syntactic Checks", extractorMetrics.get("Syntactic Checks"));
-		metrics.put("QBF Checks", extractorMetrics.get("QBF Checks"));
-		metrics.put("Separability Checks", extractorMetrics.get("Separability Checks"));
-		
-		return metrics;
+	public ExtractionMetric getMetrics(){
+		ExtractionMetric amexMetric = extractor.getMetrics();
+		ExtractionMetric.MetricBuilder builder =
+				new ExtractionMetric.MetricBuilder(ExtractionMetric.ExtractionType.AMEX);
+		builder.timeTaken(timeTaken);
+		builder.moduleSize(module.size());
+		builder.syntacticChecks(amexMetric.getSyntacticChecks());
+		builder.qbfChecks(amexMetric.getQbfChecks());
+		builder.separabilityCausingAxioms(amexMetric.getSeparabilityAxiomCount());
+		return builder.createMetric();
+
 	}
+
 
 	public LinkedHashMap<String, Long> getQBFMetrics() {
 		return extractor.getQBFMetrics();

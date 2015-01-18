@@ -1,5 +1,11 @@
 package uk.ac.liv.moduleextraction.experiments;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.*;
+import uk.ac.liv.moduleextraction.extractor.EquivalentToTerminologyExtractor;
+import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
+import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -7,17 +13,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
-
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-
-import uk.ac.liv.moduleextraction.extractor.EquivalentToTerminologyExtractor;
-import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
-import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
 public class AMEXvsSTAR implements Experiment {
 
@@ -49,9 +44,9 @@ public class AMEXvsSTAR implements Experiment {
 
 	@Override
 	public void writeMetrics(File experimentLocation) throws IOException {
-		writeResults(experimentLocation);
-		writeMetricsToFile(experimentLocation, semanticExtractor.getMetrics(), "metrics");
-		writeMetricsToFile(experimentLocation, semanticExtractor.getQBFMetrics(), "qbf-metrics");
+//		writeResults(experimentLocation);
+//		writeMetricsToFile(experimentLocation, semanticExtractor.getMetrics(), "metrics");
+//		writeMetricsToFile(experimentLocation, semanticExtractor.getQBFMetrics(), "qbf-metrics");
 	}
 	
 	public void writeResults(File experimentLocation) throws IOException{		
