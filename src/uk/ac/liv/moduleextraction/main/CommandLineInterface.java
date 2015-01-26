@@ -122,7 +122,7 @@ public class CommandLineInterface {
 					if(termChecker.isTerminology(ontology)){
 						moduleExtractor = new AMEX(ontology);
 					}
-					else if(equivChecker.isEquivalentToTerminology(ontology)){
+					else if(equivChecker.isEquivalentToTerminology(ontology.getLogicalAxioms())){
 						moduleExtractor = new EquivalentToTerminologyExtractor(ontology);
 					}
 					else{

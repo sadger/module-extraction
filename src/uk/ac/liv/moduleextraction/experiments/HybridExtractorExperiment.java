@@ -4,6 +4,7 @@ import com.google.common.base.Stopwatch;
 import org.semanticweb.owlapi.model.*;
 import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor;
 import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor.CycleRemovalMethod;
+import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
@@ -14,6 +15,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -93,6 +95,9 @@ public class HybridExtractorExperiment implements Experiment {
 	public int getAMEXExtractions(){ return iteratingExtractor.getAmexExtrations(); }
 	public int getSTARExtractions(){ return iteratingExtractor.getStarExtractions(); }
 
+	public ArrayList<ExtractionMetric> getIterationMetrics(){
+		return iteratingExtractor.getIterationMetrics();
+	}
 
 	public void performExperiment(Set<OWLEntity> signature, File signatureLocation){
 		this.sigLocation = signatureLocation;

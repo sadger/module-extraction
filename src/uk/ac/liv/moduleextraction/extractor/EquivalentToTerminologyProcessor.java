@@ -6,15 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +15,7 @@ import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.EquivalentToTerminologyChecker;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
+import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 public class EquivalentToTerminologyProcessor {
 
@@ -30,27 +23,32 @@ public class EquivalentToTerminologyProcessor {
 
 
 	private static final String NEW_IRI_PREFIX = "http://www.csc.liv.ac.uk";
-	private OWLOntology equivalentToTerminology;
 	private HashMap<OWLClass, HashSet<OWLLogicalAxiom>> repeatedAxioms;
 	private HashMap<OWLClass, OWLClass> renamingMap;
-	private HashSet<OWLLogicalAxiom> newAxioms = new HashSet<OWLLogicalAxiom>();
+	//Freshly created axioms for replacement
+	private HashSet<OWLLogicalAxiom> freshAxioms = new HashSet<OWLLogicalAxiom>();
 	private OWLDataFactory factory;
 
-	public EquivalentToTerminologyProcessor(OWLOntology ontology) throws NotEquivalentToTerminologyException, OWLOntologyCreationException {
-		EquivalentToTerminologyChecker equivToTermChecker = new EquivalentToTerminologyChecker();
+	private Set<OWLLogicalAxiom> axioms;
 
-		if(!equivToTermChecker.isEquivalentToTerminology(ontology)){
+	public EquivalentToTerminologyProcessor(OWLOntology ontology) throws NotEquivalentToTerminologyException, OWLOntologyCreationException {
+		this(ontology.getLogicalAxioms());
+	}
+
+	public EquivalentToTerminologyProcessor(Set<OWLLogicalAxiom> axioms) throws NotEquivalentToTerminologyException {
+		EquivalentToTerminologyChecker equivToTermChecker = new EquivalentToTerminologyChecker();
+		if(!equivToTermChecker.isEquivalentToTerminology(axioms)){
 			throw new NotEquivalentToTerminologyException();
 		}
 		else{
-			this.equivalentToTerminology = ontology;
-		}		
-		countRepeatedAxioms();
+			this.axioms = axioms;
+			countRepeatedAxioms();
+		}
 	}
 
 	public void countRepeatedAxioms(){
 		repeatedAxioms = new HashMap<OWLClass, HashSet<OWLLogicalAxiom>>();
-		for(OWLLogicalAxiom axiom : equivalentToTerminology.getLogicalAxioms()){
+		for(OWLLogicalAxiom axiom : axioms){
 			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
 			HashSet<OWLLogicalAxiom> namedAxioms = repeatedAxioms.get(name);
 			if(namedAxioms == null){
@@ -62,12 +60,10 @@ public class EquivalentToTerminologyProcessor {
 		}
 	}
 
-	public OWLOntology getConvertedOntology() throws OWLOntologyCreationException{
+	public Set<OWLLogicalAxiom> getConvertedAxioms() throws OWLOntologyCreationException{
 		logger.debug("{}","Performing preprocessing on ontology");
-		OWLOntologyManager ontologyManager = equivalentToTerminology.getOWLOntologyManager();
+		Set<OWLLogicalAxiom> convertedAxioms = new HashSet<OWLLogicalAxiom>();
 		factory = OWLManager.getOWLDataFactory();
-
-		OWLOntology convertedOntology = ontologyManager.createOntology();
 
 		renamingMap = new HashMap<OWLClass, OWLClass>();
 
@@ -77,6 +73,7 @@ public class EquivalentToTerminologyProcessor {
 			if(repeated.size() > 1){
 				HashSet<OWLClass> newNames = new HashSet<OWLClass>();
 				int index = 1;
+
 				for(OWLLogicalAxiom repeatedAxiom : repeated){
 					OWLClass nameOfRepeated = (OWLClass) AxiomSplitter.getNameofAxiom(repeatedAxiom);
 					OWLClassExpression definitionOfRepeated = AxiomSplitter.getDefinitionofAxiom(repeatedAxiom);
@@ -88,20 +85,22 @@ public class EquivalentToTerminologyProcessor {
 
 					OWLSubClassOfAxiom replacementAxiom = factory.getOWLSubClassOfAxiom(newClass, definitionOfRepeated);
 
-					ontologyManager.addAxiom(convertedOntology, replacementAxiom);
+					convertedAxioms.add(replacementAxiom);
+					freshAxioms.add(replacementAxiom);
 
 					index++;
 				}
 
+				//New conjunction axiom
 				OWLSubClassOfAxiom newAxiom = factory.getOWLSubClassOfAxiom(cls,factory.getOWLObjectIntersectionOf(newNames));
-				newAxioms.add(newAxiom);
-				ontologyManager.addAxiom(convertedOntology, newAxiom);
+				freshAxioms.add(newAxiom);
+				convertedAxioms.add(newAxiom);
 			}
 			else{
-				ontologyManager.addAxioms(convertedOntology, repeatedAxioms.get(cls));
+				convertedAxioms.addAll(repeatedAxioms.get(cls));
 			}
 		}
-		return convertedOntology;
+		return convertedAxioms;
 
 	}
 
@@ -117,7 +116,7 @@ public class EquivalentToTerminologyProcessor {
 			//The axioms to remap and remove are terminological but ontology may
 			//contain non-terminological axioms through the hybrid approach
 			if(verifier.isSupportedAxiom(axiom)){
-				if(newAxioms.contains(axiom)){
+				if(freshAxioms.contains(axiom)){
 					toRemove.add(axiom);
 				}
 				OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
@@ -142,6 +141,34 @@ public class EquivalentToTerminologyProcessor {
 		return module;
 	}
 
+
+	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException {
+		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/examples/equivterm.krss");
+		EquivalentToTerminologyProcessor terminologyProcessor = new EquivalentToTerminologyProcessor(ont.getLogicalAxioms());
+		ModuleUtils.remapIRIs(ont, "X");
+
+		System.out.println(ont.getLogicalAxioms());
+
+		OWLDataFactory f = ont.getOWLOntologyManager().getOWLDataFactory();
+		OWLClass a = f.getOWLClass(IRI.create("X#A"));
+		OWLClass b = f.getOWLClass(IRI.create("X#B"));
+		OWLClass c = f.getOWLClass(IRI.create("X#C"));
+		OWLClass d = f.getOWLClass(IRI.create("X#D"));
+		Set<OWLEntity> sig = new HashSet<OWLEntity>();
+		sig.add(a);
+		sig.add(b);
+
+		EquivalentToTerminologyExtractor extract = new EquivalentToTerminologyExtractor(ont);
+		NDepletingModuleExtractor extractN = new NDepletingModuleExtractor(1,ont.getLogicalAxioms());
+		System.out.println(extract.extractModule(sig));
+		System.out.println(extract.getMetrics());
+		System.out.println(extractN.extractModule(sig));
+		System.out.println(extractN.getMetrics());
+		System.out.println(extractN.extractModule(sig));
+		System.out.println(extractN.getMetrics());
+		System.out.println(extractN.extractModule(sig));
+		System.out.println(extractN.getMetrics());
+	}
 
 
 

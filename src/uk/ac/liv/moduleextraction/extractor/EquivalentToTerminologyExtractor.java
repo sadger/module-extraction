@@ -1,6 +1,7 @@
 package uk.ac.liv.moduleextraction.extractor;
 
 import com.google.common.base.Stopwatch;
+import com.sun.org.glassfish.external.amx.AMX;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -22,16 +23,20 @@ public class EquivalentToTerminologyExtractor implements Extractor {
 	private long timeTaken;
 
 	public EquivalentToTerminologyExtractor(OWLOntology equivalentToTerm) {
+		this(equivalentToTerm.getLogicalAxioms());
+	}
+
+	public EquivalentToTerminologyExtractor(Set<OWLLogicalAxiom> axioms) {
 		try {
-			processor = new EquivalentToTerminologyProcessor(equivalentToTerm);
-			OWLOntology newOnt = processor.getConvertedOntology();
-			extractor = new AMEX(newOnt);
-		} catch (OWLOntologyCreationException e) {
-			e.printStackTrace();
+			processor = new EquivalentToTerminologyProcessor(axioms);
+			extractor = new AMEX(processor.getConvertedAxioms());
 		} catch (NotEquivalentToTerminologyException e) {
+			e.printStackTrace();
+		} catch (OWLOntologyCreationException e) {
 			e.printStackTrace();
 		}
 	}
+
 	
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature) {

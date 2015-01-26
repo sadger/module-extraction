@@ -62,7 +62,7 @@ public class AcylicNotTerminologyExtractor implements Extractor {
 			System.out.println("Is terminology");
 			module = new AMEX(starOntology).extractModule(signature);
 		}
-		else if(equivChecker.isEquivalentToTerminology(starOntology)){
+		else if(equivChecker.isEquivalentToTerminology(starOntology.getLogicalAxioms())){
 			System.out.println("Is equivalent to terminology");
 			module = new EquivalentToTerminologyExtractor(starOntology).extractModule(signature);
 		}
