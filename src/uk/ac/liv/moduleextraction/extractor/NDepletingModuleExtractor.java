@@ -4,13 +4,18 @@ import com.google.common.base.Stopwatch;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import sun.security.pkcs11.Secmod;
 import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.checkers.ELAxiomChainCollector;
 import uk.ac.liv.moduleextraction.checkers.NElementInseparableChecker;
+import uk.ac.liv.moduleextraction.experiments.NDepletingComparison;
 import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
+import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
+import uk.ac.liv.moduleextraction.qbf.IncrementalSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.NElementSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
+import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
@@ -24,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class NDepletingModuleExtractor implements Extractor {
 
@@ -31,7 +37,7 @@ public class NDepletingModuleExtractor implements Extractor {
 	private Set<OWLLogicalAxiom> module;
 	private Set<OWLEntity> sigUnionSigM;
 	private final NElementInseparableChecker inseparableChecker;
-	private long qbfChecks = 0;
+
 	private final ELAxiomChainCollector chainCollector;
 	private AxiomDependencies dependT;
 	private List<OWLLogicalAxiom> allAxioms;
@@ -40,6 +46,11 @@ public class NDepletingModuleExtractor implements Extractor {
 	private ArrayList<OWLLogicalAxiom> acyclicAxioms;
 
 	private final int DOMAIN_SIZE;
+	private Stopwatch nDepWatch;
+
+	private long qbfChecks = 0;
+	private long separabilityAxioms = 0;
+	private long syntacticChecks = 0;
 
 	private NDepletingModuleExtractor(int domain_size, OWLOntology ontology) {
 		this(domain_size,ontology.getLogicalAxioms());
@@ -65,6 +76,7 @@ public class NDepletingModuleExtractor implements Extractor {
 
 		OWLLogicalAxiom insepAxiom = locator.getSeparabilityCausingAxiom();
 		qbfChecks += locator.getCheckCount();
+		separabilityAxioms++;
 
 		return insepAxiom;
 	}
@@ -72,6 +84,9 @@ public class NDepletingModuleExtractor implements Extractor {
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature) {
         resetMetrics();
+
+		nDepWatch = new Stopwatch().start();
+
 		boolean[] terminology = axiomStore.allAxiomsAsBoolean();
 		allAxioms = axiomStore.getSubsetAsList(terminology);
 
@@ -108,22 +123,26 @@ public class NDepletingModuleExtractor implements Extractor {
 			e.printStackTrace();
 		}
 
+		nDepWatch.stop();
+
+
 		return module;
 	}
 
 	private void resetMetrics() {
 		qbfChecks = 0;
+		separabilityAxioms = 0;
+		syntacticChecks = 0;
 	}
 
 	private void applyRules(boolean[] terminology) throws IOException, QBFSolverException, ExecutionException {
-		moveELChainsToModule(acyclicAxioms, terminology, axiomStore);	
-
+		moveELChainsToModule(acyclicAxioms, terminology, axiomStore);
+		qbfChecks++;
 		if(inseparableChecker.isSeparableFromEmptySet(axiomStore.getSubsetAsList(terminology), sigUnionSigM)){
 			OWLLogicalAxiom axiom = findSeparableAxiom(terminology);
 			module.add(axiom);
 			removeAxiom(terminology, axiom);
 			sigUnionSigM.addAll(axiom.getSignature());
-			qbfChecks += inseparableChecker.getTestCount();
 			applyRules(terminology);
 		}
 	}
@@ -145,6 +164,8 @@ public class NDepletingModuleExtractor implements Extractor {
 			}
 
 		}
+		syntacticChecks += chainCollector.getSyntacticChecks();
+		chainCollector.resetSyntacticChecks();
 	}
 
 
@@ -160,6 +181,16 @@ public class NDepletingModuleExtractor implements Extractor {
 		expressive.remove(axiom);
 	}
 
+	public ExtractionMetric getMetrics(){
+		ExtractionMetric.MetricBuilder builder = new ExtractionMetric.MetricBuilder(ExtractionMetric.ExtractionType.N_DEPLETING);
+		builder.moduleSize(module.size());
+		builder.timeTaken(nDepWatch.elapsed(TimeUnit.MILLISECONDS));
+		builder.qbfChecks(qbfChecks);
+		builder.separabilityCausingAxioms(separabilityAxioms);
+		builder.syntacticChecks(syntacticChecks);
+		return builder.createMetric();
+	}
+
 	public static void main(String[] args) throws IOException {
 
 		//NDepletingModuleExtractor one = new NDepletingModuleExtractor(2,ont.getLogicalAxioms());
@@ -171,26 +202,36 @@ public class NDepletingModuleExtractor implements Extractor {
 		File ontFile = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/0a3f75bb-693b-4adb-b277-dc7fe493d3f4_DUL.owl-QBF");
 		OWLOntology ontz = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
 
+		for(OWLLogicalAxiom ax : ontz.getLogicalAxioms()){
+			System.out.println(ax);
+		}
 		HybridModuleExtractor extractor2 = new HybridModuleExtractor(ontz, HybridModuleExtractor.CycleRemovalMethod.NAIVE);
 		System.out.println("Size:" + ontz.getLogicalAxiomCount());
 		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "qbfspeed/" + ontFile.getName()));
-
+		SignatureGenerator gen = new SignatureGenerator(ontz.getLogicalAxioms());
 		Stopwatch watchy = new Stopwatch().start();
 		for (int j = 1; j <= 10; j++) {
-			Set<OWLEntity> sig = man.readFile("random10-" + j);
-			Set<OWLLogicalAxiom> mod = extractor2.extractModule(sig);
-			NDepletingModuleExtractor extract = new NDepletingModuleExtractor(1,mod);
-			System.out.println(extract.extractModule(sig).size());
+			String signame = "random10-" + j;
+			Set<OWLEntity> sig = man.readFile(signame);
+//			Set<OWLLogicalAxiom> mod = extractor2.extractModule(sig);
+//			System.out.println("Mod size: " + mod.size());
+//			NDepletingModuleExtractor extract = new NDepletingModuleExtractor(1,mod);
+//			System.out.println(extract.extractModule(sig).size());
+			NDepletingComparison compare = new NDepletingComparison(1,ontz,new File("/tmp/"));
+			compare.performExperiment(sig);
+			File sigLocation = new File(ModulePaths.getResultLocation() + "qbfspeed/" + ontFile.getName() + "/" + signame);
+			sigLocation.mkdirs();
+			compare.writeMetrics(sigLocation);
 		}
 		watchy.stop();
 		System.out.println("TIME:" + watchy);
 
-			}
-//		}
+	}
+}
 
 //
-//	}
+//	}\
 
 
 
-}
+

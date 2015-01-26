@@ -69,6 +69,7 @@ public class AMEX implements Extractor{
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature) {
 
+		resetMetrics();
 		metricBuilder = new ExtractionMetric.MetricBuilder(ExtractionMetric.ExtractionType.AMEX);
 
 		Stopwatch stopwatch = new Stopwatch().start();
@@ -89,6 +90,13 @@ public class AMEX implements Extractor{
 		stopwatch.stop();
 		timeTaken = stopwatch.elapsed(TimeUnit.MILLISECONDS);
 		return module;
+	}
+
+	private void resetMetrics() {
+		syntacticChecks = 0;
+		qbfChecks = 0;
+		separabilityChecks = 0;
+		timeTaken = 0;
 	}
 
 

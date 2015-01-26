@@ -22,6 +22,7 @@ import uk.ac.liv.ontologyutils.util.ModulePaths;
 
 public class ELAxiomChainCollector {
 
+	private int syntacticChecks = 0;
 
 	public ArrayList<OWLLogicalAxiom> collectELAxiomChain(boolean[] terminology, int currentIndex, 
 			DefinitorialAxiomStore axiomStore, AxiomDependencies dependT, Set<OWLEntity> sigUnionSigM) {
@@ -49,6 +50,13 @@ public class ELAxiomChainCollector {
 
 	}
 
+	public int getSyntacticChecks() {
+		return syntacticChecks;
+	}
+
+	public void resetSyntacticChecks(){
+		syntacticChecks = 0;
+	}
 
 	public ArrayList<OWLLogicalAxiom> collectELAxiomChain(List<OWLLogicalAxiom> allAxioms, int currentIndex,
 			boolean[] terminology, DefinitorialAxiomStore axiomStore, AxiomDependencies dependT, Set<OWLEntity> sigUnionSigM) {
@@ -78,7 +86,7 @@ public class ELAxiomChainCollector {
 	public boolean hasELSyntacticDependency(OWLLogicalAxiom axiom, AxiomDependencies dependT, Set<OWLEntity> sigUnionSigM){
 		OWLClass axiomName = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
 		ELValidator validator = new ELValidator();
-
+		syntacticChecks++;
 		if(!validator.isELAxiom(axiom) || !sigUnionSigM.contains(axiomName)){
 			return false;
 		}

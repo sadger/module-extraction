@@ -28,7 +28,10 @@ public class HybridModuleExtractor implements Extractor {
 	private OntologyCycleVerifier cycleVerifier;
 	private CycleRemovalMethod method;
 
+	private Set<OWLLogicalAxiom> module;
+
 	private ArrayList<ExtractionMetric> iterationMetrics;
+	private Stopwatch hybridWatch;
 
 	public enum CycleRemovalMethod{
 		NAIVE,
@@ -48,9 +51,9 @@ public class HybridModuleExtractor implements Extractor {
 	
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) {
-
+		hybridWatch = new Stopwatch().start();
 		Set<OWLEntity> origSig = new HashSet<OWLEntity>(signature);
-		Set<OWLLogicalAxiom> module = extractStarModule(ontology, signature);
+		module = extractStarModule(ontology.getLogicalAxioms(), signature);
 		boolean sizeChanged = false;
 		do{
 			int starSize = module.size();
@@ -78,7 +81,7 @@ public class HybridModuleExtractor implements Extractor {
 
 			if(module.size() < starSize){
 				int amexSize = module.size();
-				module = extractStarModule(createOntologyFromLogicalAxioms(module), origSig);
+				module = extractStarModule(module, origSig);
 				sizeChanged = (module.size() < amexSize);
 				
 
@@ -89,11 +92,9 @@ public class HybridModuleExtractor implements Extractor {
 
 		}while(sizeChanged);
 
+		hybridWatch.stop();
 		return module;
 	}
-
-
-
 
 
 	private Set<OWLLogicalAxiom> getUnsupportedAxioms(Set<OWLLogicalAxiom> axioms){
@@ -111,16 +112,11 @@ public class HybridModuleExtractor implements Extractor {
 		return null;
 	}
 
-	public Set<OWLLogicalAxiom> extractStarModule(OWLOntology ontology, Set<OWLEntity> signature){
-		SyntacticLocalityModuleExtractor extractor = new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.STAR);
-		Stopwatch starwatch = new Stopwatch().start();
-		Set<OWLLogicalAxiom> module = ModuleUtils.getLogicalAxioms(extractor.extract(signature));
-		starwatch.stop();
+	public Set<OWLLogicalAxiom> extractStarModule(Set<OWLLogicalAxiom> axioms, Set<OWLEntity> signature){
+		STARExtractor starExtractor = new STARExtractor(axioms);
+		Set<OWLLogicalAxiom> module = starExtractor.extractModule(signature);
 		starExtractions++;
-		ExtractionMetric.MetricBuilder builder = new ExtractionMetric.MetricBuilder(ExtractionMetric.ExtractionType.STAR);
-		builder.moduleSize(module.size());
-		builder.timeTaken(starwatch.elapsed(TimeUnit.MILLISECONDS));
-		iterationMetrics.add(builder.createMetric());
+		iterationMetrics.add(starExtractor.getMetrics());
 		return module;
 	}
 
@@ -134,16 +130,14 @@ public class HybridModuleExtractor implements Extractor {
 			e.printStackTrace();
 		}
 
-
 		return ont;
 	}
 
 
-	private Set<OWLLogicalAxiom> extractSemanticModule(OWLOntology ontology, Set<OWLLogicalAxiom> existingmodule, Set<OWLEntity> signature){
-		EquivalentToTerminologyExtractor extractor = new EquivalentToTerminologyExtractor(ontology);
+	private Set<OWLLogicalAxiom> extractSemanticModule(OWLOntology inputOnt, Set<OWLLogicalAxiom> existingmodule, Set<OWLEntity> signature){
+		EquivalentToTerminologyExtractor extractor = new EquivalentToTerminologyExtractor(inputOnt);
 		Set<OWLLogicalAxiom> module = extractor.extractModule(existingmodule, signature);
-
-		manager.removeOntology(ontology);
+		manager.removeOntology(inputOnt);
 		amexExtrations++;
 		//		System.out.println("AMEX: " + module.size());
 		iterationMetrics.add(extractor.getMetrics());
@@ -153,6 +147,13 @@ public class HybridModuleExtractor implements Extractor {
 
 	public ArrayList<ExtractionMetric> getIterationMetrics() {
 		return iterationMetrics;
+	}
+
+	public ExtractionMetric getMetrics(){
+		ExtractionMetric.MetricBuilder builder = new ExtractionMetric.MetricBuilder(ExtractionMetric.ExtractionType.HYBRID);
+		builder.moduleSize(module.size());
+		builder.timeTaken(hybridWatch.elapsed(TimeUnit.MILLISECONDS));
+		return builder.createMetric();
 	}
 
 	public int getStarExtractions() {

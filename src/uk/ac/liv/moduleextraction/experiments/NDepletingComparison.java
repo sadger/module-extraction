@@ -1,14 +1,19 @@
 package uk.ac.liv.moduleextraction.experiments;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.extractor.NDepletingModuleExtractor;
+import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 import uk.ac.liv.ontologyutils.util.CSVWriter;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -24,6 +29,8 @@ public class NDepletingComparison implements Experiment {
 	private HybridExtractorExperiment starAndHybridExperiment;
 	private NDepletingModuleExtractor nDepletingModuleExtractor;
 	private Set<OWLLogicalAxiom> nDepletingModule;
+
+	private static final Joiner commaJoiner = Joiner.on(',');
 
 	private Stopwatch nDepletingStopwatch;
 
@@ -65,6 +72,10 @@ public class NDepletingComparison implements Experiment {
 		performExperiment(signature);
 	}
 
+	public int getDomainSize() {
+		return DOMAIN_SIZE;
+	}
+
 	@Override
 	public void writeMetrics(File experimentLocation) throws IOException {
 		int ndepletingSmaller = (nDepletingModule.size() < starAndHybridExperiment.getHybridModule().size()) ? 1 : 0;
@@ -80,11 +91,42 @@ public class NDepletingComparison implements Experiment {
 		csvWriter.addMetric("TimeNDepleting", nDepletingStopwatch.elapsed(TimeUnit.MILLISECONDS));
 		csvWriter.addMetric("HybridSTARExtractions",starAndHybridExperiment.getSTARExtractions());
 		csvWriter.addMetric("HybridAMEXExtractions",starAndHybridExperiment.getAMEXExtractions());
-		csvWriter.addMetric("SignatureLocation", sigLocation.getAbsolutePath());
+		if(sigLocation != null){
+			csvWriter.addMetric("SignatureLocation", sigLocation.getAbsolutePath());
+		}
+
+
+		csvWriter.writeCSVFile();
+
+		ExtractionMetric nDepMetrics = nDepletingModuleExtractor.getMetrics();
+
+		csvWriter = new CSVWriter(experimentLocation.getAbsoluteFile() + "/" + "n-depleting-metrics.csv");
+		csvWriter.addMetric("DomainSize", DOMAIN_SIZE);
+		csvWriter.addMetric("Size", nDepMetrics.getModuleSize());
+		csvWriter.addMetric("Time", nDepMetrics.getTimeTaken());
+		csvWriter.addMetric("QBFChecks", nDepMetrics.getQbfChecks());
+		csvWriter.addMetric("SyntacticChecks", nDepMetrics.getSyntacticChecks());
+		csvWriter.addMetric("SeparabilityAxioms", nDepMetrics.getSeparabilityAxiomCount());
 
 		csvWriter.writeCSVFile();
 
 
+		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "iteration-metrics.csv", false));
+		writer.write("Type, Size, Time, QBFChecks, SyntacticChecks, SeparabilityAxioms" + "\n");
+		for(ExtractionMetric metric : starAndHybridExperiment.getIterationMetrics()){
+			ArrayList<Object> metricList = new ArrayList<Object>();
+			metricList.add(metric.getType());
+			metricList.add(metric.getModuleSize());
+			metricList.add(metric.getTimeTaken());
+			metricList.add(metric.getQbfChecks());
+			metricList.add(metric.getSyntacticChecks());
+			metricList.add(metric.getSeparabilityAxiomCount());
+			writer.write(commaJoiner.join(metricList));
+			writer.write("\n");
+		}
+
+
+		writer.close();
 
 
 
