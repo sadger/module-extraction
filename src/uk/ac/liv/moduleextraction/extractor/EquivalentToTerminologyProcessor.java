@@ -159,15 +159,19 @@ public class EquivalentToTerminologyProcessor {
 		sig.add(b);
 
 		EquivalentToTerminologyExtractor extract = new EquivalentToTerminologyExtractor(ont);
-		NDepletingModuleExtractor extractN = new NDepletingModuleExtractor(1,ont.getLogicalAxioms());
+		NDepletingModuleExtractor extract1 = new NDepletingModuleExtractor(1,ont.getLogicalAxioms());
+		NDepletingModuleExtractor extract2 = new NDepletingModuleExtractor(2,ont.getLogicalAxioms());
+
 		System.out.println(extract.extractModule(sig));
 		System.out.println(extract.getMetrics());
-		System.out.println(extractN.extractModule(sig));
-		System.out.println(extractN.getMetrics());
-		System.out.println(extractN.extractModule(sig));
-		System.out.println(extractN.getMetrics());
-		System.out.println(extractN.extractModule(sig));
-		System.out.println(extractN.getMetrics());
+		System.out.println(extract1.extractModule(sig));
+		System.out.println(extract1.getMetrics());
+		System.out.println(extract2.extractModule(sig));
+		System.out.println(extract2.getMetrics());
+		System.out.println(extract1.extractModule(sig));
+		System.out.println(extract1.getMetrics());
+		System.out.println(extract2.extractModule(sig));
+		System.out.println(extract2.getMetrics());
 	}
 
 

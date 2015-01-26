@@ -21,6 +21,7 @@ import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
+import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,6 +53,9 @@ public class NDepletingModuleExtractor implements Extractor {
 	private long separabilityAxioms = 0;
 	private long syntacticChecks = 0;
 
+	//Mapping between axioms and clauses for QBF - each extractor holds its own instance for caching
+	private nAxiomToClauseStore clauseStore;
+
 	private NDepletingModuleExtractor(int domain_size, OWLOntology ontology) {
 		this(domain_size,ontology.getLogicalAxioms());
 	}
@@ -59,8 +63,9 @@ public class NDepletingModuleExtractor implements Extractor {
 	public NDepletingModuleExtractor(int domain_size, Set<OWLLogicalAxiom> ontology){
 		this.DOMAIN_SIZE = domain_size;
 		this.axiomStore = new DefinitorialAxiomStore(ontology);
-		this.inseparableChecker = new NElementInseparableChecker(domain_size);
 		this.chainCollector = new ELAxiomChainCollector();
+		this.clauseStore = new nAxiomToClauseStore(DOMAIN_SIZE);
+		this.inseparableChecker = new NElementInseparableChecker(clauseStore);
 	}
 
 	@Override
@@ -72,7 +77,7 @@ public class NDepletingModuleExtractor implements Extractor {
 			throws IOException, QBFSolverException, ExecutionException {
 
 		NElementSeparabilityAxiomLocator locator =
-				new NElementSeparabilityAxiomLocator(DOMAIN_SIZE,axiomStore.getSubsetAsArray(terminology),sigUnionSigM);
+				new NElementSeparabilityAxiomLocator(clauseStore,axiomStore.getSubsetAsArray(terminology),sigUnionSigM);
 
 		OWLLogicalAxiom insepAxiom = locator.getSeparabilityCausingAxiom();
 		qbfChecks += locator.getCheckCount();

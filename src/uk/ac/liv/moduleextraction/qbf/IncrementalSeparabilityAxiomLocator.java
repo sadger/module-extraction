@@ -31,13 +31,13 @@ public class IncrementalSeparabilityAxiomLocator extends NElementSeparabilityAxi
     private OWLLogicalAxiom[] axiomList;
     private final HashSet<OWLEntity> classesNotInSignature = new HashSet<OWLEntity>();
 
-    public IncrementalSeparabilityAxiomLocator(int domain_size, OWLLogicalAxiom[] subsetAsArray, Set<OWLEntity> sigUnionSigM) {
-        super(domain_size,subsetAsArray,sigUnionSigM);
+    public IncrementalSeparabilityAxiomLocator(nAxiomToClauseStore clauseStore, OWLLogicalAxiom[] subsetAsArray, Set<OWLEntity> sigUnionSigM) {
+        super(clauseStore,subsetAsArray,sigUnionSigM);
         this.axiomList = subsetAsArray;
         this.signature = sigUnionSigM;
         //This SHOULD be cached in order to fetch clauses for the same axioms
-        this.store = new nAxiomToClauseStore(domain_size);
-        this.entityUnderAllInterpreations = new nEntityConvertor(domain_size);
+        this.store = new nAxiomToClauseStore(clauseStore.getDomainSize());
+        this.entityUnderAllInterpreations = new nEntityConvertor(clauseStore.getDomainSize());
 
         DepQBF4J.create();
         DepQBF4J.configure("--dep-man=simple");

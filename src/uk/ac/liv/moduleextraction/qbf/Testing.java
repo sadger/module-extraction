@@ -3,6 +3,7 @@ package uk.ac.liv.moduleextraction.qbf;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import uk.ac.liv.moduleextraction.checkers.NElementInseparableChecker;
+import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -15,11 +16,11 @@ import java.util.concurrent.ExecutionException;
 public class Testing {
     Set<OWLLogicalAxiom> mod = new HashSet<OWLLogicalAxiom>();
     public void doThings(Set<OWLLogicalAxiom> axioms, Set<OWLEntity> sig) throws IOException, QBFSolverException, ExecutionException {
-        NElementInseparableChecker insep = new NElementInseparableChecker(1);
+        NElementInseparableChecker insep = new NElementInseparableChecker(new nAxiomToClauseStore(1));
         System.out.println(axioms);
         if(insep.isSeparableFromEmptySet(axioms,sig)){
             IncrementalSeparabilityAxiomLocator loc = new IncrementalSeparabilityAxiomLocator(
-                    2,
+                    new nAxiomToClauseStore(2),
                     axioms.toArray(new OWLLogicalAxiom[axioms.size()]),
                     sig);
             OWLLogicalAxiom ax = loc.findSeparabilityCausingAxiom();

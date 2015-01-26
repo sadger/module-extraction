@@ -15,6 +15,7 @@ import uk.ac.liv.moduleextraction.qbf.OneElementSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
+import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -39,8 +40,9 @@ public class AMEX implements Extractor{
 	private long timeTaken = 0; //Time taken to setup and extract the module (ms)
 	private long qbfChecks = 0; //Total number of times we actually call the qbf solver
 	private long separabilityChecks = 0; // Number of times we need to search for a separability causing axiom
-	
-	
+
+	private nAxiomToClauseStore clauseStoreMapping;
+
 	private Logger logger = LoggerFactory.getLogger(AMEX.class);
 			
 
@@ -57,7 +59,8 @@ public class AMEX implements Extractor{
 		syntacticDependencyChecker = new SyntacticDependencyChecker();
 		
 		lhsExtractor = new ExtendedLHSSigExtractor();
-		oneElementInseparableChecker = new NElementInseparableChecker(1);
+		clauseStoreMapping = new nAxiomToClauseStore(1);
+		oneElementInseparableChecker = new NElementInseparableChecker(clauseStoreMapping);
 	}
 	
 	
@@ -148,7 +151,7 @@ public class AMEX implements Extractor{
 		separabilityChecks++;
 
 		OneElementSeparabilityAxiomLocator search =
-				new OneElementSeparabilityAxiomLocator(axiomStore.getSubsetAsArray(terminology), sigUnionSigM, dependencies);
+				new OneElementSeparabilityAxiomLocator(clauseStoreMapping,axiomStore.getSubsetAsArray(terminology), sigUnionSigM, dependencies);
 
 		OWLLogicalAxiom insepAxiom = search.getSeparabilityCausingAxiom();
 		logger.debug("Adding (semantic): {}", insepAxiom);

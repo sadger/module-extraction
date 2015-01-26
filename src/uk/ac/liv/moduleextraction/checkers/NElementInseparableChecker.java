@@ -5,6 +5,7 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import uk.ac.liv.moduleextraction.qbf.DepQBFSolver;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.qbf.nElementQBFProblemGenerator;
+import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -16,10 +17,10 @@ public class NElementInseparableChecker {
 
 	
 	private long testCount = 0;
-	private final int DOMAIN_ELEMENTS;
+	private nAxiomToClauseStore clauseStore;
 
-	public NElementInseparableChecker(int domain_elements){
-		this.DOMAIN_ELEMENTS = domain_elements;
+	public NElementInseparableChecker(nAxiomToClauseStore clauseStore){
+		this.clauseStore = clauseStore;
 	}
 	
 	public boolean isSeparableFromEmptySet(Collection<OWLLogicalAxiom> w, Set<OWLEntity> signatureAndSigM) throws IOException, QBFSolverException, ExecutionException {
@@ -27,7 +28,7 @@ public class NElementInseparableChecker {
 
 		/* If W is empty it IS the empty set so cannot be separable from itself */
 		if(!w.isEmpty()){
-			nElementQBFProblemGenerator writer = new nElementQBFProblemGenerator(DOMAIN_ELEMENTS,w,signatureAndSigM);
+			nElementQBFProblemGenerator writer = new nElementQBFProblemGenerator(clauseStore,w,signatureAndSigM);
 			
 			/* An empty clause set need not be checked - in fact the QBF solver complains about
 			 * and empty problem*/
@@ -47,7 +48,7 @@ public class NElementInseparableChecker {
 	
 		}
 
-		//We test for inseparablity and return the negation
+		//We test for inseparablity and return the negationz
 		return !isInseparable;
 	}
 

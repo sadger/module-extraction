@@ -49,7 +49,6 @@ public class MultipleExperiments {
 					experimentLocation.mkdirs();
 				}
 
-				System.out.println(experimentLocation.exists());
 				//If there is already some metrics the experiment is probably finished
 				if(experimentLocation.list().length > 0){
 					System.out.println("Experiment results already exists - skipping");

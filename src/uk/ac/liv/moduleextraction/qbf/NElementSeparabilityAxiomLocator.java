@@ -3,6 +3,7 @@ package uk.ac.liv.moduleextraction.qbf;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import uk.ac.liv.moduleextraction.checkers.NElementInseparableChecker;
+import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -23,10 +24,10 @@ public class NElementSeparabilityAxiomLocator {
 	private OWLLogicalAxiom[] axiomList;
 
 
-	public NElementSeparabilityAxiomLocator(int domain_size, OWLLogicalAxiom[] subsetAsArray, Set<OWLEntity> sigUnionSigM) {
+	public NElementSeparabilityAxiomLocator(nAxiomToClauseStore clauseStoreMapping, OWLLogicalAxiom[] subsetAsArray, Set<OWLEntity> sigUnionSigM) {
 		this.axiomList = subsetAsArray;
 		this.sigUnionSigM = sigUnionSigM;
-		this.insepChecker = new NElementInseparableChecker(domain_size);
+		this.insepChecker = new NElementInseparableChecker(clauseStoreMapping);
 	}
 
 	public OWLLogicalAxiom getSeparabilityCausingAxiom() throws IOException, QBFSolverException, ExecutionException {

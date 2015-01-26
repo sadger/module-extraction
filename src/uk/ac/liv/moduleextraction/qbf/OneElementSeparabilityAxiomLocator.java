@@ -4,6 +4,7 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
+import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,8 +19,8 @@ public class OneElementSeparabilityAxiomLocator extends NElementSeparabilityAxio
     AxiomDependencies dependencies;
     Set<OWLEntity> sigUnionSigM;
 
-    public OneElementSeparabilityAxiomLocator(OWLLogicalAxiom[] subsetAsArray, Set<OWLEntity> sigUnionSigM, AxiomDependencies dependW) {
-        super(1, subsetAsArray, sigUnionSigM);
+    public OneElementSeparabilityAxiomLocator(nAxiomToClauseStore clauseStoreMapping, OWLLogicalAxiom[] subsetAsArray, Set<OWLEntity> sigUnionSigM, AxiomDependencies dependW) {
+        super(clauseStoreMapping, subsetAsArray, sigUnionSigM);
         this.dependencies = dependW;
         this.sigUnionSigM = sigUnionSigM;
     }
