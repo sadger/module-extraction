@@ -1,18 +1,16 @@
 package uk.ac.liv.moduleextraction.extractor;
 
 import com.google.common.base.Stopwatch;
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
-import uk.ac.liv.moduleextraction.experiments.OntologyFilters;
-import uk.ac.liv.moduleextraction.experiments.RepeatedEqualitiesFilter;
-import uk.ac.liv.moduleextraction.experiments.SharedNameFilter;
-import uk.ac.liv.moduleextraction.experiments.SharedNameFilter.RemovalMethod;
-import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
+import uk.ac.liv.moduleextraction.filters.OntologyFilters;
+import uk.ac.liv.moduleextraction.filters.RepeatedEqualitiesFilter;
+import uk.ac.liv.moduleextraction.filters.SharedNameFilter;
+import uk.ac.liv.moduleextraction.filters.SharedNameFilter.RemovalMethod;
+import uk.ac.liv.moduleextraction.filters.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 import uk.ac.liv.ontologyutils.axioms.AxiomStructureInspector;
 import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
-import uk.ac.liv.ontologyutils.util.ModuleUtils;
-import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
-import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 public class HybridModuleExtractor implements Extractor {
 
-	private OWLOntology ontology;
 	private OWLOntologyManager manager;
 	private int starExtractions = 0;
 	private int amexExtrations = 0;
@@ -32,17 +29,22 @@ public class HybridModuleExtractor implements Extractor {
 
 	private ArrayList<ExtractionMetric> iterationMetrics;
 	private Stopwatch hybridWatch;
+	private Set<OWLLogicalAxiom> axioms;
 
 	public enum CycleRemovalMethod{
 		NAIVE,
 		IMPROVED,
 	}
 	
-	public HybridModuleExtractor(OWLOntology ont, CycleRemovalMethod method) {
-		this.ontology = ont;
-		this.manager = ont.getOWLOntologyManager();
-		this.method = method;
+	public HybridModuleExtractor(OWLOntology ont) {
+		this(ont.getLogicalAxioms());
+	}
+
+	public HybridModuleExtractor(Set<OWLLogicalAxiom> axioms){
+		this.method = CycleRemovalMethod.NAIVE;
+		this.manager = OWLManager.createOWLOntologyManager();
 		this.iterationMetrics = new ArrayList<ExtractionMetric>();
+		this.axioms = axioms;
 	}
 	
 	public CycleRemovalMethod getCycleRemovalMethod(){
@@ -53,7 +55,7 @@ public class HybridModuleExtractor implements Extractor {
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) {
 		hybridWatch = new Stopwatch().start();
 		Set<OWLEntity> origSig = new HashSet<OWLEntity>(signature);
-		module = extractStarModule(ontology.getLogicalAxioms(), signature);
+		module = extractStarModule(axioms, signature);
 		boolean sizeChanged = false;
 		do{
 			int starSize = module.size();

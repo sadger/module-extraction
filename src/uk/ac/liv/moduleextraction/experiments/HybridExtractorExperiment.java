@@ -40,7 +40,7 @@ public class HybridExtractorExperiment implements Experiment {
 		this.location = originalLocation;
 	
 		this.starExtractor = new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.STAR);
-		this.iteratingExtractor = new HybridModuleExtractor(ont, CycleRemovalMethod.NAIVE);
+		this.iteratingExtractor = new HybridModuleExtractor(ont);
 	}
 
 

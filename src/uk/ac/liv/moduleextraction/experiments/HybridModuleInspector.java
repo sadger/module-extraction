@@ -28,7 +28,7 @@ public class HybridModuleInspector implements Experiment {
 	public void performExperiment(Set<OWLEntity> signature) {
 		unsupportedCount = 0;
 		SupportedAxiomVerifier validator = new SupportedAxiomVerifier();
-		HybridModuleExtractor extractor = new HybridModuleExtractor(ontology, CycleRemovalMethod.IMPROVED);
+		HybridModuleExtractor extractor = new HybridModuleExtractor(ontology);
 		module = extractor.extractModule(signature);
 		
 		for(OWLLogicalAxiom axiom : module){

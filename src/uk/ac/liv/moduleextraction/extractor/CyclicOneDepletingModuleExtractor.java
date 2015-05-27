@@ -6,7 +6,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.checkers.ELAxiomChainCollector;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
-import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
+import uk.ac.liv.moduleextraction.filters.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.qbf.CyclicSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;

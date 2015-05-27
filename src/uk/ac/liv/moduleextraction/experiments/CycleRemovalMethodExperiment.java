@@ -43,8 +43,8 @@ public class CycleRemovalMethodExperiment implements Experiment {
 	public CycleRemovalMethodExperiment(OWLOntology ontology, File ontLocation) {
 		this.ontology = ontology;
 		this.location = ontLocation;
-		this.naiveCycleRemovalExtractor = new HybridModuleExtractor(ontology, CycleRemovalMethod.NAIVE);
-		this.improvedCycleRemovalExtractor = new HybridModuleExtractor(ontology, CycleRemovalMethod.IMPROVED);
+		this.naiveCycleRemovalExtractor = new HybridModuleExtractor(ontology);
+		this.improvedCycleRemovalExtractor = new HybridModuleExtractor(ontology);
 		OWLOntologyManager manager = ontology.getOWLOntologyManager();
 		this.starExtractor = new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.STAR);
 	}
