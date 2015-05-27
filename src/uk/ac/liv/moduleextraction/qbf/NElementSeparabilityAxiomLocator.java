@@ -31,7 +31,8 @@ public class NElementSeparabilityAxiomLocator {
 	}
 
 	public OWLLogicalAxiom getSeparabilityCausingAxiom() throws IOException, QBFSolverException, ExecutionException {
-		/* Represents the last axioms added or removed from the split test */
+
+        /* Represents the last axioms added or removed from the split test */
 
 		OWLLogicalAxiom[] lastAdded = getTopHalf(axiomList);
 		OWLLogicalAxiom[] lastRemoved = getBottomHalf(axiomList);

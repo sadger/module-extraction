@@ -6,10 +6,6 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
-import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
-import uk.ac.liv.ontologyutils.util.ModuleUtils;
-
 public class OneDepletingModuleExtractor implements Extractor {
 
 	Extractor extractor;

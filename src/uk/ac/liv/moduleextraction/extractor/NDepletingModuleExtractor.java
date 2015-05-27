@@ -1,17 +1,17 @@
 package uk.ac.liv.moduleextraction.extractor;
 
 import com.google.common.base.Stopwatch;
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import sun.security.pkcs11.Secmod;
 import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.checkers.ELAxiomChainCollector;
 import uk.ac.liv.moduleextraction.checkers.NElementInseparableChecker;
-import uk.ac.liv.moduleextraction.experiments.NDepletingComparison;
-import uk.ac.liv.moduleextraction.experiments.SupportedExpressivenessFilter;
+import uk.ac.liv.moduleextraction.filters.AxiomTypeFilter;
+import uk.ac.liv.moduleextraction.filters.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
-import uk.ac.liv.moduleextraction.qbf.IncrementalSeparabilityAxiomLocator;
+import uk.ac.liv.moduleextraction.profling.AxiomTypeProfile;
 import uk.ac.liv.moduleextraction.qbf.NElementSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
@@ -23,7 +23,9 @@ import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -198,38 +200,93 @@ public class NDepletingModuleExtractor implements Extractor {
 
 	public static void main(String[] args) throws IOException {
 
-		//NDepletingModuleExtractor one = new NDepletingModuleExtractor(2,ont.getLogicalAxioms());
 
-		File dir = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only");
-//		for(File ontFile : dir.listFiles()){
-//			if(ontFile.isFile()){
-//				System.out.println2(ontFile.getName());
-		File ontFile = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/0a3f75bb-693b-4adb-b277-dc7fe493d3f4_DUL.owl-QBF");
-		OWLOntology ontz = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
+		int test = 1;
 
-		for(OWLLogicalAxiom ax : ontz.getLogicalAxioms()){
-			System.out.println(ax);
+
+		File ontDir = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/");
+
+
+
+		for(File f : ontDir.listFiles()){
+
+ 		    OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
+			Set<OWLLogicalAxiom> ontaxioms = ont.getLogicalAxioms();
+
+            //AxiomTypeFilter typeFilter = new AxiomTypeFilter(AxiomType.INVERSE_OBJECT_PROPERTIES);
+//			ontaxioms.removeAll(typeFilter.getUnsupportedAxioms(ontaxioms));
+
+			System.out.println("Ontsize: " + ontaxioms.size());
+
+
+			System.out.println(f.getName() + ": " + test++);
+
+            if(ontaxioms.size() < 400){
+                Set<OWLLogicalAxiom> randomSample = ModuleUtils.generateRandomAxioms(ont.getLogicalAxioms(),5);
+
+                Stopwatch samplewatch = new Stopwatch().start();
+                for(OWLLogicalAxiom axiom : randomSample){
+
+
+                    Set<OWLEntity> sig = axiom.getSignature();
+                    HybridModuleExtractor hybrid = new HybridModuleExtractor(ontaxioms);
+                    Set<OWLLogicalAxiom> hybridMod = hybrid.extractModule(sig);
+                    System.out.println(hybridMod.size());
+
+
+                    NDepletingModuleExtractor extractor = new NDepletingModuleExtractor(2,hybridMod);
+                    Set<OWLLogicalAxiom> nDep = extractor.extractModule(sig);
+                    System.out.println(nDep.size());
+
+
+                    System.out.println(nDep.size() == hybridMod.size());
+
+
+                }
+                samplewatch.stop();
+                System.out.println(samplewatch);
+            }
+
+
+
+			ont.getOWLOntologyManager().removeOntology(ont);
+			ont = null;
+
 		}
-		HybridModuleExtractor extractor2 = new HybridModuleExtractor(ontz, HybridModuleExtractor.CycleRemovalMethod.NAIVE);
-		System.out.println("Size:" + ontz.getLogicalAxiomCount());
-		SigManager man = new SigManager(new File(ModulePaths.getSignatureLocation() + "qbfspeed/" + ontFile.getName()));
-		SignatureGenerator gen = new SignatureGenerator(ontz.getLogicalAxioms());
-		Stopwatch watchy = new Stopwatch().start();
-		for (int j = 1; j <= 10; j++) {
-			String signame = "random10-" + j;
-			Set<OWLEntity> sig = man.readFile(signame);
-//			Set<OWLLogicalAxiom> mod = extractor2.extractModule(sig);
-//			System.out.println("Mod size: " + mod.size());
-//			NDepletingModuleExtractor extract = new NDepletingModuleExtractor(1,mod);
-//			System.out.println(extract.extractModule(sig).size());
-			NDepletingComparison compare = new NDepletingComparison(1,ontz,new File("/tmp/"));
-			compare.performExperiment(sig);
-			File sigLocation = new File(ModulePaths.getResultLocation() + "qbfspeed/" + ontFile.getName() + "/" + signame);
-			sigLocation.mkdirs();
-			compare.writeMetrics(sigLocation);
-		}
-		watchy.stop();
-		System.out.println("TIME:" + watchy);
+
+
+
+              /*
+        Interesting
+        55e5e251-5c11-4b64-8860-066e0c8e2a77_bility.owl-QBF
+        0122fdf6-2230-4961-9e3a-94ca44ca1a2f_Qimage.owl-QBF
+        3ac2a2b1-a86e-453b-830d-6814b286da46_owl%2Fcoma-QBF
+        30ec40e7-a0b8-42fd-b814-05de85f89116_PNO-UPN.owl-QBF
+        5012d3f2-9d81-4f56-8456-4da8174aed82_1122.owl-QBF
+
+         */
+
+
+
+
+
+//		for (int j = 1; j <= 10; j++) {
+//
+//			String signame = "random10-" + j;
+//			Set<OWLEntity> sig = man.readFile(signame);
+//
+//			AxiomTypeFilter typeFilter = new AxiomTypeFilter(AxiomType.INVERSE_OBJECT_PROPERTIES);
+//			Set<OWLLogicalAxiom> ontaxioms = ontz.getLogicalAxioms();
+//			ontaxioms.removeAll(typeFilter.getUnsupportedAxioms(ontaxioms));
+//			System.out.println("Ontsize: " + ontaxioms.size());
+//
+//			HybridModuleExtractor hybrid = new HybridModuleExtractor(ontaxioms);
+//			Set<OWLLogicalAxiom> hybridMod = hybrid.extractModule(sig);
+//			System.out.println(hybridMod.size());
+//
+
+//
+//		}
 
 	}
 }

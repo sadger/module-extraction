@@ -1,17 +1,12 @@
 package uk.ac.liv.moduleextraction.experiments;
 
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.semanticweb.owlapi.model.*;
 import uk.ac.liv.moduleextraction.extractor.NotEquivalentToTerminologyException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class MultipleExperiments {
@@ -73,16 +68,16 @@ public class MultipleExperiments {
 	public void runAlternatingExperiments(File signaturesLocation, Experiment experiment) throws IOException{
 		this.experiment  = experiment;
 		File[] signaturedirs;
-        signaturesLocation.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.isDirectory();
-            }
-        });
+		signaturesLocation.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.isDirectory();
+			}
+		});
 
-        signaturedirs = signaturesLocation.listFiles();
+		signaturedirs = signaturesLocation.listFiles();
 
-		Arrays.sort(signaturedirs); 
+		Arrays.sort(signaturedirs);
 
 		ArrayList<File>[] mapping = new ArrayList[signaturedirs.length];
 		int i = 0;
@@ -101,12 +96,12 @@ public class MultipleExperiments {
 				Collections.sort(files);
 				if(files.size() >= j2){
 					System.out.println("Experiment: " + experimentCount++);
-					
+
 					File signature = files.get(j2);
-					
+
 					File experimentLocation = copyDirectoryStructure(signature,"Signatures", new File(ModulePaths.getResultLocation()));
 					experimentLocation = new File(experimentLocation.getAbsolutePath() + "/" + signature.getName());
-	
+
 					if(new File(experimentLocation.getAbsolutePath() + "/experiment-results").exists()){
 						System.out.println("Experiment results already exists - skipping");
 						continue;
@@ -146,7 +141,7 @@ public class MultipleExperiments {
 		//Push all the directories from the end backwards to the sourceLimit (if applicable)
 		while(!source.getName().equals(sourceLimit) || source.getParent() == null){
 			if(source.isDirectory()){
-				directoriesToWrite.push(source.getName());	
+				directoriesToWrite.push(source.getName());
 			}
 			source = source.getParentFile();
 		}
@@ -170,28 +165,38 @@ public class MultipleExperiments {
 
 
 		return targetFile;
-	} 
+	}
 
 	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException, InterruptedException {
 
-//		File[] files = new File(ModulePaths.getOntologyLocation() + "/" + "OWL-Corpus-All/qbf-only").listFiles();
-//		for(File f : files){
-//			if(f.exists()){
-//				System.out.println(f.getName());
-//				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
-//				new MultipleExperiments().runExperiments(
-//						new File(ModulePaths.getSignatureLocation() + "/onedepletingcomparison/AxiomSignatures/" + f.getName()), new OneDepletingComparison(ont, f));
-//				ont.getOWLOntologyManager().removeOntology(ont);
-//				ont = null;
-//			}
-		File ontFile = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/0a3f75bb-693b-4adb-b277-dc7fe493d3f4_DUL.owl-QBF");
-		OWLOntology ontz = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
-		new MultipleExperiments().runExperiments(new File(ModulePaths.getSignatureLocation() + "/qbfspeed/" + ontFile.getName()), new NDepletingComparison(1,ontz,ontFile));
 
-//		}
 
+        File ontDir = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/");
+
+        BufferedReader br = new BufferedReader(new FileReader(new File(ModulePaths.getOntologyLocation() + "/fast-2dep-diff.txt")));
+        for(String line; (line = br.readLine()) != null; ) {
+            if(!line.trim().isEmpty()){
+                File ontFile = new File(ontDir + "/" + line);
+                OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
+                System.out.println(line);
+                new MultipleExperiments().runExperiments(
+                        new File(ModulePaths.getSignatureLocation()  + "/depleting-comparison/" + ontFile.getName()),
+                        new NDepletingComparison(3,ont,ontFile));
+
+                ont.getOWLOntologyManager().removeOntology(ont);
+                ont = null;
+
+            }
+
+
+
+        }
+        br.close();
 
 	}
+
+
+
 
 
 

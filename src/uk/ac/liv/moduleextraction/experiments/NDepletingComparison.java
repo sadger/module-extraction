@@ -7,7 +7,10 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.extractor.NDepletingModuleExtractor;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
+import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.ontologyutils.util.CSVWriter;
+import uk.ac.liv.ontologyutils.util.ModulePaths;
+import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -128,9 +131,38 @@ public class NDepletingComparison implements Experiment {
 
 		writer.close();
 
-
-
 	}
+
+    public void printMetrics() throws IOException {
+        System.out.println("S/H/D " + starAndHybridExperiment.getStarSize() + "," + starAndHybridExperiment.getIteratedSize() + "," + nDepletingModule.size());
+
+        System.out.println("Entities:" + ModuleUtils.getClassAndRoleNamesInSet(starAndHybridExperiment.getHybridModule()));
+
+        System.out.println("Σ: " + refsig);
+
+
+        for(OWLLogicalAxiom ax : starAndHybridExperiment.getHybridModule()){
+            System.out.println(ax);
+        }
+        System.out.println("=============");
+        for(OWLLogicalAxiom ax : nDepletingModule){
+            System.out.println(ax);
+        }
+
+        System.out.println("Difference:");
+        Set<OWLLogicalAxiom> hybrid = starAndHybridExperiment.getHybridModule();
+       //ModuleUtils.writeOntology(hybrid,ModulePaths.getOntologyLocation() + "/dep-explore.owl");
+//        SigManager man = new SigManager(new File(ModulePaths.getOntologyLocation()));
+//        man.writeFile(refsig,"explore");
+
+        hybrid.removeAll(nDepletingModule);
+        System.out.println("=============");
+        for(OWLLogicalAxiom ax : hybrid){
+            System.out.println(ax);
+        }
+
+
+    }
 
 
 }

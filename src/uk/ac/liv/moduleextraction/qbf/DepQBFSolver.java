@@ -1,16 +1,18 @@
 package uk.ac.liv.moduleextraction.qbf;
 
 
+import com.google.common.base.Stopwatch;
 import depqbf4j.DepQBF4J;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class DepQBFSolver {
 
-
+    private static int i = 0;
     private final Collection<Integer> universal;
     private final Collection<Integer> existential;
     private final Set<int[]> clauses;
@@ -52,12 +54,19 @@ public class DepQBFSolver {
     }
 
     public boolean isSatisfiable() throws QBFSolverException, IOException {
+//        Stopwatch satTimer = new Stopwatch().start();
+//        File qbfy = File.createTempFile("qbf-person",".qdimacs",new File("/tmp/"));
+//        DepQBF4J.printToFile(qbfy.getAbsolutePath());
+//        System.err.println("QBF file dumped to: " + qbfy.getAbsolutePath());
+        boolean returnCode;
         byte exitCode  = DepQBF4J.sat();
         switch (exitCode){
             case DepQBF4J.RESULT_SAT:
-                return true;
+                returnCode = true;
+                break;
             case DepQBF4J.RESULT_UNSAT:
-                return false;
+                returnCode = false;
+                break;
             default:
                 if(exitCode == DepQBF4J.RESULT_UNKNOWN){
                     System.err.println("The result is unknown");
@@ -69,7 +78,17 @@ public class DepQBFSolver {
                 DepQBF4J.printToFile(qbf.getAbsolutePath());
                 System.err.println("QBF file dumped to: " + qbf.getAbsolutePath());
                 throw new QBFSolverException();
+
         }
+//        satTimer.stop();
+//        long sec = satTimer.elapsed(TimeUnit.SECONDS);
+//        System.out.println(satTimer);
+//        System.out.println(sec);
+//        if(sec < 30){
+//            qbfy.delete();
+//        }
+        return returnCode;
+
     }
 
     public void delete(){
