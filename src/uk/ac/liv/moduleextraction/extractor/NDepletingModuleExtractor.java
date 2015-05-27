@@ -1,21 +1,16 @@
 package uk.ac.liv.moduleextraction.extractor;
 
 import com.google.common.base.Stopwatch;
-import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.checkers.ELAxiomChainCollector;
 import uk.ac.liv.moduleextraction.checkers.NElementInseparableChecker;
-import uk.ac.liv.moduleextraction.filters.AxiomTypeFilter;
 import uk.ac.liv.moduleextraction.filters.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
-import uk.ac.liv.moduleextraction.profling.AxiomTypeProfile;
 import uk.ac.liv.moduleextraction.qbf.NElementSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
-import uk.ac.liv.moduleextraction.signature.SigManager;
-import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
@@ -23,9 +18,7 @@ import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -90,7 +83,7 @@ public class NDepletingModuleExtractor implements Extractor {
 
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature) {
-        resetMetrics();
+		resetMetrics();
 
 		nDepWatch = new Stopwatch().start();
 
@@ -162,7 +155,7 @@ public class NDepletingModuleExtractor implements Extractor {
 				OWLLogicalAxiom chosenAxiom = acyclicAxioms.get(i);
 				if(chainCollector.hasELSyntacticDependency(chosenAxiom, dependT, sigUnionSigM)){
 					change = true;
-					ArrayList<OWLLogicalAxiom> chain = 
+					ArrayList<OWLLogicalAxiom> chain =
 							chainCollector.collectELAxiomChain(acyclicAxioms, i, terminology, axiomStore, dependT, sigUnionSigM);
 
 					module.addAll(chain);
@@ -210,42 +203,45 @@ public class NDepletingModuleExtractor implements Extractor {
 
 		for(File f : ontDir.listFiles()){
 
- 		    OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
+			OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
 			Set<OWLLogicalAxiom> ontaxioms = ont.getLogicalAxioms();
 
-            //AxiomTypeFilter typeFilter = new AxiomTypeFilter(AxiomType.INVERSE_OBJECT_PROPERTIES);
+			//AxiomTypeFilter typeFilter = new AxiomTypeFilter(AxiomType.INVERSE_OBJECT_PROPERTIES);
 //			ontaxioms.removeAll(typeFilter.getUnsupportedAxioms(ontaxioms));
 
-			System.out.println("Ontsize: " + ontaxioms.size());
+//			System.out.println("Ontsize: " + ontaxioms.size());
 
 
-			System.out.println(f.getName() + ": " + test++);
-
-            if(ontaxioms.size() < 400){
-                Set<OWLLogicalAxiom> randomSample = ModuleUtils.generateRandomAxioms(ont.getLogicalAxioms(),5);
-
-                Stopwatch samplewatch = new Stopwatch().start();
-                for(OWLLogicalAxiom axiom : randomSample){
 
 
-                    Set<OWLEntity> sig = axiom.getSignature();
-                    HybridModuleExtractor hybrid = new HybridModuleExtractor(ontaxioms);
-                    Set<OWLLogicalAxiom> hybridMod = hybrid.extractModule(sig);
-                    System.out.println(hybridMod.size());
+			if(!f.getName().equals("32885637-5212-40a0-addd-1944a55e5812_tology.owl-QBF")){
+				System.out.println(f.getName() + ": " + test++);
+				Set<OWLLogicalAxiom> randomSample = ModuleUtils.generateRandomAxioms(ont.getLogicalAxioms(),5);
+
+				Stopwatch samplewatch = new Stopwatch().start();
+				for(OWLLogicalAxiom axiom : randomSample){
 
 
-                    NDepletingModuleExtractor extractor = new NDepletingModuleExtractor(2,hybridMod);
-                    Set<OWLLogicalAxiom> nDep = extractor.extractModule(sig);
-                    System.out.println(nDep.size());
+					Set<OWLEntity> sig = axiom.getSignature();
+					HybridModuleExtractor hybrid = new HybridModuleExtractor(ontaxioms);
+					Set<OWLLogicalAxiom> hybridMod = hybrid.extractModule(sig);
+//                    System.out.println(hybridMod.size());
 
 
-                    System.out.println(nDep.size() == hybridMod.size());
+					NDepletingModuleExtractor extractor = new NDepletingModuleExtractor(2,hybridMod);
+					Set<OWLLogicalAxiom> nDep = extractor.extractModule(sig);
+					//System.out.println(nDep.size());
 
 
-                }
-                samplewatch.stop();
-                System.out.println(samplewatch);
-            }
+
+
+//                    System.out.println(nDep.size() == hybridMod.size());
+
+
+				}
+				samplewatch.stop();
+				System.out.println(samplewatch);
+			}
 
 
 

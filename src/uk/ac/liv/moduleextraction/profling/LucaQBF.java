@@ -22,7 +22,18 @@ public class LucaQBF {
     public static void main(String[] args) {
         /*LUCA - potentially difficult qbf
         382c102a-268a-4083-b6ef-618578fe3748_mvco.owl-QBF
+
+        045064bb-f429-496f-9fa6-e998003a5400_bulary.owl-QBF
+        1f149e90-466b-48b6-aa68-7b3bafacf532_gn.v12.owl-QBF
+
         */
+
+        /*
+            ZERO MODULE!!
+            32f9b463-b76d-4e89-aa1e-32a036ea29ed_ics_v4.owl-QBF
+         */
+
+
 
         String[] difficultOnts = {
 //                "162af88a-a305-4d90-902c-243748280544_rogram.owl-QBF",

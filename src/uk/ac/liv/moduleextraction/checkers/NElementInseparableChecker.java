@@ -43,7 +43,7 @@ public class NElementInseparableChecker {
 				testCount++;
                 DepQBFSolver solver = new DepQBFSolver(writer.getUniversalVariables(),writer.getExistentialVariables(),writer.getClauses());
 				isInseparable = solver.isSatisfiable();
-                solver.delete();
+                //solver.delete();
 			}
 	
 		}

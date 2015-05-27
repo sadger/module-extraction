@@ -1,17 +1,12 @@
 package uk.ac.liv.moduleextraction.qbf;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import org.semanticweb.owlapi.model.OWLOntology;
-
 import uk.ac.liv.moduleextraction.extractor.AMEX;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
+
+import java.io.*;
 
 public class QBFSolver {
 
@@ -23,9 +18,10 @@ public class QBFSolver {
 		this.qbfFile = dimacsLocation;
 		
 		solverText = "";
-		
-		File qbfSolverLocation = new File(ModulePaths.getQBFSolverLocation());
-		
+		//File qbfSolverLocation = new File("/home/william/Programs/sKizzo/sKizzo");
+		File qbfSolverLocation = new File("/home/william/Programs/quantor-3.2/quantor");
+
+
 		ProcessBuilder pb = new ProcessBuilder("./" + qbfSolverLocation.getName() , dimacsLocation.getAbsolutePath());
 		
 		pb.directory(qbfSolverLocation.getParentFile());
@@ -82,38 +78,46 @@ public class QBFSolver {
 
 		return handleExitCode(proc);
 
-	}		
+	}
+
+	private void deleteQBFFile(){
+		qbfFile.delete();
+	}
 
 	private boolean handleExitCode(Process proc) throws QBFSolverException {
 		int exitValue = -1; 
 
 		try{
 			exitValue = proc.exitValue();
-			/* Delete the qbf file */
-			qbfFile.delete();
 		}
 		catch(IllegalThreadStateException t){
 			t.printStackTrace();
 		}
 		finally{
-			if(qbfFile.exists()){
-				System.out.println("WARNING: QBF File not deleted");
-			}
 			proc.destroy();
 		}
 	
-
+		boolean result;
 		if(exitValue == 10){
-			return true;
+			deleteQBFFile();
+			result = true;
 		}
 		else if(exitValue == 20){
-			return false;
+			deleteQBFFile();
+			result = false;
 		}
 		else{
 			System.err.println("There was an error with the QBF solver, EXIT CODE " + exitValue);
+			System.out.println(qbfFile.getAbsolutePath());
 			System.out.println(solverText);
 			throw new QBFSolverException();
 		}
+
+		if(qbfFile.exists()){
+			System.out.println("WARNING: QBF File not deleted");
+		}
+
+		return  result;
 
 	}
 	

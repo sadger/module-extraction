@@ -6,14 +6,14 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
     </content>
-    <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
+    <orderEntry type="jdk" jdkName="1.7 (1)" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="ontologyutils" />
     <orderEntry type="module" module-name="propositional" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Programs/Jars/org.sat4j.core.jar!/" />
+          <root url="jar://$JAR_LOCATION$/org.sat4j.core.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -22,7 +22,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Programs/Jars/commons-cli-1.2.jar!/" />
+          <root url="jar://$JAR_LOCATION$/commons-cli-1.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -31,7 +31,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Programs/Jars/junit-4.11.jar!/" />
+          <root url="jar://$JAR_LOCATION$/junit-4.11.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -40,7 +40,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Programs/Jars/guava-14.0-rc1.jar!/" />
+          <root url="jar://$JAR_LOCATION$/guava-14.0-rc1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -49,7 +49,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Programs/Jars/owlapi-distribution-3.5.0.jar!/" />
+          <root url="jar://$JAR_LOCATION$/owlapi-distribution-3.5.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -58,7 +58,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Programs/Jars/slf4j-api-1.7.2.jar!/" />
+          <root url="jar://$JAR_LOCATION$/slf4j-api-1.7.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -67,7 +67,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Programs/Jars/slf4j-simple-1.7.2.jar!/" />
+          <root url="jar://$JAR_LOCATION$/slf4j-simple-1.7.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
