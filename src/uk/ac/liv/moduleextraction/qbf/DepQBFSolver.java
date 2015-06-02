@@ -8,24 +8,36 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class DepQBFSolver {
 
-    private static int i = 0;
-    private final Collection<Integer> universal;
-    private final Collection<Integer> existential;
+    //CONSIDER USING TROVE (or other high performance library) for unboxed primitive collections
+    private Collection<Integer> universal;
+    private Collection<Integer> existential;
     private final Set<int[]> clauses;
     private File qbfFile;
+    private HashMap<Integer, Integer> remapping;
 
     public DepQBFSolver(Collection<Integer> universal, Collection<Integer> existential, Set<int[]> clauses) {
         this.universal = universal;
         this.existential = existential;
         this.clauses = clauses;
+        this.remapping = new HashMap<>(universal.size() + existential.size());
+        remapNumbering();
         constructQBFProblem();
+    }
+
+    private void remapNumbering(){
+        int startingNumber = 1;
+        for(Integer a : universal){
+            remapping.put(a, startingNumber);
+            startingNumber++;
+        }
+        for(Integer e : existential){
+            remapping.put(e, startingNumber);
+            startingNumber++;
+        }
     }
 
     private void constructQBFProblem() {
@@ -33,16 +45,11 @@ public class DepQBFSolver {
         qbfFile = null;
         try {
             qbfFile = File.createTempFile("qbf", ".qdimacs", new File("/tmp/"));
-            qbfFile.createNewFile();
-            //System.out.println(qbfFile.getAbsolutePath());
+            System.out.println(qbfFile.getAbsolutePath());
             BufferedWriter bw = new BufferedWriter(new FileWriter(qbfFile));
 
-            //The value of the variables needs to be as big as the numerical value of largest variable even if all other
-            //lower values don't exist (I hope this doesn't break anything)
-            int maxExists = (existential.size() == 0) ? 0 : Collections.max(existential);
-            int maxUniversal = (universal.size() == 0) ? 0 : Collections.max(universal);
 
-            int variables = Math.max((universal.size() + existential.size()), Math.max(maxExists,maxUniversal));
+            int variables = universal.size() + existential.size();
 
 
             bw.write("p cnf " + variables + " " + clauses.size() + "\n");
@@ -50,20 +57,20 @@ public class DepQBFSolver {
             //Universal
             bw.write("a ");
             for(Integer a : universal){
-                bw.write(a + " ");
+                bw.write(remapping.get(a) + " ");
             }
             bw.write(0 + "\n");
 
             //Existential
             bw.write("e ");
             for(Integer e : existential){
-                bw.write(e + " ");
+                bw.write(remapping.get(e) + " ");
             }
             bw.write(0 + "\n");
 
             for(int[] clause : clauses){
                 for(int i : clause){
-                    bw.write(i + " ");
+                    bw.write(remapping.get(i) + " ");
                 }
                 bw.write(0 + "\n");
             }
@@ -149,17 +156,17 @@ public class DepQBFSolver {
 
     public static void main(String[] args) {
 
-        HashSet<Integer> universal = Sets.newHashSet(1);
-        HashSet<Integer> exist = Sets.newHashSet(2,3);
+        HashSet<Integer> uni = Sets.newHashSet(21,34,41,541);
+        HashSet<Integer> ex = Sets.newHashSet(9, 47);
 
-        int[] clause1 = {1, 2};
-        int[] clause2 = {2, -3};
+        HashSet<int[]> clauses = new HashSet<>();
+        int[] first = {21, 9, 541};
+        clauses.add(first);
 
-        HashSet<int[]> clauses = new HashSet<int[]>();
-        clauses.add(clause1);
-        clauses.add(clause2);
+        DepQBFSolver solver = new DepQBFSolver(uni,ex,clauses);
 
-        DepQBFSolver solver = new DepQBFSolver(universal,exist,clauses);
+
+
 
 
     }
