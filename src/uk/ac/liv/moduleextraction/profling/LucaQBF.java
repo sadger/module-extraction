@@ -44,35 +44,40 @@ public class LucaQBF {
                 "293e6a33-a1d4-4474-bb51-9e43dac93448_DUL_v25.owl-QBF"
         };
 
-
         for(File f : new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/").listFiles()){
-            OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
-            System.out.println(f.getName() + ": " + ont.getLogicalAxiomCount());
-//            for(OWLLogicalAxiom ax : ont.getLogicalAxioms()){
-//                System.out.println(ax);
-//            }
+            if(f.getName().equals("1184523f-1b0c-43ef-b50c-8c561473a1df_1541.owl-QBF")){
+                OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
+                System.out.println(f.getName() + ": " + ont.getLogicalAxiomCount());
+/*            for(OWLLogicalAxiom ax : ont.getLogicalAxioms()){
+                System.out.println(ax);
+            }*/
 
-            Set<OWLLogicalAxiom> randomSample = ModuleUtils.generateRandomAxioms(ont.getLogicalAxioms(), 5);
-
-
-
-
-            Stopwatch samplewatch = Stopwatch.createStarted();
-            for(OWLLogicalAxiom axiom : randomSample){
+                Set<OWLLogicalAxiom> randomSample = ModuleUtils.generateRandomAxioms(ont.getLogicalAxioms(), 5);
 
 
-                Set<OWLEntity> sig = axiom.getSignature();
-                TwoDepletingExperiment expr = new TwoDepletingExperiment(ont,f);
-                expr.performExperiment(sig);
-                expr.writeMetrics(new File("/tmp"));
 
 
+                Stopwatch samplewatch = Stopwatch.createStarted();
+                for(OWLLogicalAxiom axiom : randomSample){
+
+
+                    Set<OWLEntity> sig = axiom.getSignature();
+                    NDepletingModuleExtractor extractor = new NDepletingModuleExtractor(1,ont.getLogicalAxioms());
+                    System.out.println(extractor.extractModule(sig).size());
+
+//                    TwoDepletingExperiment expr = new TwoDepletingExperiment(ont,f);
+//                    expr.performExperiment(sig);
+//                    expr.writeMetrics(new File("/tmp"));
+
+
+                }
+                samplewatch.stop();
+                System.out.println(samplewatch);
+
+                ont.getOWLOntologyManager().removeOntology(ont);
+                ont = null;
             }
-            samplewatch.stop();
-            System.out.println(samplewatch);
 
-            ont.getOWLOntologyManager().removeOntology(ont);
-            ont = null;
 
         }
 
