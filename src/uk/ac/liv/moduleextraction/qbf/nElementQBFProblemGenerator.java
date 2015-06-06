@@ -1,14 +1,10 @@
 package uk.ac.liv.moduleextraction.qbf;
 
-import com.google.common.base.Stopwatch;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.*;
-import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.util.ModulePaths;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 import uk.ac.liv.propositional.formula.PropositionalFormula;
 import uk.ac.liv.propositional.nSeparability.ClauseStore;
@@ -33,7 +29,6 @@ public class nElementQBFProblemGenerator {
     private nAxiomToClauseStore mapper;
 
     private HashSet<int[]> clauses;
-    private HashSet<Integer> variables;
     private HashSet<Integer> freshVariables;
     private nEntityConvertor entityUnderAllInterpreations;
 
@@ -49,7 +44,6 @@ public class nElementQBFProblemGenerator {
         this.classesNotInSignature = new HashSet<OWLEntity>();
         this.entityUnderAllInterpreations = new nEntityConvertor(DOMAIN_SIZE);
         this.clauses = new HashSet<int[]>();
-        this.variables = new HashSet<Integer>();
         this.freshVariables = new HashSet<Integer>();
         this.existentialVariables = new HashSet<Integer>();
         this.universalVariables = new HashSet<Integer>();
@@ -109,7 +103,6 @@ public class nElementQBFProblemGenerator {
             }
             else{
                 clauses.addAll(clauseStore.getClauses());
-                variables.addAll(clauseStore.getVariables());
                 freshVariables.addAll(clauseStore.getFreshVariables());
             }
         }
