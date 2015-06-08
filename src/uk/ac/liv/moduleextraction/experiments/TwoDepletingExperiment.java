@@ -5,11 +5,10 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.extractor.NDepletingModuleExtractor;
+import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 import uk.ac.liv.ontologyutils.util.CSVWriter;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,9 +18,10 @@ public class TwoDepletingExperiment implements  Experiment {
     private final OWLOntology ontology;
     private final File originalLocation;
     private File sigLocation;
+    private Set<OWLEntity> refSig;
     private boolean twoDepletingExtracted = false;
     private Set<OWLLogicalAxiom> twoDepletingModule;
-    private NDepletingModuleExtractor twoDepletingModuleExtractor;
+    private NDepletingModuleExtractor twoDepletingExtractor;
     private Set<OWLLogicalAxiom> oneDepletingModule;
     private NDepletingModuleExtractor oneDepletingExtractor;
     private Set<OWLLogicalAxiom> hybridModule;
@@ -35,7 +35,7 @@ public class TwoDepletingExperiment implements  Experiment {
 
     @Override
     public void performExperiment(Set<OWLEntity> signature) {
-
+        this.refSig = signature;
         hybridExperiment = new HybridExtractorExperiment(ontology,originalLocation);
         hybridExperiment.performExperiment(signature);
 
@@ -46,10 +46,10 @@ public class TwoDepletingExperiment implements  Experiment {
 
         if(!(oneDepletingModule.size() == hybridModule.size())) {
             twoDepletingExtracted = true;
-            twoDepletingModuleExtractor = new NDepletingModuleExtractor(2, hybridModule);
+            twoDepletingExtractor = new NDepletingModuleExtractor(2, hybridModule);
 
             //Extract EXACTLY 2 module then join with 1-depleting module
-            twoDepletingModule = twoDepletingModuleExtractor.extractModule(signature);
+            twoDepletingModule = twoDepletingExtractor.extractModule(signature);
             exactlyTwoModule = new HashSet<>(twoDepletingModule);
             twoDepletingModule.addAll(oneDepletingModule);
         }
@@ -76,16 +76,34 @@ public class TwoDepletingExperiment implements  Experiment {
     @Override
     public void writeMetrics(File experimentLocation) throws IOException {
 
-        CSVWriter csvWriter = new CSVWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results.csv");
-        csvWriter.addMetric("STARSize", hybridExperiment.getStarModule().size());
-        csvWriter.addMetric("HybridSize", hybridModule.size());
-        csvWriter.addMetric("OneDepSize", oneDepletingModule.size());
-        csvWriter.addMetric("TwoDepExtracted", String.valueOf(twoDepletingExtracted).toUpperCase());
-        csvWriter.addMetric("ExactlyTwoSize", (twoDepletingExtracted) ? exactlyTwoModule.size() : "NA");
-        csvWriter.addMetric("TwoDepSize", (twoDepletingExtracted) ? twoDepletingModule.size() : "NA");
-        csvWriter.addMetric("EqualOneTwo", (twoDepletingExtracted) ? String.valueOf(oneDepletingModule.equals(twoDepletingModule)).toUpperCase() : "NA");
-        csvWriter.addMetric("EqualTwoExactlyTwo", (twoDepletingExtracted) ? String.valueOf(twoDepletingModule.equals(exactlyTwoModule)).toUpperCase()  : "NA");
-        csvWriter.printCSVFileToOutput();
+        CSVWriter metricWriter = new CSVWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results.csv");
+        metricWriter.addMetric("STARSize", hybridExperiment.getStarModule().size());
+        metricWriter.addMetric("HybridSize", hybridModule.size());
+        metricWriter.addMetric("OneDepSize", oneDepletingModule.size());
+        metricWriter.addMetric("TwoDepExtracted", String.valueOf(twoDepletingExtracted).toUpperCase());
+        metricWriter.addMetric("ExactlyTwoSize", (twoDepletingExtracted) ? exactlyTwoModule.size() : "NA");
+        metricWriter.addMetric("TwoDepSize", (twoDepletingExtracted) ? twoDepletingModule.size() : "NA");
+        metricWriter.addMetric("EqualOneTwo", (twoDepletingExtracted) ? String.valueOf(oneDepletingModule.equals(twoDepletingModule)).toUpperCase() : "NA");
+        metricWriter.addMetric("EqualTwoExactlyTwo", (twoDepletingExtracted) ? String.valueOf(twoDepletingModule.equals(exactlyTwoModule)).toUpperCase() : "NA");
+        metricWriter.writeCSVFile();
+
+        ExtractionMetric oneMetric = oneDepletingExtractor.getMetrics();
+        ExtractionMetric twoMetric = (twoDepletingExtracted) ? twoDepletingExtractor.getMetrics() : null;
+
+        CSVWriter qbfWriter = new CSVWriter(experimentLocation.getAbsoluteFile() + "/" + "qbf-results.csv");
+        qbfWriter.addMetric("OneQBFChecks", oneMetric.getQbfChecks());
+        qbfWriter.addMetric("OneSyntacticChecks", oneMetric.getSyntacticChecks());
+        qbfWriter.addMetric("OneSeparabilityAxioms", oneMetric.getSeparabilityAxiomCount());
+        qbfWriter.addMetric("OneTime", oneMetric.getTimeTaken());
+        qbfWriter.addMetric("TwoQBFChecks", (twoDepletingExtracted) ? twoMetric.getQbfChecks() : "NA");
+        qbfWriter.addMetric("TwoSyntacticChecks", (twoDepletingExtracted) ? twoMetric.getSyntacticChecks() : "NA");
+        qbfWriter.addMetric("TwoSeparabilityAxioms", (twoDepletingExtracted) ? twoMetric.getSeparabilityAxiomCount() : "NA");
+        qbfWriter.addMetric("TwoTime", (twoDepletingExtracted) ? twoMetric.getTimeTaken() : "NA");
+        qbfWriter.writeCSVFile();
+
+
+
+
     }
 
 }
