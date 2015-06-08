@@ -1,18 +1,16 @@
 package uk.ac.liv.moduleextraction.profling;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.Sets;
-import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.experiments.TwoDepletingExperiment;
-import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor;
-import uk.ac.liv.moduleextraction.extractor.NDepletingModuleExtractor;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -38,21 +36,23 @@ public class LucaQBF {
 
 
         String[] difficultOnts = {
-               //"162af88a-a305-4d90-902c-243748280544_rogram.owl-QBF",
-              "2003a12d-586c-482c-ab03-556a6d9003fd_ly.rdf.owl-QBF",
+                //"162af88a-a305-4d90-902c-243748280544_rogram.owl-QBF",
+                "2003a12d-586c-482c-ab03-556a6d9003fd_ly.rdf.owl-QBF",
                 "1950f729-0968-4af6-8e58-90b990c1e90d_r3.rdf-QBF",
                 "293e6a33-a1d4-4474-bb51-9e43dac93448_DUL_v25.owl-QBF"
         };
 
+        /* 41b2d4e5-ada0-402d-8e71-82ef89fd106c_chment.owl-QBF
+        3bc3a1fb-e41f-49e6-9c2e-adef8fc073fc_DOGOnt.owl-QBF */
+
         for(File f : new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/").listFiles()){
-            if(f.getName().equals("1184523f-1b0c-43ef-b50c-8c561473a1df_1541.owl-QBF")){
+            if(f.getName().equals("3bc3a1fb-e41f-49e6-9c2e-adef8fc073fc_DOGOnt.owl-QBF")){
                 OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
                 System.out.println(f.getName() + ": " + ont.getLogicalAxiomCount());
-/*            for(OWLLogicalAxiom ax : ont.getLogicalAxioms()){
-                System.out.println(ax);
-            }*/
+//                ont.getLogicalAxioms().forEach(System.out::println);
 
-                Set<OWLLogicalAxiom> randomSample = ModuleUtils.generateRandomAxioms(ont.getLogicalAxioms(), 5);
+
+                Set<OWLLogicalAxiom> randomSample = ModuleUtils.generateRandomAxioms(ont.getLogicalAxioms(), 100);
 
 
 
@@ -62,12 +62,12 @@ public class LucaQBF {
 
 
                     Set<OWLEntity> sig = axiom.getSignature();
-                    NDepletingModuleExtractor extractor = new NDepletingModuleExtractor(1,ont.getLogicalAxioms());
-                    System.out.println(extractor.extractModule(sig).size());
+//                    NDepletingModuleExtractor extractor = new NDepletingModuleExtractor(1,ont.getLogicalAxioms());
+//                    System.out.println(extractor.extractModule(sig).size());
 
-//                    TwoDepletingExperiment expr = new TwoDepletingExperiment(ont,f);
-//                    expr.performExperiment(sig);
-//                    expr.writeMetrics(new File("/tmp"));
+                    TwoDepletingExperiment expr = new TwoDepletingExperiment(ont,f);
+                    expr.performExperiment(sig);
+                    expr.writeMetrics(new File("/tmp"));
 
 
                 }
@@ -76,7 +76,9 @@ public class LucaQBF {
 
                 ont.getOWLOntologyManager().removeOntology(ont);
                 ont = null;
+
             }
+
 
 
         }
