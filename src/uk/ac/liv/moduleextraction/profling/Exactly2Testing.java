@@ -20,7 +20,7 @@ public class Exactly2Testing {
 
     public static void main(String[] args) throws IOException {
         File ontLocation = new File(ModulePaths.getOntologyLocation() + "/exactly2");
-        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontLocation.getAbsolutePath() + "/exactly2diff-3.owl");
+        //OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontLocation.getAbsolutePath() + "/exactly2diff-3.owl");
 
         int n_value = 8;
         OWLDataFactory f = OWLManager.getOWLDataFactory();

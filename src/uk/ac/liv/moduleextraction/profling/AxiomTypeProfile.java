@@ -48,14 +48,19 @@ public class AxiomTypeProfile {
 
         String ontologyName = "3ac2a2b1-a86e-453b-830d-6814b286da46_owl%2Fcoma-QBF";
         File ontLoc =
-                new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/" + ontologyName);
+                new File(ModulePaths.getOntologyLocation() + "/NCI/1");
 
 
-        System.out.println(ontologyName);
+
+
         OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontLoc.getAbsolutePath());
+        System.out.println(ont.getLogicalAxiomCount());
         OntologyCycleVerifier verifier = new OntologyCycleVerifier(ModuleUtils.getCoreAxioms(ont));
         DLExpressivityChecker checker = new DLExpressivityChecker(Collections.singleton(ont));
 
+        ExpressionTypeProfiler type = new ExpressionTypeProfiler();
+        type.profileOntology(ont);
+        type.printMetrics();
         String express = checker.getDescriptionLogicName();
         System.out.println("Expressivity: " + express);
         System.out.println("Axioms: " + ont.getLogicalAxiomCount());
@@ -63,6 +68,7 @@ public class AxiomTypeProfile {
         new AxiomTypeProfile(ont).printMetrics();
 
     }
+
 
 
 }

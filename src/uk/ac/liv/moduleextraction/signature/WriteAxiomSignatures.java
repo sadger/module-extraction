@@ -59,25 +59,20 @@ public class WriteAxiomSignatures {
 	
 	
 	public static void main(String[] args) throws OWLOntologyCreationException {
-		
-//		try{
-//			BufferedReader br = new BufferedReader(new FileReader(ModulePaths.getSignatureLocation() + "NewIteratingExperiments/acyclic-supported-no-nci"));
-//			String line;
-//			while ((line = br.readLine()) != null) {
-//			   File ontologyLocation = new File(line);
-//			   System.out.println(ontologyLocation.getName());
-//			   OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ontologyLocation.getAbsolutePath());
-//			   Set<OWLLogicalAxiom> subset = ModuleUtils.generateRandomAxioms(ModuleUtils.getCoreAxioms(ontology), 500);
-//			   WriteAxiomSignatures writer = new WriteAxiomSignatures(subset, new File(ModulePaths.getSignatureLocation() + "/NewIteratingExperiments/CoreAxiomSignatures/" + ontologyLocation.getName()));
-//			   writer.writeAxiomSignatures();
-//			   ontology.getOWLOntologyManager().removeOntology(ontology);
-//			}
-//			br.close();
-//		}catch(IOException e){
-//			e.printStackTrace();
-//		}
-		
-		
+
+
+
+
+        File ontologyLocation = new File(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_15.04d.owl");
+        System.out.println(ontologyLocation.getName());
+        OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ontologyLocation.getAbsolutePath());
+        Set<OWLLogicalAxiom> subset = ModuleUtils.generateRandomAxioms(ModuleUtils.getCoreAxioms(ontology), 500);
+        WriteAxiomSignatures writer = new WriteAxiomSignatures(subset, new File(ModulePaths.getSignatureLocation() + "/two-depleting/" + ontologyLocation.getName()));
+        writer.writeAxiomSignatures();
+        ontology.getOWLOntologyManager().removeOntology(ontology);
+
+
+/*
 		File[] files = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only").listFiles();
 		int i = 1;
 		for(File f : files){
@@ -91,6 +86,7 @@ public class WriteAxiomSignatures {
 				   ont.getOWLOntologyManager().removeOntology(ont);
 			}
 		}
+*/
 
 
 

@@ -170,23 +170,19 @@ public class MultipleExperiments {
     public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException, InterruptedException {
 
 
-
-        File ontDir = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/");
-        for(File file : ontDir.listFiles()){
-            File ontFile = file;
-            OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
-            new MultipleExperiments().runExperiments(
-                    new File(ModulePaths.getSignatureLocation()  + "/depleting-comparison/" + ontFile.getName()),
-                    new NDepletingComparison(1,ont,ontFile));
-
-            ont.getOWLOntologyManager().removeOntology(ont);
-            ont = null;
-
-        }
-
+        File ontFile = new File(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_15.04d.owl");
+        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
+        System.out.println(ontFile.getName());
+        new MultipleExperiments().runExperiments(
+                new File(ModulePaths.getSignatureLocation()  + "/two-depleting/" + ontFile.getName()),
+                new TwoDepletingExperiment(ont,ontFile));
 
 
     }
+
+
+
+
 
 
 }
