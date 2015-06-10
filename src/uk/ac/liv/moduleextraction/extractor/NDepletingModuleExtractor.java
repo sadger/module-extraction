@@ -63,6 +63,10 @@ public class NDepletingModuleExtractor implements Extractor {
 		this.inseparableChecker = new NElementInseparableChecker(clauseStore);
 	}
 
+	public Set<OWLLogicalAxiom> getModule(){
+		return module;
+	}
+
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) {
 		return extractModule(new HashSet<OWLLogicalAxiom>(),signature);
@@ -127,6 +131,10 @@ public class NDepletingModuleExtractor implements Extractor {
 
 
 		return module;
+	}
+
+	public Stopwatch getStopwatch(){
+		return nDepWatch;
 	}
 
 	private void resetMetrics() {

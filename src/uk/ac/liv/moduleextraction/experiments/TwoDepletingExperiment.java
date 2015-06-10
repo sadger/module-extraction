@@ -12,17 +12,23 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class TwoDepletingExperiment implements  Experiment {
+
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     private final OWLOntology ontology;
     private final File originalLocation;
     private File sigLocation;
     private Set<OWLEntity> refSig;
     private boolean twoDepletingExtracted = false;
-    private Set<OWLLogicalAxiom> twoDepletingModule;
+    private Set<OWLLogicalAxiom> twoDepletingModule = new HashSet<>();
     private NDepletingModuleExtractor twoDepletingExtractor;
-    private Set<OWLLogicalAxiom> oneDepletingModule;
+    private Set<OWLLogicalAxiom> oneDepletingModule = new HashSet<>();
     private NDepletingModuleExtractor oneDepletingExtractor;
     private Set<OWLLogicalAxiom> hybridModule;
     private HybridExtractorExperiment hybridExperiment;
@@ -35,6 +41,10 @@ public class TwoDepletingExperiment implements  Experiment {
 
     @Override
     public void performExperiment(Set<OWLEntity> signature) {
+
+        final ScheduledFuture<?> dumpHandler =
+                scheduler.scheduleAtFixedRate(dumpExtraction,10,60,TimeUnit.MINUTES);
+
         this.refSig = signature;
         hybridExperiment = new HybridExtractorExperiment(ontology,originalLocation);
         hybridExperiment.performExperiment(signature);
@@ -54,6 +64,8 @@ public class TwoDepletingExperiment implements  Experiment {
             twoDepletingModule.addAll(oneDepletingModule);
         }
 
+        dumpHandler.cancel(true);
+
 //        System.out.println("H: " + hybridModule.size());
 //        System.out.println("1: " + oneDepletingModule.size());
 //        System.out.println("2-dep? :" + twoDepletingExtracted);
@@ -67,6 +79,16 @@ public class TwoDepletingExperiment implements  Experiment {
     }
 
 
+    private Runnable dumpExtraction = new Runnable() {
+        @Override
+        public void run() {
+            System.out.println("Hybrid: " + hybridModule.size());
+            System.out.println("One " + oneDepletingExtractor.getModule().size());
+            System.out.println("OneElapsedTime: " + ((oneDepletingExtractor != null) ? oneDepletingExtractor.getStopwatch() : "Not Started"));
+            System.out.println("Two: " + ((twoDepletingExtractor != null) ? twoDepletingExtractor.getModule().size() : "Not Started"));
+            System.out.println("TwoElapsedTime: " + ((twoDepletingExtractor != null) ? twoDepletingExtractor.getStopwatch() : "Not Started"));
+        }
+    };
 
     @Override
     public void performExperiment(Set<OWLEntity> signature, File signatureLocation) {
