@@ -83,10 +83,11 @@ public class TwoDepletingExperiment implements  Experiment {
         @Override
         public void run() {
             System.out.println("Hybrid: " + hybridModule.size());
-            System.out.println("One " + oneDepletingExtractor.getModule().size());
+            System.out.println("One: " + oneDepletingExtractor.getModule().size());
             System.out.println("OneElapsedTime: " + ((oneDepletingExtractor != null) ? oneDepletingExtractor.getStopwatch() : "Not Started"));
             System.out.println("Two: " + ((twoDepletingExtractor != null) ? twoDepletingExtractor.getModule().size() : "Not Started"));
             System.out.println("TwoElapsedTime: " + ((twoDepletingExtractor != null) ? twoDepletingExtractor.getStopwatch() : "Not Started"));
+            System.out.println();
         }
     };
 
