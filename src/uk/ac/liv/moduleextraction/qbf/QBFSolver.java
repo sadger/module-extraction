@@ -2,7 +2,9 @@ package uk.ac.liv.moduleextraction.qbf;
 
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class QBFSolver {
 
@@ -10,11 +12,21 @@ public class QBFSolver {
     private int solverIndex;
     private String solverText = "";
 
+    //How long should we wait before using another solver
+    private static final int SOLVER_TIMEOUT_SECONDS = 10;
+    private boolean withTimeout;
+
     private static String[] qbfLocations = ModulePaths.getQBFSolverLocation().split(File.pathSeparator, -1);
 
-    private boolean isSatisfiable(File dimacsLocation, int solverIndex) throws QBFSolverException{
-
+    private boolean isSatisfiable(File dimacsLocation, int solverIndex, boolean withTimeout) throws QBFSolverException{
+        this.withTimeout = withTimeout;
         this.solverIndex = solverIndex;
+
+
+        if(withTimeout && solverIndex == qbfLocations.length){
+            return isSatisfiable(dimacsLocation,0,false);
+        }
+
         if(solverIndex > qbfLocations.length - 1){
             System.err.println("CANNOT SOLVE QBF - NO VALID SOLVER LEFT TO TRY");
 			System.out.println("QBF FILE: " + qbfFile.getAbsolutePath());
@@ -26,7 +38,7 @@ public class QBFSolver {
         File qbfSolverLocation = new File(qbfLocations[solverIndex]);
 
 //        if(solverIndex != 0){
-//            System.out.println(qbfSolverLocation.getName());
+//          System.out.println(qbfSolverLocation.getName());
 //        }
 
 
@@ -54,32 +66,39 @@ public class QBFSolver {
 
         }
 
-        InputStream is = proc.getInputStream();
-        InputStreamReader isr = new InputStreamReader(is);
-        BufferedReader br = new BufferedReader(isr);
+//        System.out.println("HHHHH");
+//        InputStream is = proc.getInputStream();
+//        InputStreamReader isr = new InputStreamReader(is);
+//        BufferedReader br = new BufferedReader(isr);
+//
+//        String line;
+//
+//        try {
+//            while ((line = br.readLine()) != null) {
+//                solverText += line + "\n";
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        finally{
+//            try{
+//                isr.close();
+//                br.close();
+//            }
+//            catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
 
-        String line;
 
         try {
-            while ((line = br.readLine()) != null) {
-                solverText += line + "\n";
+            if(withTimeout){
+                proc.waitFor(SOLVER_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        finally{
-            try{
-                isr.close();
-                br.close();
+            else{
+                proc.waitFor();
             }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            proc.waitFor();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -90,7 +109,7 @@ public class QBFSolver {
 	public boolean isSatisfiable (File dimacsLocation) throws QBFSolverException{
         this.qbfFile = dimacsLocation;
         this.solverText = "";
-        return isSatisfiable(dimacsLocation,0);
+        return isSatisfiable(dimacsLocation,0,true);
 	}
 
 
@@ -101,7 +120,8 @@ public class QBFSolver {
 			exitValue = proc.exitValue();
 		}
 		catch(IllegalThreadStateException t){
-			t.printStackTrace();
+            //System.out.println("Process timed out solving");
+            //t.printStackTrace();
 		}
 		finally{
 			proc.destroy();
@@ -116,7 +136,7 @@ public class QBFSolver {
 		}
 		else{
             //Try the next solver
-            return isSatisfiable(qbfFile,++solverIndex);
+            return isSatisfiable(qbfFile,++solverIndex,withTimeout);
 		}
 
         qbfFile.delete();
@@ -131,7 +151,7 @@ public class QBFSolver {
 	public static void main(String[] args) throws IOException, QBFSolverException {
 
 		QBFSolver solver = new QBFSolver();
-        System.out.println(solver.isSatisfiable(new File("/tmp/qbf4167122398314786090.qdimacs")));
+        System.out.println(solver.isSatisfiable(new File(ModulePaths.getResultLocation() + "/qbf-slow/qbf1707796416043093684.qdimacs")));
 
 	}
 
