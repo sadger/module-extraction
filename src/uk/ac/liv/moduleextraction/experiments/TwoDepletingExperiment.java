@@ -37,6 +37,7 @@ public class TwoDepletingExperiment implements  Experiment {
     public TwoDepletingExperiment(OWLOntology ont, File originalLocation) {
         this.ontology = ont;
         this.originalLocation = originalLocation;
+        this.hybridExperiment = new HybridExtractorExperiment(ontology,originalLocation);
     }
 
     @Override
@@ -46,7 +47,7 @@ public class TwoDepletingExperiment implements  Experiment {
                 scheduler.scheduleAtFixedRate(dumpExtraction,10,60,TimeUnit.MINUTES);
 
         this.refSig = signature;
-        hybridExperiment = new HybridExtractorExperiment(ontology,originalLocation);
+
         hybridExperiment.performExperiment(signature);
 
         hybridModule = hybridExperiment.getHybridModule();

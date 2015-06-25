@@ -3,7 +3,6 @@ package uk.ac.liv.moduleextraction.experiments;
 import com.google.common.base.Stopwatch;
 import org.semanticweb.owlapi.model.*;
 import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor;
-import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor.CycleRemovalMethod;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
@@ -40,7 +39,6 @@ public class HybridExtractorExperiment implements Experiment {
 		this.location = originalLocation;
 	
 		this.starExtractor = new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.STAR);
-		this.iteratingExtractor = new HybridModuleExtractor(ont);
 	}
 
 
@@ -58,6 +56,8 @@ public class HybridExtractorExperiment implements Experiment {
 
 		starSize = starModule.size();
 
+		//Begin with the STAR module as it's the basis of the hybrid process anyway
+		iteratingExtractor = new HybridModuleExtractor(starModule);
 
 		hybridWatch = Stopwatch.createStarted();
 		//And then the iterated one 
