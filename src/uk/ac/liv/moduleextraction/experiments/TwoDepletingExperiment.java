@@ -41,6 +41,7 @@ public class TwoDepletingExperiment implements  Experiment {
     public TwoDepletingExperiment(OWLOntology ont, File originalLocation) {
         this.ontology = ont;
         this.originalLocation = originalLocation;
+        this.hybridExperiment = new HybridExtractorExperiment(ontology,originalLocation);
     }
 
     @Override
@@ -55,22 +56,15 @@ public class TwoDepletingExperiment implements  Experiment {
                 scheduler.scheduleAtFixedRate(dumpExtraction,10,60,TimeUnit.MINUTES);
 
         this.refSig = signature;
-        hybridExperiment = new HybridExtractorExperiment(ontology,originalLocation);
+
         hybridExperiment.performExperiment(signature);
 
-
-
         hybridModule = hybridExperiment.getHybridModule();
-
-        //ModuleUtils.writeOntology(hybridExperiment.getStarModule(), ModulePaths.getOntologyLocation() + "star-nci.owl");
 
         oneDepletingExtractor = new NDepletingModuleExtractor(1, hybridModule);
         oneDepletingModule = oneDepletingExtractor.extractModule(signature);
 
-        System.out.println("H: " + hybridModule.size());
-        System.out.println("1: " + oneDepletingModule.size());
-        System.out.println(oneDepletingModule.size() == hybridModule.size());
-        System.out.println(!(oneDepletingModule.size() == hybridModule.size()));
+
         if(!(oneDepletingModule.size() == hybridModule.size())) {
             System.out.println("HERE");
             twoDepletingExtracted = true;
@@ -85,7 +79,7 @@ public class TwoDepletingExperiment implements  Experiment {
 
         dumpHandler.cancel(true);
 
-        System.out.println("H: " + hybridModule.size());
+/*        System.out.println("H: " + hybridModule.size());
         System.out.println("1: " + oneDepletingModule.size());
         System.out.println("2-dep? :" + twoDepletingExtracted);
         if(twoDepletingExtracted){
@@ -93,7 +87,7 @@ public class TwoDepletingExperiment implements  Experiment {
             System.out.println("E2: " + exactlyTwoModule.size());
             System.out.println("2: " + twoDepletingModule.size());
         }
-        System.out.println();
+        System.out.println();*/
 
     }
 
