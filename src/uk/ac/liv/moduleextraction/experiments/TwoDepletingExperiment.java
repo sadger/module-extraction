@@ -66,7 +66,6 @@ public class TwoDepletingExperiment implements  Experiment {
 
 
         if(!(oneDepletingModule.size() == hybridModule.size())) {
-            System.out.println("HERE");
             twoDepletingExtracted = true;
 
             twoDepletingExtractor = new NDepletingModuleExtractor(2, hybridModule);
@@ -121,7 +120,7 @@ public class TwoDepletingExperiment implements  Experiment {
         metricWriter.addMetric("TwoDepSize", (twoDepletingExtracted) ? twoDepletingModule.size() : "NA");
         metricWriter.addMetric("EqualOneTwo", (twoDepletingExtracted) ? String.valueOf(oneDepletingModule.equals(twoDepletingModule)).toUpperCase() : "NA");
         metricWriter.addMetric("EqualTwoExactlyTwo", (twoDepletingExtracted) ? String.valueOf(twoDepletingModule.equals(exactlyTwoModule)).toUpperCase() : "NA");
-        metricWriter.printCSVFileToOutput();
+        metricWriter.writeCSVFile();
 
         ExtractionMetric oneMetric = oneDepletingExtractor.getMetrics();
         ExtractionMetric twoMetric = (twoDepletingExtracted) ? twoDepletingExtractor.getMetrics() : null;
@@ -135,7 +134,7 @@ public class TwoDepletingExperiment implements  Experiment {
         qbfWriter.addMetric("TwoSyntacticChecks", (twoDepletingExtracted) ? twoMetric.getSyntacticChecks() : "NA");
         qbfWriter.addMetric("TwoSeparabilityAxioms", (twoDepletingExtracted) ? twoMetric.getSeparabilityAxiomCount() : "NA");
         qbfWriter.addMetric("TwoTime", (twoDepletingExtracted) ? twoMetric.getTimeTaken() : "NA");
-        qbfWriter.printCSVFileToOutput();
+        qbfWriter.writeCSVFile();
 
 
     }
