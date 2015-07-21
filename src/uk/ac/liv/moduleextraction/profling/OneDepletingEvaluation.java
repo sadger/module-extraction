@@ -5,11 +5,9 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import uk.ac.liv.moduleextraction.experiments.NDepletingComparison;
-import uk.ac.liv.moduleextraction.experiments.OneDepletingComparison;
+import uk.ac.liv.moduleextraction.experiments.ExactlyNDepletingComparison;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
@@ -29,7 +27,7 @@ public class OneDepletingEvaluation {
 		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontLoc.getAbsolutePath());
 
         System.out.println(ont.getLogicalAxiomCount());
-        NDepletingComparison compare = new NDepletingComparison(2,ont,ontLoc);
+        ExactlyNDepletingComparison compare = new ExactlyNDepletingComparison(2,ont,ontLoc);
 //		SigManager man =
 //                new SigManager(
 //                        new File(ModulePaths.getResultLocation() +

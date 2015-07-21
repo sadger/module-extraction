@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-public class NDepletingComparison implements Experiment {
+public class ExactlyNDepletingComparison implements Experiment {
 
 
 	private File originalLocation;
@@ -39,7 +39,7 @@ public class NDepletingComparison implements Experiment {
 
 	private final int DOMAIN_SIZE;
 
-	public NDepletingComparison(int domain_size, OWLOntology ont, File originalLocation) {
+	public ExactlyNDepletingComparison(int domain_size, OWLOntology ont, File originalLocation) {
 		this.ontology = ont;
 		this.originalLocation = originalLocation;
 		this.DOMAIN_SIZE = domain_size;

@@ -25,8 +25,8 @@ public class MultipleExperiments {
 		/* Create new folder in result location with same name as signature
 		folder */
         File newResultFolder = copyDirectoryStructure(signaturesLocation, "Signatures",new File(ModulePaths.getResultLocation()));
-        if(experimentType instanceof NDepletingComparison){
-            NDepletingComparison ndep = (NDepletingComparison) experimentType;
+        if(experimentType instanceof ExactlyNDepletingComparison){
+            ExactlyNDepletingComparison ndep = (ExactlyNDepletingComparison) experimentType;
             newResultFolder = new File(newResultFolder.getAbsolutePath() + "/" + "domain_size-" + ndep.getDomainSize());
         }
 
@@ -169,15 +169,14 @@ public class MultipleExperiments {
 
     public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException, InterruptedException {
 
-
         File ontDir = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/");
         for(File file : ontDir.listFiles()){
             File ontFile = file;
             OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
             if(ont.getLogicalAxiomCount() > 0){
                 new MultipleExperiments().runExperiments(
-                        new File(ModulePaths.getSignatureLocation()  + "/depleting-comparison-only-diff/" + ontFile.getName()),
-                        new TwoDepletingExperiment(ont,ontFile));
+                        new File(ModulePaths.getSignatureLocation()  + "/depleting-comparison-only-2-diff/" + ontFile.getName()),
+                        new NDepletingExperiment(3,ont,ontDir));
             }
 
 
