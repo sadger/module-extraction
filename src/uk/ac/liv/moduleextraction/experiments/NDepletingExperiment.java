@@ -80,7 +80,7 @@ public class NDepletingExperiment implements  Experiment{
         this.metrics = new ArrayList<>();
 
         hybridExperiment.performExperiment(signature);
-        final Set<OWLLogicalAxiom> hybridModule = hybridExperiment.getHybridModule();
+        hybridModule = hybridExperiment.getHybridModule();
 
         int hybridSize = hybridModule.size();
 
@@ -133,7 +133,7 @@ public class NDepletingExperiment implements  Experiment{
             metricWriter.addMetric("SignatureLocation", signatureLocation.getAbsolutePath());
         }
 
-        metricWriter.writeCSVFile();
+        metricWriter.printCSVFileToOutput();
 
         CSVWriter exactlyWriter = new CSVWriter(experimentLocation.getAbsoluteFile() + "/" + "exactly-experiment-results.csv");
         //To ensure equal number of fields in the CSV file print a column even if the module wasn't extracted
@@ -143,7 +143,7 @@ public class NDepletingExperiment implements  Experiment{
 
 
         }
-        exactlyWriter.writeCSVFile();
+        exactlyWriter.printCSVFileToOutput();
     }
 
     public static void main(String[] args) throws IOException {

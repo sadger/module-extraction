@@ -6,12 +6,16 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.util.DLExpressivityChecker;
+import uk.ac.liv.moduleextraction.experiments.NDepletingExperiment;
 import uk.ac.liv.moduleextraction.experiments.TwoDepletingExperiment;
+import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
@@ -25,40 +29,22 @@ public class LucaQBF {
 
     public static void main(String[] args) throws IOException {
 
+        String name = "368d0b5a-aead-4245-a8f2-8eab74b86326_DUUL.owl-QBF";
+        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/" + name);
 
-        Set<String> skip = Sets.newHashSet("13ee048d-0403-4ac4-b733-6147d4bc08ac_quality.owl", "96ddfabf-9413-436c-ad27-febd29e457a4_hI=1%2FCH4");
+        System.out.println(ont.getLogicalAxiomCount());
 
-        for(File f : new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/").listFiles()){
-            if(!skip.contains(f.getName())){
+        SigManager man =  new SigManager(new File(ModulePaths.getSignatureLocation() + "/depleting-comparison-only-diff/" + name));
 
-                if(f.isFile()){
-                    OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
-
-                    if(ont != null){
-                        System.out.println(f.getName() + ": " + ont.getLogicalAxiomCount());
-
-                        if(ont.getLogicalAxiomCount() > 2000){
-                            DLExpressivityChecker checker = new DLExpressivityChecker(Collections.singleton(ont));
-                            System.out.println("Expressivity: " + checker.getDescriptionLogicName());
-
-
-                        }
-
-                        ont.getOWLOntologyManager().removeOntology(ont);
-                        ont = null;
-                    }
-
-                }
-
-
-            }
-
-
-
-
+        int i = 0;
+        for(OWLLogicalAxiom ax : ont.getLogicalAxioms()){
+            System.out.println(++i);
+            Set<OWLEntity> sig = ax.getSignature();
+            NDepletingExperiment n = new NDepletingExperiment(3,ont,new File("/tmp/"));
+            n.performExperiment(sig);
+            n.writeMetrics(new File("/tmp/"));
 
         }
-
 
 
     }
