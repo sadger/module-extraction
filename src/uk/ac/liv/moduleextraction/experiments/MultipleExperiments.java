@@ -1,12 +1,17 @@
 package uk.ac.liv.moduleextraction.experiments;
 
-import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import uk.ac.liv.moduleextraction.extractor.NotEquivalentToTerminologyException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
 import java.util.*;
 
 public class MultipleExperiments {
@@ -170,18 +175,24 @@ public class MultipleExperiments {
     public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException, InterruptedException {
 
         File ontDir = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/");
-        for(File file : ontDir.listFiles()){
-            File ontFile = file;
-            OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
-            if(ont.getLogicalAxiomCount() > 0){
-                new MultipleExperiments().runExperiments(
-                        new File(ModulePaths.getSignatureLocation()  + "/depleting-comparison-only-2-diff/" + ontFile.getName()),
-                        new NDepletingExperiment(3,ont,ontDir));
+        File[] files = ontDir.listFiles();
+        Arrays.sort(files);
+        for(File ontFile : files){
+            // Between 0-9 asumming each ontology name starts with a number
+            int indexValue = Character.valueOf(ontFile.getName().toString().charAt(0)) - 48;
+
+            if(indexValue == 0){
+                OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
+                if(ont.getLogicalAxiomCount() > 0){
+                    new MultipleExperiments().runExperiments(
+                            new File(ModulePaths.getSignatureLocation()  + "/depleting-comparison/" + ontFile.getName()),
+                            new DatalogExperiment(ont,ontDir));
+                }
+
+
+                ont.getOWLOntologyManager().removeOntology(ont);
+                ont = null;
             }
-
-
-            ont.getOWLOntologyManager().removeOntology(ont);
-            ont = null;
 
         }
 
