@@ -5,6 +5,7 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 import uk.ac.liv.propositional.formula.PropositionalFormula;
 import uk.ac.liv.propositional.nSeparability.ClauseStore;
@@ -12,10 +13,9 @@ import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
 import uk.ac.liv.propositional.nSeparability.nEntityConvertor;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 
 public class nElementQBFProblemGenerator {
@@ -30,27 +30,28 @@ public class nElementQBFProblemGenerator {
 
     private HashSet<int[]> clauses;
     private HashSet<Integer> freshVariables;
-    private nEntityConvertor entityUnderAllInterpreations;
+    private nEntityConvertor underAllInterpretations;
 
     private HashSet<Integer> existentialVariables;
     private HashSet<Integer> universalVariables;
 
     private boolean isUnsatisfiable = false;
+    private Set<OWLEntity> ontologyEntities;
 
     public nElementQBFProblemGenerator(nAxiomToClauseStore clauseStoreMapping, Collection<OWLLogicalAxiom> ontology, Set<OWLEntity> signatureAndSigM) throws IOException, ExecutionException {
         this.DOMAIN_SIZE = clauseStoreMapping.getDomainSize();
         this.ontology = ontology;
-        this.signature = new HashSet<OWLEntity>(signatureAndSigM);
-        this.classesNotInSignature = new HashSet<OWLEntity>();
-        this.entityUnderAllInterpreations = new nEntityConvertor(DOMAIN_SIZE);
-        this.clauses = new HashSet<int[]>();
-        this.freshVariables = new HashSet<Integer>();
-        this.existentialVariables = new HashSet<Integer>();
-        this.universalVariables = new HashSet<Integer>();
+        this.signature = new HashSet<>(signatureAndSigM);
+        this.classesNotInSignature = new HashSet<>();
+        this.underAllInterpretations = new nEntityConvertor(DOMAIN_SIZE);
+        this.clauses = new HashSet<>();
+        this.freshVariables = new HashSet<>();
+        this.existentialVariables = new HashSet<>();
+        this.universalVariables = new HashSet<>();
         this.mapper = clauseStoreMapping;
         populateSignatures();
         collectClausesAndVariables();
-        generateQBFProblem();
+        collectQuantifiers();
     }
 
     public boolean isUnsatisfiable(){
@@ -74,21 +75,19 @@ public class nElementQBFProblemGenerator {
     }
 
     private void populateSignatures() {
-        Set<OWLEntity> ontologyEntities = ModuleUtils.getClassAndRoleNamesInSet(ontology);
+        //Class, roles, and named individuals (nominals)
+        ontologyEntities = ModuleUtils.getSignatureOfAxioms(ontology);
+        ontologyEntities.remove(factory.getOWLThing());
+        ontologyEntities.remove(factory.getOWLNothing());
 
+        //Discard any symbols not in the signature of the ontology
         signature.retainAll(ontologyEntities);
-        signature.remove(factory.getOWLThing());
-        signature.remove(factory.getOWLNothing());
 
+        //Sig(O) \ Σ
         classesNotInSignature.addAll(ontologyEntities);
         classesNotInSignature.removeAll(signature);
 
-		/* Remove Top and Bottom classes */
-        classesNotInSignature.remove(factory.getOWLThing());
-        classesNotInSignature.remove(factory.getOWLNothing());
     }
-
-
 
     private void collectClausesAndVariables() {
         for(OWLLogicalAxiom axiom: ontology){
@@ -106,9 +105,33 @@ public class nElementQBFProblemGenerator {
                 freshVariables.addAll(clauseStore.getFreshVariables());
             }
         }
+
+        /* Additional constraints for nominals in the ontology
+          (not necessary in single element interpretations) */
+        if(DOMAIN_SIZE > 1){
+            ontologyEntities.stream()
+                    .filter(e -> e.isOWLNamedIndividual())
+                    .forEach(e -> clauses.addAll(getNominalConstraint((OWLNamedIndividual) e)));
+        }
     }
 
-    public void generateQBFProblem() throws IOException{
+    public HashSet<int[]> getNominalConstraint(OWLNamedIndividual indiv){
+        HashSet<int[]> constraintClauses = new HashSet<>();
+        ArrayList<PropositionalFormula> underAll = new ArrayList<>(indiv.accept(underAllInterpretations));
+        System.out.println(underAll);
+        //Pairwise disjointness = n(n-1)/2 clauses
+        for(int i = 0; i <= DOMAIN_SIZE - 1 ; i++){
+            for (int j = i+1; j <= DOMAIN_SIZE - 1 ; j++) {
+                int[] constraint = {-mapper.lookupMapping(underAll.get(i)), -mapper.lookupMapping(underAll.get(j))};
+                System.out.println(Arrays.toString(constraint));
+                constraintClauses.add(constraint);
+            }
+        }
+        return constraintClauses;
+    }
+
+
+    public void collectQuantifiers() throws IOException{
         writeUniversalQuantifiers();
         writeExistentialQuantifiers();
     }
@@ -116,7 +139,7 @@ public class nElementQBFProblemGenerator {
 
     private void writeUniversalQuantifiers() throws IOException{
         for(OWLEntity sigEnt : signature){
-            for(PropositionalFormula ent : sigEnt.accept(entityUnderAllInterpreations)){
+            for(PropositionalFormula ent : sigEnt.accept(underAllInterpretations)){
                 Integer entValue = mapper.lookupMapping(ent);
                 if(!(entValue == null)){
                     universalVariables.add(entValue);
@@ -127,16 +150,14 @@ public class nElementQBFProblemGenerator {
 
     private void writeExistentialQuantifiers() throws IOException{
         for(OWLEntity sigEnt : classesNotInSignature){
-            for(PropositionalFormula ent : sigEnt.accept(entityUnderAllInterpreations)){
+            for(PropositionalFormula ent : sigEnt.accept(underAllInterpretations)){
                 Integer entValue = mapper.lookupMapping(ent);
                 if(!(entValue == null)){
                     existentialVariables.add(entValue);
                 }
             }
         }
-        for(Integer fresh : freshVariables){
-            existentialVariables.add(fresh);
-        }
+        existentialVariables.addAll(freshVariables.stream().collect(Collectors.toSet()));
     }
 
     

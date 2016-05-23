@@ -37,6 +37,7 @@ public class DepQBFSolver {
         constructQBFProblem();
     }
 
+    /* Map variables contiguously from 1, otherwise some QBF solvers complain */
     private void remapNumbering(){
 
         int startingNumber = 1;
@@ -56,7 +57,7 @@ public class DepQBFSolver {
         qbfFile = null;
         try {
             qbfFile = File.createTempFile("qbf", ".qdimacs", new File("/tmp/"));
-            //System.out.println(qbfFile.getAbsolutePath());
+            System.out.println(qbfFile.getAbsolutePath());
             BufferedWriter bw = new BufferedWriter(new FileWriter(qbfFile));
 
 
@@ -98,8 +99,6 @@ public class DepQBFSolver {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
 
 
     }
