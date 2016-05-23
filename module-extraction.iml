@@ -42,24 +42,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$JAR_LOCATION$/slf4j-api-1.7.12.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$JAR_LOCATION$/slf4j-simple-1.7.12.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$JAR_LOCATION$/junit-4.12.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -86,6 +68,25 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="PrisM" />
+    <orderEntry type="module" module-name="PrisM" scope="PROVIDED" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.1" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$JAR_LOCATION$/slf4j-simple-1.7.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$JAR_LOCATION$/slf4j-api-1.7.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

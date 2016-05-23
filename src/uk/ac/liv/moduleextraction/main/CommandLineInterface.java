@@ -1,42 +1,26 @@
 package uk.ac.liv.moduleextraction.main;
 
+import org.apache.commons.cli.*;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
+import org.semanticweb.owlapi.io.ToStringRenderer;
+import org.semanticweb.owlapi.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import uk.ac.liv.moduleextraction.extractor.AMEX;
+import uk.ac.liv.moduleextraction.extractor.EquivalentToTerminologyExtractor;
+import uk.ac.liv.moduleextraction.extractor.Extractor;
+import uk.ac.liv.moduleextraction.signature.SigManager;
+import uk.ac.liv.ontologyutils.axioms.AtomicLHSAxiomVerifier;
+import uk.ac.liv.ontologyutils.ontologies.EquivalentToTerminologyChecker;
+import uk.ac.liv.ontologyutils.ontologies.TerminologyChecker;
+import uk.ac.manchester.cs.owlapi.dlsyntax.DLSyntaxObjectRenderer;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.commons.cli.BasicParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
-import org.semanticweb.owlapi.io.ToStringRenderer;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
-import org.semanticweb.owlapi.model.RemoveAxiom;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import uk.ac.liv.moduleextraction.extractor.EquivalentToTerminologyExtractor;
-import uk.ac.liv.moduleextraction.extractor.Extractor;
-import uk.ac.liv.moduleextraction.extractor.AMEX;
-import uk.ac.liv.moduleextraction.signature.SigManager;
-import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
-import uk.ac.liv.ontologyutils.ontologies.EquivalentToTerminologyChecker;
-import uk.ac.liv.ontologyutils.ontologies.TerminologyChecker;
-import uk.ac.manchester.cs.owlapi.dlsyntax.DLSyntaxObjectRenderer;
 
 public class CommandLineInterface {
 	
@@ -105,7 +89,7 @@ public class CommandLineInterface {
 					TerminologyChecker termChecker = new TerminologyChecker();
 					EquivalentToTerminologyChecker equivChecker = new EquivalentToTerminologyChecker();
 					
-					SupportedAxiomVerifier supported = new SupportedAxiomVerifier();
+					AtomicLHSAxiomVerifier supported = new AtomicLHSAxiomVerifier();
 					
 					ArrayList<RemoveAxiom> toRemove = new ArrayList<RemoveAxiom>();
 					for(OWLLogicalAxiom ax : ontology.getLogicalAxioms()){

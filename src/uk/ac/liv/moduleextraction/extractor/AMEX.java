@@ -1,9 +1,7 @@
 package uk.ac.liv.moduleextraction.extractor;
 
 import com.google.common.base.Stopwatch;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
@@ -14,6 +12,8 @@ import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 import uk.ac.liv.moduleextraction.qbf.OneElementSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
+import uk.ac.liv.ontologyutils.loader.OntologyLoader;
+import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
 import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
 
@@ -133,7 +133,7 @@ public class AMEX implements Extractor{
 		applySyntacticRule(terminology);
 		
 		HashSet<OWLLogicalAxiom> lhsSigT = lhsExtractor.getLHSSigAxioms(axiomStore.getSubsetAsList(terminology), sigUnionSigM, dependencies);
-		
+
 		qbfChecks++;
 		if(oneElementInseparableChecker.isSeparableFromEmptySet(lhsSigT, sigUnionSigM)){
 			OWLLogicalAxiom insepAxiom = findSeparableAxiom(terminology);
@@ -154,7 +154,7 @@ public class AMEX implements Extractor{
 				new OneElementSeparabilityAxiomLocator(clauseStoreMapping,axiomStore.getSubsetAsArray(terminology), sigUnionSigM, dependencies);
 
 		OWLLogicalAxiom insepAxiom = search.getSeparabilityCausingAxiom();
-		logger.debug("Adding (semantic): {}", insepAxiom);
+		logger.trace("Separability Causing: {}", insepAxiom);
 		qbfChecks += search.getCheckCount();
 		return insepAxiom;
 	}
@@ -174,9 +174,10 @@ public class AMEX implements Extractor{
 					if(syntacticDependencyChecker.hasSyntacticSigDependency(chosenAxiom, dependencies, sigUnionSigM)){
 						
 						change = true;
+
 						module.add(chosenAxiom);
 						terminology[i] = false;
-						logger.debug("Adding (syntactic): {}", chosenAxiom);
+						logger.trace("Axiom dependency: {}", chosenAxiom);
 						sigUnionSigM.addAll(chosenAxiom.getSignature());
 						
 						
@@ -185,6 +186,28 @@ public class AMEX implements Extractor{
 			}
 		}
 	
+	}
+
+	public static void main(String[] args) {
+		//Thesis example
+
+        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/shared/vent.krss");
+		ModuleUtils.remapIRIs(ont, "X");
+		ont.getLogicalAxioms().forEach(System.out::println);
+
+		Set<OWLEntity> signature = new HashSet<>();
+
+		OWLDataFactory f = ont.getOWLOntologyManager().getOWLDataFactory();
+
+		signature.add(f.getOWLClass(IRI.create("X#A")));
+		signature.add(f.getOWLClass(IRI.create("X#C")));
+		signature.add(f.getOWLClass(IRI.create("X#LVC")));
+
+
+		AMEX amex = new AMEX(ont);
+
+		System.out.println(amex.extractModule(signature));
+
 	}
 	
 

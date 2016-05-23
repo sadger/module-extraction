@@ -155,7 +155,7 @@ public class NDepletingExperiment implements  Experiment{
 
         for(OWLLogicalAxiom axiom : ont.getLogicalAxioms()){
             Set<OWLEntity> sig = axiom.getSignature();
-            NDepletingExperiment expr = new NDepletingExperiment(3,ont,ontLocation);
+            NDepletingExperiment expr = new NDepletingExperiment(2,ont,ontLocation);
             expr.performExperiment(sig);
             expr.writeMetrics(new File("/tmp/xxx"));
         }

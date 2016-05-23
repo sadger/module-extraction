@@ -1,13 +1,12 @@
 package uk.ac.liv.moduleextraction.filters;
 
+import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import uk.ac.liv.ontologyutils.axioms.AtomicLHSAxiomVerifier;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-
-import uk.ac.liv.moduleextraction.filters.SupportedFilter;
-import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
+import java.util.stream.Collectors;
 
 public class SupportedExpressivenessFilter implements SupportedFilter {
 
@@ -19,14 +18,8 @@ public class SupportedExpressivenessFilter implements SupportedFilter {
 	@Override
 	public Set<OWLLogicalAxiom> getUnsupportedAxioms(Collection<OWLLogicalAxiom> axioms) {
 		HashSet<OWLLogicalAxiom> unsupported = new HashSet<OWLLogicalAxiom>();
-		SupportedAxiomVerifier verifier = new SupportedAxiomVerifier();
-		for(OWLLogicalAxiom axiom : axioms){
-			
-			if(!verifier.isSupportedAxiom(axiom)){
-				unsupported.add(axiom);
-			}
-		}
-		
+		AtomicLHSAxiomVerifier verifier = new AtomicLHSAxiomVerifier();
+		unsupported.addAll(axioms.stream().filter(axiom -> !verifier.isSupportedAxiom(axiom)).collect(Collectors.toSet()));
 		return unsupported;
 	}
 

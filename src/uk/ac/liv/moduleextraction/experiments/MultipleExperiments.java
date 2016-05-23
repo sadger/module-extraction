@@ -184,9 +184,9 @@ public class MultipleExperiments {
             if(indexValue == 0){
                 OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
                 if(ont.getLogicalAxiomCount() > 0){
-                    new MultipleExperiments().runExperiments(
-                            new File(ModulePaths.getSignatureLocation()  + "/depleting-comparison/" + ontFile.getName()),
-                            new DatalogExperiment(ont,ontDir));
+//                    new MultipleExperiments().runExperiments(
+//                            new File(ModulePaths.getSignatureLocation()  + "/depleting-comparison/" + ontFile.getName()),
+//                            new DatalogExperiment(ont,ontDir));
                 }
 
 

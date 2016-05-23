@@ -1,3 +1,4 @@
+/*
 package uk.ac.liv.moduleextraction.experiments;
 
 import com.google.common.base.Stopwatch;
@@ -16,9 +17,11 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+*/
 /**
 * Created by william on 05/10/15.
-*/
+*//*
+
 public class DatalogExperiment implements  Experiment {
 
 
@@ -94,3 +97,4 @@ public class DatalogExperiment implements  Experiment {
 
     }
 }
+*/

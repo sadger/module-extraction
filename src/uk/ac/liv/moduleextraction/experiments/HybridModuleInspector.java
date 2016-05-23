@@ -1,18 +1,16 @@
 package uk.ac.liv.moduleextraction.experiments;
 
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
+import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor;
+import uk.ac.liv.ontologyutils.axioms.AtomicLHSAxiomVerifier;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Set;
-
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-
-import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor;
-import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor.CycleRemovalMethod;
-import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
 
 public class HybridModuleInspector implements Experiment {
 
@@ -27,7 +25,7 @@ public class HybridModuleInspector implements Experiment {
 	@Override
 	public void performExperiment(Set<OWLEntity> signature) {
 		unsupportedCount = 0;
-		SupportedAxiomVerifier validator = new SupportedAxiomVerifier();
+		AtomicLHSAxiomVerifier validator = new AtomicLHSAxiomVerifier();
 		HybridModuleExtractor extractor = new HybridModuleExtractor(ontology);
 		module = extractor.extractModule(signature);
 		

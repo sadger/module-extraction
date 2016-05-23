@@ -2,7 +2,6 @@ package uk.ac.liv.moduleextraction.filters;
 
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
 
 import java.util.Collection;
 import java.util.HashSet;

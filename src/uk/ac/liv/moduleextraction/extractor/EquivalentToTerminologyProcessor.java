@@ -1,21 +1,20 @@
 package uk.ac.liv.moduleextraction.extractor;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import uk.ac.liv.ontologyutils.axioms.AtomicLHSAxiomVerifier;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
-import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.ontologies.EquivalentToTerminologyChecker;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class EquivalentToTerminologyProcessor {
 
@@ -61,7 +60,7 @@ public class EquivalentToTerminologyProcessor {
 	}
 
 	public Set<OWLLogicalAxiom> getConvertedAxioms() throws OWLOntologyCreationException{
-		logger.debug("{}","Performing preprocessing on ontology");
+		//logger.debug("{}","Performing preprocessing on ontology");
 		Set<OWLLogicalAxiom> convertedAxioms = new HashSet<OWLLogicalAxiom>();
 		factory = OWLManager.getOWLDataFactory();
 
@@ -107,10 +106,10 @@ public class EquivalentToTerminologyProcessor {
 
 
 	public Set<OWLLogicalAxiom> postProcessModule(Set<OWLLogicalAxiom> module){
-		logger.debug("{}","Performing postprocessing on module");
+		//logger.debug("{}","Performing postprocessing on module");
 		HashSet<OWLLogicalAxiom> toAdd = new HashSet<OWLLogicalAxiom>();
 		HashSet<OWLLogicalAxiom> toRemove = new HashSet<OWLLogicalAxiom>();
-		SupportedAxiomVerifier verifier = new SupportedAxiomVerifier();
+		AtomicLHSAxiomVerifier verifier = new AtomicLHSAxiomVerifier();
 
 		for(OWLLogicalAxiom axiom : module){
 			//The axioms to remap and remove are terminological but ontology may

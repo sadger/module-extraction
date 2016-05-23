@@ -1,21 +1,16 @@
 package uk.ac.liv.moduleextraction.profling;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
-
-import uk.ac.liv.ontologyutils.axioms.OneDepletingSupportedAxiomVerifier;
-import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
+import uk.ac.liv.ontologyutils.axioms.AtomicLHSAxiomVerifier;
+import uk.ac.liv.ontologyutils.axioms.NDepletingSupportedAxiomVerifier;
+import uk.ac.liv.ontologyutils.axioms.SupportedPlusNominalVerifier;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.util.ModulePaths;
-import uk.ac.liv.ontologyutils.util.ModuleUtils;
-import uk.ac.liv.propositional.convertors.ALCAxiomToPropositionalConvertor;
+
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class AxiomTypes {
@@ -33,9 +28,9 @@ public class AxiomTypes {
 					OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
 					int unsupportedcount = 0;
 					for(OWLLogicalAxiom axiom : ont.getLogicalAxioms()){
-						SupportedAxiomVerifier verifier = new SupportedAxiomVerifier();
+						AtomicLHSAxiomVerifier verifier = new AtomicLHSAxiomVerifier();
 						AxiomType<?> type = axiom.getAxiomType();
-						if(!axiom.accept(new OneDepletingSupportedAxiomVerifier())){
+						if(!axiom.accept(new NDepletingSupportedAxiomVerifier(new SupportedPlusNominalVerifier()))){
 							System.out.println(axiom.getAxiomType());
 							System.out.println(axiom);
 						//	System.out.println(axiom.accept(new ALCAxiomToPropositionalConvertor()));

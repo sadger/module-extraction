@@ -1,32 +1,24 @@
 package uk.ac.liv.moduleextraction.checkers;
 
 
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
+import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
+import uk.ac.liv.moduleextraction.chaindependencies.DependencySet;
+import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
+import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
+import uk.ac.liv.ontologyutils.axioms.AtomicLHSAxiomVerifier;
+import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
+import uk.ac.liv.ontologyutils.axioms.AxiomStructureInspector;
+import uk.ac.liv.ontologyutils.loader.OntologyLoader;
+import uk.ac.liv.ontologyutils.util.ModulePaths;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-
-import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
-import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
-import uk.ac.liv.moduleextraction.chaindependencies.DependencySet;
-import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
-import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
-import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
-import uk.ac.liv.ontologyutils.axioms.AxiomStructureInspector;
-import uk.ac.liv.ontologyutils.axioms.SupportedAxiomVerifier;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.util.ModulePaths;
-import uk.ac.liv.ontologyutils.util.ModuleUtils;
 
 
 public class ExtendedLHSSigExtractor {
@@ -34,7 +26,7 @@ public class ExtendedLHSSigExtractor {
 	private Set<OWLEntity> signatureDependencies = new HashSet<OWLEntity>();
 
 	AxiomDependencies dependencies;
-    SupportedAxiomVerifier verifier = new SupportedAxiomVerifier();
+    AtomicLHSAxiomVerifier verifier = new AtomicLHSAxiomVerifier();
 
 
 	public HashSet<OWLLogicalAxiom> getLHSSigAxioms(boolean[] terminology,

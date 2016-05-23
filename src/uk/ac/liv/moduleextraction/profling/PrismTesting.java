@@ -1,3 +1,4 @@
+/*
 package uk.ac.liv.moduleextraction.profling;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -53,3 +54,4 @@ class PrismTesting{
 
     }
 }
+*/

@@ -20,7 +20,7 @@ public class QBFSolver {
 
     private boolean isSatisfiable(File dimacsLocation, int solverIndex, boolean withTimeout) throws QBFSolverException{
 
-        System.out.println(dimacsLocation);
+        //System.out.println(dimacsLocation);
 
         this.withTimeout = withTimeout;
         this.solverIndex = solverIndex;
@@ -142,12 +142,12 @@ public class QBFSolver {
             return isSatisfiable(qbfFile,++solverIndex,withTimeout);
 		}
 
-        //qbfFile.delete();
+        qbfFile.delete();
 		if(qbfFile.exists()){
 			System.out.println("WARNING: QBF File not deleted");
 		}
 
-        System.out.println(result);
+        //System.out.println(result);
         return  result;
 
 	}

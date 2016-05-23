@@ -1,22 +1,13 @@
 package uk.ac.liv.moduleextraction.signature;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SigManager {
 	Logger logger = LoggerFactory.getLogger(SigManager.class);
@@ -25,7 +16,7 @@ public class SigManager {
 	public SigManager(File directory) {
 
 		this.directory = directory;
-		//System.out.println("Sig Manager @ " + directory.getAbsolutePath());
+		System.out.println("Sig Manager @ " + directory.getAbsolutePath());
 	}
 
 	public void writeFile(Set<OWLEntity> signature, String name) throws IOException{
