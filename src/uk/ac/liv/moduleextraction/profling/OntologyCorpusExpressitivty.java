@@ -19,7 +19,7 @@ public class OntologyCorpusExpressitivty {
 
     public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException, InterruptedException {
 
-        File ontDir = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/at-most-sriq");
+        File ontDir = new File(ModulePaths.getOntologyLocation() + "/Bioportal/at-most-sriq");
         File[] files = ontDir.listFiles();
         Arrays.sort(files);
         HashMap<String,Integer> partition = new HashMap<>();

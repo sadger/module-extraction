@@ -16,7 +16,7 @@ public class SigManager {
 	public SigManager(File directory) {
 
 		this.directory = directory;
-		System.out.println("Sig Manager @ " + directory.getAbsolutePath());
+		//System.out.println("Sig Manager @ " + directory.getAbsolutePath());
 	}
 
 	public void writeFile(Set<OWLEntity> signature, String name) throws IOException{
