@@ -98,7 +98,6 @@ public class ExactlyNDepletingComparison implements Experiment {
 			csvWriter.addMetric("SignatureLocation", sigLocation.getAbsolutePath());
 		}
 
-
 		csvWriter.writeCSVFile();
 
 		ExtractionMetric nDepMetrics = nDepletingModuleExtractor.getMetrics();
@@ -114,22 +113,6 @@ public class ExactlyNDepletingComparison implements Experiment {
 		csvWriter.writeCSVFile();
 
 
-		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "iteration-metrics.csv", false));
-		writer.write("Type, Size, Time, QBFChecks, SyntacticChecks, SeparabilityAxioms" + "\n");
-		for(ExtractionMetric metric : starAndHybridExperiment.getIterationMetrics()){
-			ArrayList<Object> metricList = new ArrayList<Object>();
-			metricList.add(metric.getType());
-			metricList.add(metric.getModuleSize());
-			metricList.add(metric.getTimeTaken());
-			metricList.add(metric.getQbfChecks());
-			metricList.add(metric.getSyntacticChecks());
-			metricList.add(metric.getSeparabilityAxiomCount());
-			writer.write(commaJoiner.join(metricList));
-			writer.write("\n");
-		}
-
-
-		writer.close();
 
 	}
 

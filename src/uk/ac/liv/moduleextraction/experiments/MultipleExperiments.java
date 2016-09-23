@@ -40,7 +40,7 @@ public class MultipleExperiments {
         for(File f : files){
             if(f.isFile()){
 
-                System.out.println("Experiment " + experimentCount + ": " + f.getName());
+                System.out.println("Experiment " + experimentCount + "/" + files.length + ":" + f.getName());
                 experimentCount++;
                 //New folder in result location - same name as sig file
                 File experimentLocation = new File(newResultFolder.getAbsolutePath() + "/" + f.getName());
@@ -174,34 +174,32 @@ public class MultipleExperiments {
 
     public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException, InterruptedException {
 
-        File ontDir = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/");
+        File ontDir = new File(ModulePaths.getOntologyLocation() + "/Bioportal/at-most-sriq");
         File[] files = ontDir.listFiles();
-        Arrays.sort(files);
+        HashMap<String,Integer> ontSize = new HashMap<>();
+
+        for(File ontFile : files) {
+            OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
+            ontSize.put(ontFile.getName(), ont.getLogicalAxiomCount());
+            ont.getOWLOntologyManager().removeOntology(ont);
+            ont = null;
+        }
+
+        Arrays.sort(files, (o1, o2) -> ontSize.get(o1.getName()).compareTo(ontSize.get(o2.getName())));
+
+        System.out.println("Finished sorting ontologies");
+
         for(File ontFile : files){
-            // Between 0-9 asumming each ontology name starts with a number
-            int indexValue = Character.valueOf(ontFile.getName().toString().charAt(0)) - 48;
+            OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
+            new MultipleExperiments().runExperiments(
+                    new File(ModulePaths.getSignatureLocation() + "/Bioportal/at-most-sriq/" + ontFile.getName()),
+                    new NDepletingExperiment(2,ont,ontFile));
 
-            if(indexValue == 0){
-                OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
-                if(ont.getLogicalAxiomCount() > 0){
-//                    new MultipleExperiments().runExperiments(
-//                            new File(ModulePaths.getSignatureLocation()  + "/depleting-comparison/" + ontFile.getName()),
-//                            new DatalogExperiment(ont,ontDir));
-                }
-
-
-                ont.getOWLOntologyManager().removeOntology(ont);
-                ont = null;
-            }
-
+            ont.getOWLOntologyManager().removeOntology(ont);
+            ont = null;
         }
 
     }
-
-
-
-
-
 
 }
 

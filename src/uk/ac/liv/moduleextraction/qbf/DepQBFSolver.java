@@ -57,7 +57,7 @@ public class DepQBFSolver {
         qbfFile = null;
         try {
             qbfFile = File.createTempFile("qbf", ".qdimacs", new File("/tmp/"));
-           // System.out.println(qbfFile.getAbsolutePath());
+            //System.out.println(qbfFile.getAbsolutePath());
             BufferedWriter bw = new BufferedWriter(new FileWriter(qbfFile));
 
 

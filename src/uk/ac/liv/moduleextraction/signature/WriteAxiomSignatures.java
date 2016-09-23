@@ -62,34 +62,19 @@ public class WriteAxiomSignatures {
 
 
 
-
-        File ontologyLocation = new File(ModulePaths.getOntologyLocation() + "/NCI/Thesaurus_15.04d.owl");
-        System.out.println(ontologyLocation.getName());
-        OWLOntology ontology = OntologyLoader.loadOntologyAllAxioms(ontologyLocation.getAbsolutePath());
-        Set<OWLLogicalAxiom> subset = ModuleUtils.generateRandomAxioms(ModuleUtils.getCoreAxioms(ontology), 500);
-        WriteAxiomSignatures writer = new WriteAxiomSignatures(subset, new File(ModulePaths.getSignatureLocation() + "/two-depleting/" + ontologyLocation.getName()));
-        writer.writeAxiomSignatures();
-        ontology.getOWLOntologyManager().removeOntology(ontology);
-
-
-/*
-		File[] files = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only").listFiles();
+		File[] files = new File(ModulePaths.getOntologyLocation() + "/Bioportal/at-most-sriq").listFiles();
 		int i = 1;
 		for(File f : files){
 			System.out.println("Expr: " + i++);
 			if(f.exists()){
 				System.out.print(f.getName() + ": ");
 				OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
-				 WriteAxiomSignatures writer = new WriteAxiomSignatures(ont, 
-						 new File(ModulePaths.getSignatureLocation() + "/onedepletingcomparison/AxiomSignatures/" + f.getName()));
+				 WriteAxiomSignatures writer = new WriteAxiomSignatures(ont,
+						 new File(ModulePaths.getSignatureLocation() + "/Bioportal/at-most-sriq/" + f.getName()));
 				   writer.writeAxiomSignatures();
 				   ont.getOWLOntologyManager().removeOntology(ont);
 			}
 		}
-*/
-
-
-
 
 	}
 
