@@ -19,7 +19,7 @@ public class OntologyCorpusExpressitivty {
 
     public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException, IOException, OWLOntologyStorageException, InterruptedException {
 
-        File ontDir = new File(ModulePaths.getOntologyLocation() + "/Bioportal/at-most-sriq");
+        File ontDir = new File(ModulePaths.getOntologyLocation() + "/tones-named/at-most-sriq/");
         File[] files = ontDir.listFiles();
         Arrays.sort(files);
         HashMap<String,Integer> partition = new HashMap<>();
@@ -33,18 +33,21 @@ public class OntologyCorpusExpressitivty {
         for(File ontFile : files){
 
             String name = ontFile.getName();
-            name = name.substring(0,name.length()-4);
 
-            OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
+            if(!name.equals("rename-list.txt")){
+                System.out.println(name);
 
-            if(ont != null){
+                OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
 
-                int count = ont.getLogicalAxiomCount();
-                if(min == 0){ min = count;}
-                min = Math.min(min,count);
-                max = Math.max(max,count);
+                System.out.println(ont.getLogicalAxiomCount());
+                if(ont != null){
 
-                if(count < 501){
+                    int count = ont.getLogicalAxiomCount();
+                    if(min == 0){ min = count;}
+                    min = Math.min(min,count);
+                    max = Math.max(max,count);
+
+
                     int binsize = 100;
                     Integer bin = (int) Math.ceil((double) count/binsize) * binsize;
 
@@ -56,22 +59,26 @@ public class OntologyCorpusExpressitivty {
                         sizeBins.put(bin,++currentBinValue);
                     }
 
-                }
 
-                DLExpressivityChecker checker = new DLExpressivityChecker(Collections.singleton(ont));
-                String DLName = checker.getDescriptionLogicName();
 
-                Integer dlcount = partition.get(DLName);
-                if(dlcount  == null){
-                    partition.put(DLName,1);
-                }
-                else{
-                    partition.put(DLName,++dlcount );
-                }
+                    DLExpressivityChecker checker = new DLExpressivityChecker(Collections.singleton(ont));
+                    String DLName = checker.getDescriptionLogicName();
 
-                ont.getOWLOntologyManager().removeOntology(ont);
-                ont = null;
+                    Integer dlcount = partition.get(DLName);
+                    if(dlcount  == null){
+                        partition.put(DLName,1);
+                    }
+                    else{
+                        partition.put(DLName,++dlcount );
+                    }
+
+                    ont.getOWLOntologyManager().removeOntology(ont);
+                    ont = null;
+                }
             }
+
+
+
 
 
 
