@@ -1,24 +1,17 @@
 package uk.ac.liv.moduleextraction.checkers;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-
 import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
-import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
-import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
 import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 import uk.ac.liv.ontologyutils.expressions.ELValidator;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.util.ModulePaths;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ELAxiomChainCollector {
 

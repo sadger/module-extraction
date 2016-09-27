@@ -1,27 +1,13 @@
 package uk.ac.liv.moduleextraction.signature;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-
-import com.clarkparsia.owlapi.modularity.locality.LocalityClass;
-import com.clarkparsia.owlapi.modularity.locality.SyntacticLocalityEvaluator;
-
-import uk.ac.liv.moduleextraction.extractor.CyclicOneDepletingModuleExtractor;
+import org.semanticweb.owlapi.model.*;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
-import uk.ac.liv.ontologyutils.util.ModuleUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Set;
 
 public class WriteAxiomSignatures {
 

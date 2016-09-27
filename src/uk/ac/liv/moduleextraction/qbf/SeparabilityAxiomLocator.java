@@ -1,19 +1,15 @@
 package uk.ac.liv.moduleextraction.qbf;
 
-import java.io.IOException;
-import java.util.*;
-
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
-import uk.ac.liv.moduleextraction.chaindependencies.ChainDependencies;
 import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.InseperableChecker;
-import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
-import uk.ac.liv.ontologyutils.util.ModuleUtils;
+
+import java.io.IOException;
+import java.util.*;
 
 public class SeparabilityAxiomLocator {
 
