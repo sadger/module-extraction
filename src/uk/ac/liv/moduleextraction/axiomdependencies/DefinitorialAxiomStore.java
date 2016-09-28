@@ -1,10 +1,10 @@
-package uk.ac.liv.moduleextraction.storage;
+package uk.ac.liv.moduleextraction.axiomdependencies;
+
+import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
 public class DefinitorialAxiomStore{
 	final OWLLogicalAxiom[] axioms;

@@ -69,31 +69,6 @@ public class QBFSolver {
 
         }
 
-//        System.out.println("HHHHH");
-//        InputStream is = proc.getInputStream();
-//        InputStreamReader isr = new InputStreamReader(is);
-//        BufferedReader br = new BufferedReader(isr);
-//
-//        String line;
-//
-//        try {
-//            while ((line = br.readLine()) != null) {
-//                solverText += line + "\n";
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        finally{
-//            try{
-//                isr.close();
-//                br.close();
-//            }
-//            catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-
-
 
         try {
             if(withTimeout){

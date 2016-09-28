@@ -1,19 +1,18 @@
 package uk.ac.liv.moduleextraction.signature;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-
-import uk.ac.liv.moduleextraction.chaindependencies.DependencySet;
+import uk.ac.liv.moduleextraction.axiomdependencies.DependencySet;
 import uk.ac.liv.moduleextraction.util.OtherUtils;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 
 

@@ -1,9 +1,9 @@
 package uk.ac.liv.moduleextraction.extractor;
 
 import org.semanticweb.owlapi.model.*;
-import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
-import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
-import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
+import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
+import uk.ac.liv.moduleextraction.axiomdependencies.DefinitorialAxiomStore;
+import uk.ac.liv.moduleextraction.checkers.AxiomDependencyChecker;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
@@ -18,7 +18,7 @@ import java.util.Set;
  */
 public class MEX implements Extractor {
 
-    private SyntacticDependencyChecker syntacticDependencyChecker;
+    private AxiomDependencyChecker axiomDependencyChecker;
     private AxiomDependencies dependencies;
     private AxiomDependencies equivalenceDependencies;
     private Set<OWLClass> defT;
@@ -35,7 +35,7 @@ public class MEX implements Extractor {
         dependencies = new AxiomDependencies(axioms);
         equivalenceDependencies = new AxiomDependencies(collectEquivalenceAxioms(axioms));
         axiomStore = new DefinitorialAxiomStore(dependencies.getDefinitorialSortedAxioms());
-        syntacticDependencyChecker = new SyntacticDependencyChecker();
+        axiomDependencyChecker = new AxiomDependencyChecker();
     }
 
     @Override
@@ -69,7 +69,7 @@ public class MEX implements Extractor {
             for (int i = 0; i < terminology.length; i++) {
                 if(terminology[i]){
                     OWLLogicalAxiom chosenAxiom = axiomStore.getAxiom(i);
-                    if(syntacticDependencyChecker.hasSyntacticSigDependency(chosenAxiom, dependencies, sigUnionSigM)){
+                    if(axiomDependencyChecker.hasSyntacticSigDependency(chosenAxiom, dependencies, sigUnionSigM)){
                         System.out.println("AxiomDep: " + chosenAxiom);
                         change = true;
                         module.add(chosenAxiom);

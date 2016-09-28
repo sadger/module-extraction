@@ -4,14 +4,14 @@ import com.google.common.base.Stopwatch;
 import org.semanticweb.owlapi.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
+import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
+import uk.ac.liv.moduleextraction.axiomdependencies.DefinitorialAxiomStore;
+import uk.ac.liv.moduleextraction.checkers.AxiomDependencyChecker;
 import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.NElementInseparableChecker;
-import uk.ac.liv.moduleextraction.checkers.SyntacticDependencyChecker;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 import uk.ac.liv.moduleextraction.qbf.OneElementSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
-import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
 import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
@@ -29,7 +29,7 @@ public class AMEX implements Extractor{
 	private AxiomDependencies dependencies;
 	private Set<OWLLogicalAxiom> module;
 	private Set<OWLEntity> sigUnionSigM;
-	private SyntacticDependencyChecker syntacticDependencyChecker;
+	private AxiomDependencyChecker axiomDependencyChecker;
 	private DefinitorialAxiomStore axiomStore;
 	
 	private ExtendedLHSSigExtractor lhsExtractor;
@@ -56,7 +56,7 @@ public class AMEX implements Extractor{
 		dependencies = new AxiomDependencies(ontology);
 		axiomStore = new DefinitorialAxiomStore(dependencies.getDefinitorialSortedAxioms());
 		
-		syntacticDependencyChecker = new SyntacticDependencyChecker();
+		axiomDependencyChecker = new AxiomDependencyChecker();
 		
 		lhsExtractor = new ExtendedLHSSigExtractor();
 		clauseStoreMapping = new nAxiomToClauseStore(1);
@@ -112,22 +112,11 @@ public class AMEX implements Extractor{
 		return metricBuilder.createMetric();
 	}
 
-//	public LinkedHashMap<String, Long> getMetrics() {
-//		LinkedHashMap<String, Long> metrics = new LinkedHashMap<String, Long>();
-//		metrics.put("Module size", (long) module.size());
-//		metrics.put("Time taken", timeTaken);
-//		metrics.put("Syntactic Checks", syntacticChecks);
-//		metrics.put("QBF Checks", qbfChecks);
-//		metrics.put("Separability Checks", separabilityChecks);
-//		return metrics;
-//	}
-
 
 	public LinkedHashMap<String, Long> getQBFMetrics() {
 		return oneElementInseparableChecker.getQBFMetrics();
 	}
 
-	
 	
 	private void applyRules(boolean[] terminology) throws IOException, QBFSolverException, ExecutionException {
 		applySyntacticRule(terminology);
@@ -171,7 +160,7 @@ public class AMEX implements Extractor{
 					
 					OWLLogicalAxiom chosenAxiom = axiomStore.getAxiom(i);
 					syntacticChecks++;
-					if(syntacticDependencyChecker.hasSyntacticSigDependency(chosenAxiom, dependencies, sigUnionSigM)){
+					if(axiomDependencyChecker.hasSyntacticSigDependency(chosenAxiom, dependencies, sigUnionSigM)){
 						
 						change = true;
 

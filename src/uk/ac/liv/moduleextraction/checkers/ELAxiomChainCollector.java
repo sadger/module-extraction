@@ -3,8 +3,8 @@ package uk.ac.liv.moduleextraction.checkers;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
-import uk.ac.liv.moduleextraction.storage.DefinitorialAxiomStore;
+import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
+import uk.ac.liv.moduleextraction.axiomdependencies.DefinitorialAxiomStore;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 import uk.ac.liv.ontologyutils.expressions.ELValidator;
 

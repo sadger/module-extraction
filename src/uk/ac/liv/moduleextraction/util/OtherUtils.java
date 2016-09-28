@@ -1,10 +1,9 @@
 package uk.ac.liv.moduleextraction.util;
 
-import java.util.Set;
-
 import org.semanticweb.owlapi.model.OWLEntity;
+import uk.ac.liv.moduleextraction.axiomdependencies.DependencySet;
 
-import uk.ac.liv.moduleextraction.chaindependencies.DependencySet;
+import java.util.Set;
 
 
 public class OtherUtils {

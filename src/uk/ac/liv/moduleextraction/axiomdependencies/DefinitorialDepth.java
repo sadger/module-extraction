@@ -1,21 +1,14 @@
-package uk.ac.liv.moduleextraction.chaindependencies;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+package uk.ac.liv.moduleextraction.axiomdependencies;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
-
 import uk.ac.liv.ontologyutils.axioms.AxiomComparator;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.util.ModulePaths;
 import uk.ac.liv.ontologyutils.util.ModuleUtils;
+
+import java.util.*;
 
 
 

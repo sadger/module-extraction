@@ -1,20 +1,13 @@
 package uk.ac.liv.moduleextraction.checkers;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-
-import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
+import org.semanticweb.owlapi.model.*;
+import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
 import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
 import uk.ac.liv.ontologyutils.loader.OntologyLoader;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class MeaninglessEquivalenceChecker {
 

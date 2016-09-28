@@ -1,8 +1,8 @@
-package uk.ac.liv.moduleextraction.chaindependencies;
-
-import java.util.HashSet;
+package uk.ac.liv.moduleextraction.axiomdependencies;
 
 import org.semanticweb.owlapi.model.OWLEntity;
+
+import java.util.HashSet;
 
 public class  DependencySet extends HashSet<OWLEntity>{
 	public DependencySet() {

@@ -2,7 +2,7 @@ package uk.ac.liv.moduleextraction.qbf;
 
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import uk.ac.liv.moduleextraction.chaindependencies.AxiomDependencies;
+import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
 import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
 
