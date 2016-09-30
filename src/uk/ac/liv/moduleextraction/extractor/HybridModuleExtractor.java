@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import uk.ac.liv.moduleextraction.filters.OntologyFilters;
 import uk.ac.liv.moduleextraction.filters.RepeatedEqualitiesFilter;
 import uk.ac.liv.moduleextraction.filters.SharedNameFilter;
-import uk.ac.liv.moduleextraction.filters.SharedNameFilter.RemovalMethod;
 import uk.ac.liv.moduleextraction.filters.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 import uk.ac.liv.moduleextraction.signature.SigManager;
@@ -119,7 +118,7 @@ public class HybridModuleExtractor implements Extractor {
 		OntologyFilters filters = new OntologyFilters();
 		AxiomStructureInspector inspector = new AxiomStructureInspector(axioms);
 		filters.addFilter(new SupportedExpressivenessFilter());
-		filters.addFilter(new SharedNameFilter(inspector, RemovalMethod.REMOVE_EQUALITIES));
+		filters.addFilter(new SharedNameFilter(inspector));
 		filters.addFilter(new RepeatedEqualitiesFilter(inspector));
 		return filters.getUnsupportedAxioms(axioms);
 	}
