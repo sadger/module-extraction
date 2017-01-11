@@ -1,17 +1,11 @@
 package uk.ac.liv.moduleextraction.filters;
 
+import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-
-import uk.ac.liv.moduleextraction.filters.SharedNameFilter.RemovalMethod;
-import uk.ac.liv.ontologyutils.axioms.AxiomStructureInspector;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.util.ModulePaths;
 
 public class OntologyFilters implements SupportedFilter {
 
@@ -42,20 +36,6 @@ public class OntologyFilters implements SupportedFilter {
 		}
 		
 		return unsupported;
-	}
-	
-	public static void main(String[] args) {
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "interp/diff.krss");
-		OntologyFilters filters = new OntologyFilters();
-		filters.addFilter(new SupportedExpressivenessFilter());
-		filters.addFilter(new SharedNameFilter(new AxiomStructureInspector(ont), RemovalMethod.RANDOM));
-		System.out.println(ont.getLogicalAxioms());
-		Set<OWLLogicalAxiom> unsup = filters.getUnsupportedAxioms(ont.getLogicalAxioms());
-		Set<OWLLogicalAxiom> all = ont.getLogicalAxioms();
-		System.out.println("Unsupported: " + unsup);
-		all.removeAll(unsup);
-		System.out.println("Supported: " + all);
-		
 	}
 
 }

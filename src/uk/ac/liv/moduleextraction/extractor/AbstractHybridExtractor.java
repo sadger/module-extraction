@@ -1,34 +1,37 @@
 package uk.ac.liv.moduleextraction.extractor;
 
+import com.google.common.collect.ImmutableSet;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 
+import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by william on 30/09/16.
- */
-public abstract class GenericHybridExtractor implements Extractor{
 
 
+public abstract class AbstractHybridExtractor implements Extractor{
 
     Set<OWLLogicalAxiom> module;
 
-    GenericHybridExtractor(Set<OWLLogicalAxiom> ont){
+    AbstractHybridExtractor(Set<OWLLogicalAxiom> ont){
         this.module = ont;
     }
 
     @Override
     public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) {
-        module = extractUsingFirstExtractor(signature);
+
+        //Immutable copy in case extractors modify signature
+        ImmutableSet<OWLEntity> immutableSig = ImmutableSet.copyOf(signature);
+
+        module = extractUsingFirstExtractor(new HashSet<>(immutableSig));
         int prevSize = module.size();
         do {
-            module = extractUsingSecondExtractor(signature);
+            module = extractUsingSecondExtractor(new HashSet<>(immutableSig));
             if(module.size() < prevSize){
                 prevSize = module.size();
-                module = extractUsingFirstExtractor(signature);
+                module = extractUsingFirstExtractor(new HashSet<>(immutableSig));
             }
-        }while(prevSize != module.size());
+        } while(prevSize != module.size());
 
         return module;
     }
@@ -42,3 +45,4 @@ public abstract class GenericHybridExtractor implements Extractor{
     abstract Set<OWLLogicalAxiom> extractUsingSecondExtractor(Set<OWLEntity> signature);
 
 }
+

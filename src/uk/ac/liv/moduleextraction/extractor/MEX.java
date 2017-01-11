@@ -88,12 +88,15 @@ public class MEX implements Extractor {
                 OWLLogicalAxiom chosenAxiom = axiomStore.getAxiom(i);
                 OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(chosenAxiom);
 
+                //Candidate for causing an indirect dependency
                 if(chosenAxiom.getAxiomType() == AxiomType.EQUIVALENT_CLASSES
                     && sigUnionSigM.contains(name)){
 
+                    //Compute LHS dependencies
                     Set<OWLEntity> lhsDependencies = new HashSet<>(equivalenceDependencies.get(chosenAxiom));
                     lhsDependencies.removeAll(defT);
 
+                    //Compute RHS dependencies
                     Set<OWLEntity> rhsDependencies = new HashSet<>();
                     for (int j = 0; j < terminology.length; j++) {
                         if (i != j && terminology[j]) {
@@ -105,6 +108,7 @@ public class MEX implements Extractor {
                         }
                     }
 
+                    //Determine if RHS contains all LHS - an indirect dependency is detected
                     containsIndirectDependency = rhsDependencies.containsAll(lhsDependencies);
 
                     if(containsIndirectDependency){
@@ -145,7 +149,7 @@ public class MEX implements Extractor {
         OWLClass a2 = f.getOWLClass(IRI.create("X#A2"));
         OWLClass c = f.getOWLClass(IRI.create("X#C"));
 
-        Set<OWLEntity> sig = new HashSet<>(Arrays.asList(a,a1,a2,c));
+        Set<OWLEntity> sig = new HashSet<>(Arrays.asList(a,a1,a2));
 
         MEX mex = new MEX(equiv.getLogicalAxioms());
         System.out.println("Mod: " + mex.extractModule(sig));
