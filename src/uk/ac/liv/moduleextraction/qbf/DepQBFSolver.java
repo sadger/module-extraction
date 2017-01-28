@@ -6,9 +6,9 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.extractor.NDepletingModuleExtractor;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.util.ModulePaths;
-import uk.ac.liv.ontologyutils.util.ModuleUtils;
+import uk.ac.liv.moduleextraction.util.ModulePaths;
+import uk.ac.liv.moduleextraction.util.ModuleUtils;
+import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
 import java.io.BufferedWriter;
 import java.io.File;

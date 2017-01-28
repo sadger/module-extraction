@@ -1,6 +1,7 @@
 package uk.ac.liv.moduleextraction.qbf;
 
-import uk.ac.liv.ontologyutils.util.ModulePaths;
+
+import uk.ac.liv.moduleextraction.util.ModulePaths;
 
 import java.io.File;
 import java.io.IOException;

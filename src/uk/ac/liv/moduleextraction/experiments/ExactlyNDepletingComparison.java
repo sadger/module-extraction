@@ -1,22 +1,16 @@
 package uk.ac.liv.moduleextraction.experiments;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.extractor.NDepletingModuleExtractor;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
-import uk.ac.liv.moduleextraction.signature.SigManager;
-import uk.ac.liv.ontologyutils.util.CSVWriter;
-import uk.ac.liv.ontologyutils.util.ModulePaths;
-import uk.ac.liv.ontologyutils.util.ModuleUtils;
+import uk.ac.liv.moduleextraction.util.CSVWriter;
+import uk.ac.liv.moduleextraction.util.ModuleUtils;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -33,7 +27,6 @@ public class ExactlyNDepletingComparison implements Experiment {
 	private NDepletingModuleExtractor nDepletingModuleExtractor;
 	private Set<OWLLogicalAxiom> nDepletingModule;
 
-	private static final Joiner commaJoiner = Joiner.on(',');
 
 	private Stopwatch nDepletingStopwatch;
 

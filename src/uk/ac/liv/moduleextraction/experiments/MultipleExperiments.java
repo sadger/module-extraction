@@ -6,8 +6,8 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import uk.ac.liv.moduleextraction.extractor.NotEquivalentToTerminologyException;
 import uk.ac.liv.moduleextraction.signature.SigManager;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.util.ModulePaths;
+import uk.ac.liv.moduleextraction.util.ModulePaths;
+import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
 import java.io.File;
 import java.io.FileFilter;

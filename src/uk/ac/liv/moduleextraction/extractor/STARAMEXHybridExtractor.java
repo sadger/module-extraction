@@ -1,23 +1,21 @@
 package uk.ac.liv.moduleextraction.extractor;
 
 import org.semanticweb.owlapi.model.*;
+import uk.ac.liv.moduleextraction.cycles.OntologyCycleVerifier;
 import uk.ac.liv.moduleextraction.filters.OntologyFilters;
 import uk.ac.liv.moduleextraction.filters.RepeatedEqualitiesFilter;
 import uk.ac.liv.moduleextraction.filters.SharedNameFilter;
 import uk.ac.liv.moduleextraction.filters.SupportedExpressivenessFilter;
-import uk.ac.liv.ontologyutils.axioms.AxiomStructureInspector;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
-import uk.ac.liv.ontologyutils.util.ModulePaths;
-import uk.ac.liv.ontologyutils.util.ModuleUtils;
+import uk.ac.liv.moduleextraction.util.AxiomStructureInspector;
+import uk.ac.liv.moduleextraction.util.ModulePaths;
+import uk.ac.liv.moduleextraction.util.ModuleUtils;
+import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by william on 30/09/16.
- */
+
 public class STARAMEXHybridExtractor extends AbstractHybridExtractor {
 
     public STARAMEXHybridExtractor(Set<OWLLogicalAxiom> ont) {

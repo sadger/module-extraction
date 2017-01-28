@@ -8,17 +8,14 @@ import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.axiomdependencies.DefinitorialAxiomStore;
 import uk.ac.liv.moduleextraction.checkers.ELAxiomChainCollector;
 import uk.ac.liv.moduleextraction.checkers.NElementInseparableChecker;
+import uk.ac.liv.moduleextraction.cycles.OntologyCycleVerifier;
 import uk.ac.liv.moduleextraction.filters.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 import uk.ac.liv.moduleextraction.qbf.NElementSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.ontologies.OntologyCycleVerifier;
-import uk.ac.liv.ontologyutils.util.ModulePaths;
-import uk.ac.liv.ontologyutils.util.ModuleUtils;
+import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -199,100 +196,9 @@ public class NDepletingModuleExtractor implements Extractor {
 		return builder.createMetric();
 	}
 
-	public static void main(String[] args) throws IOException {
-
-
-		int test = 1;
-
-
-		File ontDir = new File(ModulePaths.getOntologyLocation() + "/OWL-Corpus-All/qbf-only/");
 
 
 
-		for(File f : ontDir.listFiles()){
-
-			OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
-			Set<OWLLogicalAxiom> ontaxioms = ont.getLogicalAxioms();
-
-			//AxiomTypeFilter typeFilter = new AxiomTypeFilter(AxiomType.INVERSE_OBJECT_PROPERTIES);
-//			ontaxioms.removeAll(typeFilter.getUnsupportedAxioms(ontaxioms));
-
-//			System.out.println("Ontsize: " + ontaxioms.size());
-
-
-
-
-			if(!f.getName().equals("32885637-5212-40a0-addd-1944a55e5812_tology.owl-QBF")){
-				System.out.println(f.getName() + ": " + test++);
-				Set<OWLLogicalAxiom> randomSample = ModuleUtils.generateRandomAxioms(ont.getLogicalAxioms(),5);
-
-				Stopwatch samplewatch = Stopwatch.createStarted();
-				for(OWLLogicalAxiom axiom : randomSample){
-
-
-					Set<OWLEntity> sig = axiom.getSignature();
-					HybridModuleExtractor hybrid = new HybridModuleExtractor(ontaxioms);
-					Set<OWLLogicalAxiom> hybridMod = hybrid.extractModule(sig);
-//                    System.out.println(hybridMod.size());
-
-
-					NDepletingModuleExtractor extractor = new NDepletingModuleExtractor(2,hybridMod);
-					Set<OWLLogicalAxiom> nDep = extractor.extractModule(sig);
-					//System.out.println(nDep.size());
-
-
-
-
-//                    System.out.println(nDep.size() == hybridMod.size());
-
-
-				}
-				samplewatch.stop();
-				System.out.println(samplewatch);
-			}
-
-
-
-			ont.getOWLOntologyManager().removeOntology(ont);
-			ont = null;
-
-		}
-
-
-
-              /*
-        Interesting
-        55e5e251-5c11-4b64-8860-066e0c8e2a77_bility.owl-QBF
-        0122fdf6-2230-4961-9e3a-94ca44ca1a2f_Qimage.owl-QBF
-        3ac2a2b1-a86e-453b-830d-6814b286da46_owl%2Fcoma-QBF
-        30ec40e7-a0b8-42fd-b814-05de85f89116_PNO-UPN.owl-QBF
-        5012d3f2-9d81-4f56-8456-4da8174aed82_1122.owl-QBF
-
-         */
-
-
-
-
-
-//		for (int j = 1; j <= 10; j++) {
-//
-//			String signame = "random10-" + j;
-//			Set<OWLEntity> sig = man.readFile(signame);
-//
-//			AxiomTypeFilter typeFilter = new AxiomTypeFilter(AxiomType.INVERSE_OBJECT_PROPERTIES);
-//			Set<OWLLogicalAxiom> ontaxioms = ontz.getLogicalAxioms();
-//			ontaxioms.removeAll(typeFilter.getUnsupportedAxioms(ontaxioms));
-//			System.out.println("Ontsize: " + ontaxioms.size());
-//
-//			HybridModuleExtractor hybrid = new HybridModuleExtractor(ontaxioms);
-//			Set<OWLLogicalAxiom> hybridMod = hybrid.extractModule(sig);
-//			System.out.println(hybridMod.size());
-//
-
-//
-//		}
-
-	}
 }
 
 //

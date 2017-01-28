@@ -5,8 +5,8 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.axiomdependencies.DefinitorialAxiomStore;
-import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
-import uk.ac.liv.ontologyutils.expressions.ELValidator;
+import uk.ac.liv.moduleextraction.util.AxiomSplitter;
+import uk.ac.liv.moduleextraction.util.ELValidator;
 
 import java.util.ArrayList;
 import java.util.HashSet;

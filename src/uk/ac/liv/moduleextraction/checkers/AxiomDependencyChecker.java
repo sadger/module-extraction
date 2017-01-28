@@ -4,7 +4,7 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
-import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
+import uk.ac.liv.moduleextraction.util.AxiomSplitter;
 
 import java.util.HashSet;
 import java.util.Set;

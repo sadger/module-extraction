@@ -11,8 +11,4 @@ public class  DependencySet extends HashSet<OWLEntity>{
 	
 	private static final long serialVersionUID = 5147803484884184934L;
 	
-	public void mergeWith(DependencySet dependencySet){
-		addAll(dependencySet);
-	}
-	
 }

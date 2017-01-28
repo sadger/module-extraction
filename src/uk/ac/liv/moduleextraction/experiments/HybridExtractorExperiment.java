@@ -7,7 +7,7 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
-import uk.ac.liv.ontologyutils.util.ModuleUtils;
+import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 

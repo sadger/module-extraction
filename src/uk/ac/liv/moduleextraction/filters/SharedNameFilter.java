@@ -2,7 +2,7 @@ package uk.ac.liv.moduleextraction.filters;
 
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import uk.ac.liv.ontologyutils.axioms.AxiomStructureInspector;
+import uk.ac.liv.moduleextraction.util.AxiomStructureInspector;
 
 import java.util.Collection;
 import java.util.HashSet;

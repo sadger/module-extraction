@@ -1,7 +1,7 @@
 package uk.ac.liv.moduleextraction.filters;
 
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import uk.ac.liv.ontologyutils.axioms.AtomicLHSAxiomVerifier;
+import uk.ac.liv.moduleextraction.util.AtomicLHSAxiomVerifier;
 
 import java.util.Collection;
 import java.util.HashSet;

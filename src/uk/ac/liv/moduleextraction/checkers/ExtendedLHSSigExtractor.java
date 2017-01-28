@@ -6,9 +6,9 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.axiomdependencies.DependencySet;
-import uk.ac.liv.ontologyutils.axioms.AtomicLHSAxiomVerifier;
-import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
-import uk.ac.liv.ontologyutils.axioms.AxiomStructureInspector;
+import uk.ac.liv.moduleextraction.util.AtomicLHSAxiomVerifier;
+import uk.ac.liv.moduleextraction.util.AxiomSplitter;
+import uk.ac.liv.moduleextraction.util.AxiomStructureInspector;
 
 import java.util.HashSet;
 import java.util.List;

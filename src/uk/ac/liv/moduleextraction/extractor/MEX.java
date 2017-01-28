@@ -4,10 +4,10 @@ import org.semanticweb.owlapi.model.*;
 import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.axiomdependencies.DefinitorialAxiomStore;
 import uk.ac.liv.moduleextraction.checkers.AxiomDependencyChecker;
-import uk.ac.liv.ontologyutils.axioms.AxiomSplitter;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.util.ModulePaths;
-import uk.ac.liv.ontologyutils.util.ModuleUtils;
+import uk.ac.liv.moduleextraction.util.AxiomSplitter;
+import uk.ac.liv.moduleextraction.util.ModulePaths;
+import uk.ac.liv.moduleextraction.util.ModuleUtils;
+import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -70,7 +70,6 @@ public class MEX implements Extractor {
                 if(terminology[i]){
                     OWLLogicalAxiom chosenAxiom = axiomStore.getAxiom(i);
                     if(axiomDependencyChecker.hasSyntacticSigDependency(chosenAxiom, dependencies, sigUnionSigM)){
-                        System.out.println("AxiomDep: " + chosenAxiom);
                         change = true;
                         module.add(chosenAxiom);
                         terminology[i] = false;
@@ -112,8 +111,6 @@ public class MEX implements Extractor {
                     containsIndirectDependency = rhsDependencies.containsAll(lhsDependencies);
 
                     if(containsIndirectDependency){
-                        System.out.println("Indirect: " + chosenAxiom);
-
                         module.add(chosenAxiom);
                         terminology[i] = false;
                         sigUnionSigM.addAll(chosenAxiom.getSignature());
