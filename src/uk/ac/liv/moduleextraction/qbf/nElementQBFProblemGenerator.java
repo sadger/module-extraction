@@ -6,11 +6,11 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import uk.ac.liv.moduleextraction.propositional.formula.PropositionalFormula;
+import uk.ac.liv.moduleextraction.propositional.nSeparability.ClauseStore;
+import uk.ac.liv.moduleextraction.propositional.nSeparability.nAxiomToClauseStore;
+import uk.ac.liv.moduleextraction.propositional.nSeparability.nEntityConvertor;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
-import uk.ac.liv.propositional.formula.PropositionalFormula;
-import uk.ac.liv.propositional.nSeparability.ClauseStore;
-import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
-import uk.ac.liv.propositional.nSeparability.nEntityConvertor;
 
 import java.io.IOException;
 import java.util.*;

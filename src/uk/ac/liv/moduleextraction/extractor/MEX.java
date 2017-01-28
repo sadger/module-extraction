@@ -1,6 +1,8 @@
 package uk.ac.liv.moduleextraction.extractor;
 
 import org.semanticweb.owlapi.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.axiomdependencies.DefinitorialAxiomStore;
 import uk.ac.liv.moduleextraction.checkers.AxiomDependencyChecker;
@@ -27,6 +29,9 @@ public class MEX implements Extractor {
     private Set<OWLLogicalAxiom> module;
     private Set<OWLEntity> sigUnionSigM;
 
+    private Logger logger = LoggerFactory.getLogger(MEX.class);
+
+
     public MEX(OWLOntology ontology) {
         this(ontology.getLogicalAxioms());
     }
@@ -45,6 +50,7 @@ public class MEX implements Extractor {
 
     @Override
     public Set<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature) {
+        logger.debug("Extracting MEX module for signature {}", (signature.size() < 15) ? signature : "|" + signature.size() + "|");
         boolean[] terminology = axiomStore.allAxiomsAsBoolean();
         module = existingModule;
         sigUnionSigM = ModuleUtils.getClassAndRoleNamesInSet(existingModule);
@@ -70,6 +76,7 @@ public class MEX implements Extractor {
                 if(terminology[i]){
                     OWLLogicalAxiom chosenAxiom = axiomStore.getAxiom(i);
                     if(axiomDependencyChecker.hasSyntacticSigDependency(chosenAxiom, dependencies, sigUnionSigM)){
+                        logger.trace("Axiom dependency: {}", chosenAxiom);
                         change = true;
                         module.add(chosenAxiom);
                         terminology[i] = false;
@@ -111,6 +118,7 @@ public class MEX implements Extractor {
                     containsIndirectDependency = rhsDependencies.containsAll(lhsDependencies);
 
                     if(containsIndirectDependency){
+                        logger.trace("Indirect dependency: {}", chosenAxiom);
                         module.add(chosenAxiom);
                         terminology[i] = false;
                         sigUnionSigM.addAll(chosenAxiom.getSignature());

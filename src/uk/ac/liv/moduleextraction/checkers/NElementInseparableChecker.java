@@ -2,10 +2,10 @@ package uk.ac.liv.moduleextraction.checkers;
 
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import uk.ac.liv.moduleextraction.propositional.nSeparability.nAxiomToClauseStore;
 import uk.ac.liv.moduleextraction.qbf.DepQBFSolver;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.qbf.nElementQBFProblemGenerator;
-import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
 
 import java.io.IOException;
 import java.util.Collection;

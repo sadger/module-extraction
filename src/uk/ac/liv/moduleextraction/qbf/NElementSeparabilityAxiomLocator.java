@@ -3,7 +3,7 @@ package uk.ac.liv.moduleextraction.qbf;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import uk.ac.liv.moduleextraction.checkers.NElementInseparableChecker;
-import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
+import uk.ac.liv.moduleextraction.propositional.nSeparability.nAxiomToClauseStore;
 
 import java.io.IOException;
 import java.util.Arrays;

@@ -11,10 +11,10 @@ import uk.ac.liv.moduleextraction.checkers.NElementInseparableChecker;
 import uk.ac.liv.moduleextraction.cycles.OntologyCycleVerifier;
 import uk.ac.liv.moduleextraction.filters.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
+import uk.ac.liv.moduleextraction.propositional.nSeparability.nAxiomToClauseStore;
 import uk.ac.liv.moduleextraction.qbf.NElementSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
-import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
 
 import java.io.IOException;
 import java.util.ArrayList;

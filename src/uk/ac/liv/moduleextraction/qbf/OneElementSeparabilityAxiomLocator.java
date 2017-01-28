@@ -4,7 +4,7 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
-import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
+import uk.ac.liv.moduleextraction.propositional.nSeparability.nAxiomToClauseStore;
 
 import java.util.Arrays;
 import java.util.Collection;

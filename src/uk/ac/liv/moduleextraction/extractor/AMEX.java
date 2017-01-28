@@ -10,12 +10,12 @@ import uk.ac.liv.moduleextraction.checkers.AxiomDependencyChecker;
 import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.NElementInseparableChecker;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
+import uk.ac.liv.moduleextraction.propositional.nSeparability.nAxiomToClauseStore;
 import uk.ac.liv.moduleextraction.qbf.OneElementSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.moduleextraction.util.OntologyLoader;
-import uk.ac.liv.propositional.nSeparability.nAxiomToClauseStore;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -71,6 +71,7 @@ public class AMEX implements Extractor{
 	
 	@Override
 	public Set<OWLLogicalAxiom> extractModule(Set<OWLLogicalAxiom> existingModule, Set<OWLEntity> signature) {
+		logger.debug("Extracting AMEX module for signature {}", signature);
 
 		resetMetrics();
 		metricBuilder = new ExtractionMetric.MetricBuilder(ExtractionMetric.ExtractionType.AMEX);
