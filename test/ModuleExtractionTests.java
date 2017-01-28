@@ -4,7 +4,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({HybridModuleExtraction.class})
+@SuiteClasses({HybridModuleExtraction.class, MEXExtraction.class})
 
 public class ModuleExtractionTests {
 

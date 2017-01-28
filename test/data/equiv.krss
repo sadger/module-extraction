@@ -1,0 +1,4 @@
+(implies C A2)
+(implies A1 B1)
+(implies A2 B2)
+(define-concept A (and B1 B2))

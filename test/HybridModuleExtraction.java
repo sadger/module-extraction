@@ -3,8 +3,8 @@ import org.junit.Test;
 import org.semanticweb.owlapi.model.*;
 import uk.ac.liv.moduleextraction.extractor.STARAMEXHybridExtractor;
 import uk.ac.liv.moduleextraction.extractor.STARExtractor;
-import uk.ac.liv.ontologyutils.loader.OntologyLoader;
-import uk.ac.liv.ontologyutils.util.ModuleUtils;
+import uk.ac.liv.moduleextraction.util.ModuleUtils;
+import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
 import java.io.File;
 import java.net.URL;
