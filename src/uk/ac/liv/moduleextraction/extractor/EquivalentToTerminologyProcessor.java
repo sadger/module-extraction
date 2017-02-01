@@ -4,7 +4,9 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.liv.moduleextraction.util.*;
+import uk.ac.liv.moduleextraction.util.AtomicLHSAxiomVerifier;
+import uk.ac.liv.moduleextraction.util.AxiomSplitter;
+import uk.ac.liv.moduleextraction.util.EquivalentToTerminologyChecker;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -135,38 +137,6 @@ public class EquivalentToTerminologyProcessor {
 		return module;
 	}
 
-
-	public static void main(String[] args) throws OWLOntologyCreationException, NotEquivalentToTerminologyException {
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/examples/equivterm.krss");
-		EquivalentToTerminologyProcessor terminologyProcessor = new EquivalentToTerminologyProcessor(ont.getLogicalAxioms());
-		ModuleUtils.remapIRIs(ont, "X");
-
-		System.out.println(ont.getLogicalAxioms());
-
-		OWLDataFactory f = ont.getOWLOntologyManager().getOWLDataFactory();
-		OWLClass a = f.getOWLClass(IRI.create("X#A"));
-		OWLClass b = f.getOWLClass(IRI.create("X#B"));
-		OWLClass c = f.getOWLClass(IRI.create("X#C"));
-		OWLClass d = f.getOWLClass(IRI.create("X#D"));
-		Set<OWLEntity> sig = new HashSet<OWLEntity>();
-		sig.add(a);
-		sig.add(b);
-
-		EquivalentToTerminologyExtractor extract = new EquivalentToTerminologyExtractor(ont);
-		NDepletingModuleExtractor extract1 = new NDepletingModuleExtractor(1,ont.getLogicalAxioms());
-		NDepletingModuleExtractor extract2 = new NDepletingModuleExtractor(2,ont.getLogicalAxioms());
-
-		System.out.println(extract.extractModule(sig));
-		System.out.println(extract.getMetrics());
-		System.out.println(extract1.extractModule(sig));
-		System.out.println(extract1.getMetrics());
-		System.out.println(extract2.extractModule(sig));
-		System.out.println(extract2.getMetrics());
-		System.out.println(extract1.extractModule(sig));
-		System.out.println(extract1.getMetrics());
-		System.out.println(extract2.extractModule(sig));
-		System.out.println(extract2.getMetrics());
-	}
 
 
 
