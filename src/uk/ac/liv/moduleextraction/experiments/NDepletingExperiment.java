@@ -1,20 +1,16 @@
 package uk.ac.liv.moduleextraction.experiments;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.extractor.NDepletingModuleExtractor;
-import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 import uk.ac.liv.moduleextraction.util.CSVWriter;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -134,22 +130,6 @@ public class NDepletingExperiment implements  Experiment{
             csvWriter.addMetric("SignatureLocation", signatureLocation.getAbsolutePath());
         }
         csvWriter.writeCSVFile();
-
-
-        BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "iteration-metrics.csv", false));
-        writer.write("Type, Size, Time, QBFChecks, SyntacticChecks, SeparabilityAxioms" + "\n");
-        for(ExtractionMetric metric : hybridExperiment.getIterationMetrics()){
-            ArrayList<Object> metricList = new ArrayList<Object>();
-            metricList.add(metric.getType());
-            metricList.add(metric.getModuleSize());
-            metricList.add(metric.getTimeTaken());
-            metricList.add(metric.getQbfChecks());
-            metricList.add(metric.getSyntacticChecks());
-            metricList.add(metric.getSeparabilityAxiomCount());
-            writer.write(Joiner.on(',').join(metricList));
-            writer.write("\n");
-        }
-        writer.close();
 
         CSVWriter metricWriter = new CSVWriter(experimentLocation.getAbsoluteFile() + "/" + "n-depleting-metrics.csv");
         metricWriter.addMetric("STARSize", hybridExperiment.getStarModule().size());

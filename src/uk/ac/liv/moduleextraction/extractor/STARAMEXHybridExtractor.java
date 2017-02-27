@@ -1,22 +1,21 @@
 package uk.ac.liv.moduleextraction.extractor;
 
-import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import uk.ac.liv.moduleextraction.cycles.OntologyCycleVerifier;
 import uk.ac.liv.moduleextraction.filters.OntologyFilters;
 import uk.ac.liv.moduleextraction.filters.RepeatedEqualitiesFilter;
 import uk.ac.liv.moduleextraction.filters.SharedNameFilter;
 import uk.ac.liv.moduleextraction.filters.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.util.AxiomStructureInspector;
-import uk.ac.liv.moduleextraction.util.ModulePaths;
-import uk.ac.liv.moduleextraction.util.ModuleUtils;
-import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 
 public class STARAMEXHybridExtractor extends AbstractHybridExtractor {
+
+    private int starExtractions;
+    private int amexExtractions;
 
     public STARAMEXHybridExtractor(Set<OWLLogicalAxiom> ont) {
         super(ont);
@@ -24,12 +23,14 @@ public class STARAMEXHybridExtractor extends AbstractHybridExtractor {
 
     @Override
     Set<OWLLogicalAxiom> extractUsingFirstExtractor(Set<OWLEntity> signature) {
+        starExtractions++;
         STARExtractor starExtractor = new STARExtractor(module);
         return starExtractor.extractModule(signature);
     }
 
     @Override
     Set<OWLLogicalAxiom> extractUsingSecondExtractor(Set<OWLEntity> signature) {
+        amexExtractions++;
         Set<OWLLogicalAxiom> unsupported = getUnsupportedAxioms(module);
         module.removeAll(unsupported);
         Set<OWLLogicalAxiom> cycleCausing = getCycleCausingAxioms(module);
@@ -53,27 +54,12 @@ public class STARAMEXHybridExtractor extends AbstractHybridExtractor {
         return cycleVerifier.getCycleCausingAxioms();
     }
 
-    public static void main(String[] args) {
-        OWLOntology food = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/distribution/food.owl");
-        ModuleUtils.remapIRIs(food, "X");
+    public int getAmexExtractions() {
+        return amexExtractions;
+    }
 
-        food.getLogicalAxioms().forEach(System.out::println);
-        OWLDataFactory f = food.getOWLOntologyManager().getOWLDataFactory();
-
-        OWLObjectProperty hasFood = f.getOWLObjectProperty(IRI.create("X#hasFood"));
-
-        Set<OWLEntity> sig = new HashSet<>(Arrays.asList(hasFood));
-
-        System.out.println(food.getSignature().contains(hasFood));
-
-        STARAMEXHybridExtractor starAmex = new STARAMEXHybridExtractor(food.getLogicalAxioms());
-        Set<OWLLogicalAxiom> module = starAmex.extractModule(sig);
-
-        STARExtractor extractor = new STARExtractor(food.getLogicalAxioms());
-        System.out.println(extractor.extractModule(sig));
-
-        System.out.println(module);
-
+    public int getStarExtractions() {
+        return starExtractions;
     }
 
 }

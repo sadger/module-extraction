@@ -5,8 +5,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import uk.ac.liv.moduleextraction.extractor.HybridModuleExtractor;
-import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
+import uk.ac.liv.moduleextraction.extractor.STARAMEXHybridExtractor;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
@@ -15,14 +14,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class HybridExtractorExperiment implements Experiment {
 
 	private SyntacticLocalityModuleExtractor starExtractor;
-	private HybridModuleExtractor iteratingExtractor;
+	private STARAMEXHybridExtractor hybridExtractor;
 	private int starSize = 0;
 	private int itSize = 0;
 	private Set<OWLLogicalAxiom> starModule;
@@ -37,16 +35,11 @@ public class HybridExtractorExperiment implements Experiment {
 	public HybridExtractorExperiment(OWLOntology ont, File originalLocation) {
 		this.ontology = ont;
 		this.location = originalLocation;
-	
 		this.starExtractor = new SyntacticLocalityModuleExtractor(ont.getOWLOntologyManager(), ont, ModuleType.STAR);
 	}
 
-
-
 	@Override
 	public void performExperiment(Set<OWLEntity> signature) {
-
-
 		starWatch = Stopwatch.createStarted();
 		//Compute the star module on it's own
 		Set<OWLAxiom> starAxioms = starExtractor.extract(signature);
@@ -57,16 +50,14 @@ public class HybridExtractorExperiment implements Experiment {
 		starSize = starModule.size();
 
 		//Begin with the STAR module as it's the basis of the hybrid process anyway
-		iteratingExtractor = new HybridModuleExtractor(starModule);
+		hybridExtractor= new STARAMEXHybridExtractor(starModule);
 
 		hybridWatch = Stopwatch.createStarted();
 		//And then the iterated one 
-		itModule = iteratingExtractor.extractModule(signature);
+		itModule = hybridExtractor.extractModule(signature);
 		itSize = itModule.size();
 		//		
 		hybridWatch.stop();
-
-
 	}
 
 	public int getIteratedSize(){
@@ -93,12 +84,9 @@ public class HybridExtractorExperiment implements Experiment {
 		return starWatch;
 	}
 
-	public int getAMEXExtractions(){ return iteratingExtractor.getAmexExtrations(); }
-	public int getSTARExtractions(){ return iteratingExtractor.getStarExtractions(); }
+	public int getAMEXExtractions(){ return hybridExtractor.getAmexExtractions(); }
+	public int getSTARExtractions(){ return hybridExtractor.getStarExtractions(); }
 
-	public ArrayList<ExtractionMetric> getIterationMetrics(){
-		return iteratingExtractor.getIterationMetrics();
-	}
 
 	public void performExperiment(Set<OWLEntity> signature, File signatureLocation){
 		this.sigLocation = signatureLocation;
@@ -108,12 +96,11 @@ public class HybridExtractorExperiment implements Experiment {
 
 	@Override
 	public void writeMetrics(File experimentLocation) throws IOException {
-
 		BufferedWriter writer = new BufferedWriter(new FileWriter(experimentLocation.getAbsoluteFile() + "/" + "experiment-results", false));
 
 		writer.write("StarSize, IteratedSize, Difference, StarExtractions, AmexExtractions, StarTime, IteratedTime, OntLocation, SigLocation" + "\n");
 		writer.write(starSize + "," + itSize + "," + ((starSize == itSize) ? "0" : "1") + "," +
-				iteratingExtractor.getStarExtractions() + "," + iteratingExtractor.getAmexExtrations() + "," + 
+				hybridExtractor.getStarExtractions() + "," + hybridExtractor.getAmexExtractions() + "," +
 				+ starWatch.elapsed(TimeUnit.MILLISECONDS) + "," + hybridWatch.elapsed(TimeUnit.MILLISECONDS) + ","
 				+ location.getAbsolutePath() + "," + sigLocation.getAbsolutePath() + "\n");
 		writer.flush();
@@ -124,7 +111,7 @@ public class HybridExtractorExperiment implements Experiment {
 	public void printMetrics(){
 		System.out.print("StarSize, IteratedSize, Difference, StarExtractions, AmexExtractions, StarTime, HybridTime" + "\n");
 		System.out.print(starSize + "," + itSize + "," + ((starSize == itSize) ? "0" : "1") + "," +
-				iteratingExtractor.getStarExtractions() + "," + iteratingExtractor.getAmexExtrations() 
+				hybridExtractor.getStarExtractions() + "," + hybridExtractor.getAmexExtractions()
 				+ "," + 	starWatch.toString() + "," + hybridWatch.toString() + "\n");
 
 	}
