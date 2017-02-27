@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class SupportedExpressivenessFilter implements SupportedFilter {
+public class ALCQIwithAtomicLHSFilter implements SupportedFilter {
 
 	@Override
 	public boolean isRequired() {

@@ -19,7 +19,7 @@ public class AtomicLHSAxiomVerifier {
 	public boolean isSupportedAxiom(OWLLogicalAxiom axiom){
 		
 		AxiomType<?> type = axiom.getAxiomType();
-		SupportedExpressionVerifier expressionVerifier = new SupportedExpressionVerifier();
+		ALCQIExpressionVerifier expressionVerifier = new ALCQIExpressionVerifier();
 	
 		if(type == AxiomType.SUBCLASS_OF || type == AxiomType.EQUIVALENT_CLASSES){
 			

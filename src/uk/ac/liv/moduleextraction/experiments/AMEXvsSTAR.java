@@ -2,7 +2,7 @@ package uk.ac.liv.moduleextraction.experiments;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
-import uk.ac.liv.moduleextraction.extractor.EquivalentToTerminologyExtractor;
+import uk.ac.liv.moduleextraction.extractor.AMEX;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
@@ -18,7 +18,7 @@ public class AMEXvsSTAR implements Experiment {
 
 	OWLOntologyManager manager;
 	OWLOntology ontology;
-	EquivalentToTerminologyExtractor semanticExtractor;
+	AMEX amex;
 	SyntacticLocalityModuleExtractor syntaxModExtractor;
 	Set<OWLLogicalAxiom> syntacticModule = null;
 	Set<OWLLogicalAxiom> semanticModule = null;
@@ -27,7 +27,7 @@ public class AMEXvsSTAR implements Experiment {
 	public AMEXvsSTAR(OWLOntology ontology) {
 		this.manager = ontology.getOWLOntologyManager();
 		this.syntaxModExtractor = new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.STAR);
-		this.semanticExtractor = new EquivalentToTerminologyExtractor(ontology);
+		this.amex = new AMEX(ontology);
 	}
 	
 	@Override
@@ -37,16 +37,13 @@ public class AMEXvsSTAR implements Experiment {
 		Set<OWLAxiom> syntacticOntology = syntaxModExtractor.extract(signature);
 		
 		syntacticModule = getLogicalAxioms(syntacticOntology);
-		semanticModule = semanticExtractor.extractModule(signature);
-		
+		semanticModule = amex.extractModule(signature);
 
 	}
 
 	@Override
 	public void writeMetrics(File experimentLocation) throws IOException {
-//		writeResults(experimentLocation);
-//		writeMetricsToFile(experimentLocation, semanticExtractor.getMetrics(), "metrics");
-//		writeMetricsToFile(experimentLocation, semanticExtractor.getQBFMetrics(), "qbf-metrics");
+		writeResults(experimentLocation);
 	}
 	
 	public void writeResults(File experimentLocation) throws IOException{		

@@ -9,7 +9,7 @@ import uk.ac.liv.moduleextraction.axiomdependencies.DefinitorialAxiomStore;
 import uk.ac.liv.moduleextraction.checkers.ELAxiomChainCollector;
 import uk.ac.liv.moduleextraction.checkers.NElementInseparableChecker;
 import uk.ac.liv.moduleextraction.cycles.OntologyCycleVerifier;
-import uk.ac.liv.moduleextraction.filters.SupportedExpressivenessFilter;
+import uk.ac.liv.moduleextraction.filters.ALCQIwithAtomicLHSFilter;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 import uk.ac.liv.moduleextraction.propositional.nSeparability.nAxiomToClauseStore;
 import uk.ac.liv.moduleextraction.qbf.NElementSeparabilityAxiomLocator;
@@ -91,7 +91,7 @@ public class NDepletingModuleExtractor implements Extractor {
 		boolean[] terminology = axiomStore.allAxiomsAsBoolean();
 		allAxioms = axiomStore.getSubsetAsList(terminology);
 
-		SupportedExpressivenessFilter filter = new SupportedExpressivenessFilter();
+		ALCQIwithAtomicLHSFilter filter = new ALCQIwithAtomicLHSFilter();
 		expressive = filter.getUnsupportedAxioms(allAxioms);
 		allAxioms.removeAll(expressive);
 

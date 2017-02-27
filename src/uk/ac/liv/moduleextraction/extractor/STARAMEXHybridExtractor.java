@@ -3,10 +3,10 @@ package uk.ac.liv.moduleextraction.extractor;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import uk.ac.liv.moduleextraction.cycles.OntologyCycleVerifier;
+import uk.ac.liv.moduleextraction.filters.ALCQIwithAtomicLHSFilter;
 import uk.ac.liv.moduleextraction.filters.OntologyFilters;
 import uk.ac.liv.moduleextraction.filters.RepeatedEqualitiesFilter;
 import uk.ac.liv.moduleextraction.filters.SharedNameFilter;
-import uk.ac.liv.moduleextraction.filters.SupportedExpressivenessFilter;
 import uk.ac.liv.moduleextraction.util.AxiomStructureInspector;
 
 import java.util.Set;
@@ -31,6 +31,8 @@ public class STARAMEXHybridExtractor extends AbstractHybridExtractor {
     @Override
     Set<OWLLogicalAxiom> extractUsingSecondExtractor(Set<OWLEntity> signature) {
         amexExtractions++;
+
+        //Remove any axioms which cause ontology to not be an acyclic ALCQI terminology with RCIs
         Set<OWLLogicalAxiom> unsupported = getUnsupportedAxioms(module);
         module.removeAll(unsupported);
         Set<OWLLogicalAxiom> cycleCausing = getCycleCausingAxioms(module);
@@ -43,8 +45,11 @@ public class STARAMEXHybridExtractor extends AbstractHybridExtractor {
     private Set<OWLLogicalAxiom> getUnsupportedAxioms(Set<OWLLogicalAxiom> axioms){
         OntologyFilters filters = new OntologyFilters();
         AxiomStructureInspector inspector = new AxiomStructureInspector(axioms);
-        filters.addFilter(new SupportedExpressivenessFilter());
+        //Locate all axioms that are not ALCQI or do not have an atomic LHS..
+        filters.addFilter(new ALCQIwithAtomicLHSFilter());
+        //.. and those axioms with shared names ..
         filters.addFilter(new SharedNameFilter(inspector));
+        //.. finally any repeated equalities
         filters.addFilter(new RepeatedEqualitiesFilter(inspector));
         return filters.getUnsupportedAxioms(axioms);
     }

@@ -13,25 +13,9 @@ public class TarjanStronglyConnectedComponents {
 	private HashSet<HashSet<OWLClass>> stronglyconnected = new HashSet<HashSet<OWLClass>>();
 	
 	int index = 0;
-	
-	int max = 1;
-	int total = 0;
-	int count = 0;
-	
-	
-	public TarjanStronglyConnectedComponents() {
-		
-	}
-	
+
 	public void performTarjan(Graph graph){
-		for(Vertex v : graph.values()){
-			if(v.index == -1){
-				stronglyConnect(v);
-			}
-		}
-//		System.out.println("C: " + count);
-//		System.out.println("Max: " + max);
-//		System.out.println("Avg: " + (double) total/count);
+		graph.values().stream().filter(v -> v.index == -1).forEach(this::stronglyConnect);
 	}
 	
 	public HashSet<HashSet<OWLClass>> getStronglyConnectComponents() {
@@ -50,28 +34,20 @@ public class TarjanStronglyConnectedComponents {
 			if(adj.index == -1){
 				stronglyConnect(adj);
 				v.lowlink = Math.min(v.lowlink, adj.lowlink);
-				//System.out.println(v + " lowlink = " + v.lowlink);
 			}
 			else if (adj.onStack){
 				v.lowlink = Math.min(v.lowlink, adj.index);
-				//System.out.println(v + " lowlink = " + v.lowlink);
 			}
 			
 		}
 		if (v.lowlink == v.index) {
 			HashSet<OWLClass> sc = new HashSet<OWLClass>();
-			Vertex n = null;
+			Vertex n;
 			do {
 				n = vertexStack.pop();
 				n.onStack = false;
 				sc.add(n.value);
-			}while(!n.equals(v));
-			if(sc.size() > 1){
-//				count++;
-//				total += sc.size();
-//				max = Math.max(max, sc.size());
-//				System.out.println(sc.size());
-			}
+			} while(!n.equals(v));
 			stronglyconnected.add(sc);
 		}
 	}

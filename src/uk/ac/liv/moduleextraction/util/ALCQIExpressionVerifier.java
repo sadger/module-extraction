@@ -2,10 +2,8 @@ package uk.ac.liv.moduleextraction.util;
 
 import org.semanticweb.owlapi.model.*;
 
-/**
-* Created by william on 21/05/16.
-*/
-public class SupportedExpressionVerifier implements OWLClassExpressionVisitorEx<Boolean> {
+
+public class ALCQIExpressionVerifier implements OWLClassExpressionVisitorEx<Boolean> {
 
     @Override
     public Boolean visit(OWLClass arg0) {

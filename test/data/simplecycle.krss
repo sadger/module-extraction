@@ -1,0 +1,4 @@
+(implies D A)
+(implies A B)
+(implies B C)
+(implies C D)
