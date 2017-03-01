@@ -72,6 +72,7 @@ public class GraphBuilder {
 		public int lowlink = -1;
 		public HashSet<OWLLogicalAxiom> axioms = new HashSet<OWLLogicalAxiom>();
 		public boolean joinedToSelf = false;
+
 		
 		public Vertex(OWLClass value) {
 			this.value = value;

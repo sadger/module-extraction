@@ -7,9 +7,10 @@ import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -31,6 +32,7 @@ public class CycleTest {
         OWLOntology simple = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/simplecycle.krss");
         ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(simple.getLogicalAxioms());
 
+
         /*
         0: D ⊑ A
         1: A ⊑ B
@@ -50,8 +52,79 @@ public class CycleTest {
     public void complexCycle(){
         OWLOntology complex = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/complexcycle.krss");
         ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(complex.getLogicalAxioms());
-        axioms.forEach(System.out::println);
+        Collections.sort(axioms);
 
+        /*
+        0: C ≡ D ⊓ F
+        1: W ≡ Z ⊓ (∀ r.W)
+        2: A ⊑ B
+        3: A ⊑ ∃ r.E
+        4: B ⊑ C ⊓ E
+        5: D ⊑ ∀ r.A
+        6: E ⊑ G
+        7: G ⊑ H ⊓ I
+        8: H ⊑ ∃ r.G
+        9: X ⊑ Y ⊔ Z
+        */
+
+        OntologyCycleVerifier verifier = new OntologyCycleVerifier(axioms);
+        //Whole ontology is cyclic
+        assertTrue(verifier.isCyclic());
+
+        //Cycle: [B ⊑ C ⊓ E, C ≡ D ⊓ F, D ⊑ ∀ r.A, A ⊑ B] + [A ⊑ ∃ r.E]
+        HashSet<OWLLogicalAxiom> cyclicSubset = new HashSet<>(
+                Arrays.asList(axioms.get(4), axioms.get(0),
+                        axioms.get(5), axioms.get(2), axioms.get(3)));
+
+        verifier = new OntologyCycleVerifier(cyclicSubset);
+
+        assertTrue("Subset is cyclic", verifier.isCyclic());
+
+        Set<OWLLogicalAxiom> cycleCausing = verifier.getCycleCausingAxioms();
+
+        //Does not contain [A ⊑ ∃ r.E] even though uses concept name A
+        assertTrue("Cycle causing set contains unnecessary axiom", !cycleCausing.contains(axioms.get(3)));
+
+        //Cycle [H ⊑ ∃ r.G, G ⊑ H ⊓ I] + [E ⊑ G]
+        cyclicSubset = new HashSet<>(
+                Arrays.asList(axioms.get(6), axioms.get(7),
+                        axioms.get(8)));
+
+
+        verifier = new OntologyCycleVerifier(cyclicSubset);
+
+        assertTrue("Subset is cyclic", verifier.isCyclic());
+
+        cycleCausing = verifier.getCycleCausingAxioms();
+
+        System.out.println(cycleCausing);
+
+        assertTrue("Cycle causing set contains unnecessary axiom" + " " + axioms.get(6), !cycleCausing.contains(axioms.get(6)));
+
+        //Single axiom  W ≡ Z ⊓ (∀ r.W)
+        cyclicSubset = new HashSet<>(Arrays.asList(axioms.get(1)));
+
+        verifier = new OntologyCycleVerifier(cyclicSubset);
+
+        assertTrue("Subset is cyclic", verifier.isCyclic());
+    }
+
+    @Test //Thesis example
+    public void removeCycle(){
+        OWLOntology complex = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/complexcycle.krss");
+
+        ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(complex.getLogicalAxioms());
+        OntologyCycleVerifier verifier = new OntologyCycleVerifier(axioms);
+
+        assertTrue("Ontology is cyclic", verifier.isCyclic());
+
+        //Remove those causing a cycle
+        axioms.removeAll(verifier.getCycleCausingAxioms());
+
+        //Check the result is acyclic
+        verifier = new OntologyCycleVerifier(axioms);
+
+        assertFalse("Ontology should be acyclic",  verifier.isCyclic());
     }
 
 }

@@ -20,7 +20,6 @@ import java.util.Set;
 
 public class DepQBFSolver {
 
-    //CONSIDER USING TROVE (or other high performance library) for unboxed primitive collections
     private Collection<Integer> universal;
     private Collection<Integer> existential;
     private final Set<int[]> clauses;

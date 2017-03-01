@@ -31,17 +31,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$JAR_LOCATION$/trove-3.0.3.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.6.1" level="project" />
-    <orderEntry type="library" name="Maven: com.google.guava:guava:18.0" level="project" />
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$JAR_LOCATION$/owlapi-distribution-3.5.2.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -70,6 +59,15 @@
       <library>
         <CLASSES>
           <root url="jar://$JAR_LOCATION$/slf4j-simple-1.7.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$JAR_LOCATION$/trove4j-3.0.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

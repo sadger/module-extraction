@@ -1,8 +1,6 @@
 package uk.ac.liv.moduleextraction.cycles;
 
-import com.google.common.base.Stopwatch;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.util.AxiomSplitter;
@@ -11,7 +9,6 @@ import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,13 +25,10 @@ public class OntologyCycleVerifier {
 	
 	public OntologyCycleVerifier(Collection<OWLLogicalAxiom> axioms) {
 		this.axioms = axioms;
-		Stopwatch watch = Stopwatch.createStarted();
 		GraphBuilder builder = new GraphBuilder();
 		g = builder.buildGraph(axioms);
 		tarj = new TarjanStronglyConnectedComponents();
 		tarj.performTarjan(g);
-		watch.stop();
-		//System.out.println("Time taken to build and compute SCC: "  + watch.toString());
 	}
 	
 	public boolean isCyclic() {
@@ -68,22 +62,6 @@ public class OntologyCycleVerifier {
 		return cycleCausing;
 	}
 	
-	public HashSet<OWLClass> getDependsOnCycleNames(){
-		HashSet<OWLClass> dependsCycle = new HashSet<OWLClass>();
-		HashSet<OWLClass> cycleCausing = getCycleCausingNames();
-		for(OWLLogicalAxiom axiom : axioms){
-			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
-			OWLClassExpression def = AxiomSplitter.getDefinitionofAxiom(axiom);
-			if(!cycleCausing.contains(name)){
-				for(OWLClass cls : def.getClassesInSignature()){
-					if(cycleCausing.contains(cls)){
-						dependsCycle.add(name);
-					}
-				}
-			}
-		}
-		return dependsCycle;
-	}
 
 	/* Naive approach - must currently be used in one-depleting modules */
 	public Set<OWLLogicalAxiom> getCycleCausingAxioms(){
@@ -98,38 +76,8 @@ public class OntologyCycleVerifier {
 		return cycleCausing;
 	}
 	
-	public Set<OWLLogicalAxiom> getAxiomsForNames(Set<OWLClass> names){
-		Set<OWLLogicalAxiom> namedAxioms = new HashSet<OWLLogicalAxiom>();
-		for(OWLLogicalAxiom ax : axioms){
-			OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(ax);
-			if(names.contains(name)){
-				namedAxioms.add(ax);
-			}
-		}
-		return namedAxioms;
-	}
-	
-	public Set<OWLLogicalAxiom> getBetterCycleCausingAxioms(){
-		CycleRemover remove = new CycleRemover();
-		Set<OWLLogicalAxiom> cycleCausing = new HashSet<OWLLogicalAxiom>();
-		
-		for(HashSet<OWLClass> component : tarj.getStronglyConnectComponents()){
-			if(component.size() > 1){
-				Set<OWLLogicalAxiom> namedInComponent = getAxiomsForNames(component);
-				namedInComponent.removeAll(remove.getAcyclicSubset(namedInComponent));
-				cycleCausing.addAll(namedInComponent);
-			}
-		}
-		for(GraphBuilder.Vertex v : g.values()){
-			if(v.joinedToSelf){
-				cycleCausing.addAll(getAxiomsForNames(Collections.singleton(v.value)));
-			}
-		}
-		
-		
-		return cycleCausing;
-	}
-	
+
+
 	public void printSCC(){
 		for(HashSet<OWLClass> component : tarj.getStronglyConnectComponents()){
 			if(component.size() > 1){
@@ -147,7 +95,7 @@ public class OntologyCycleVerifier {
 		System.out.println("Cyclic?: " + cycle.isCyclic());
 		cycle.printSCC();
 
-		
-		
+
+
 	}
 }
