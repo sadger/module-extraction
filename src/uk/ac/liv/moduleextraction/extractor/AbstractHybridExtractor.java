@@ -17,15 +17,16 @@ public abstract class AbstractHybridExtractor implements Extractor{
     protected Set<OWLLogicalAxiom> module;
     private ArrayList<ExtractionMetric> iterationMetrics;
     private Stopwatch hybridWatch;
+    private Set<OWLLogicalAxiom> axioms;
 
     AbstractHybridExtractor(Set<OWLLogicalAxiom> ont){
-        this.module = ont;
         iterationMetrics = new ArrayList<>();
+        this.axioms = ont;
     }
 
     @Override
     public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) {
-
+        this.module = new HashSet<>(axioms);
         //Immutable copy in case extractors modify signature
         ImmutableSet<OWLEntity> immutableSig = ImmutableSet.copyOf(signature);
 

@@ -9,9 +9,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by william on 27/02/17.
@@ -44,7 +42,7 @@ public class CycleTest {
 
         //Ontology is cyclic and all axioms contribute to cycle
         assertTrue(verifier.isCyclic());
-        assertEquals(axioms, new ArrayList<>(verifier.getCycleCausingAxioms()));
+        assertEquals(axioms, new ArrayList<>(verifier.getCycleCausingAxioms(true)));
 
     }
 
@@ -80,10 +78,11 @@ public class CycleTest {
 
         assertTrue("Subset is cyclic", verifier.isCyclic());
 
-        Set<OWLLogicalAxiom> cycleCausing = verifier.getCycleCausingAxioms();
+        Set<OWLLogicalAxiom> cycleCausing = verifier.getCycleCausingAxioms(true);
 
+        OWLLogicalAxiom unnecessaryAxiom = axioms.get(3);
         //Does not contain [A ⊑ ∃ r.E] even though uses concept name A
-        assertTrue("Cycle causing set contains unnecessary axiom", !cycleCausing.contains(axioms.get(3)));
+        assertTrue("Cycle causing set contains unnecessary axiom: " + unnecessaryAxiom, !cycleCausing.contains(unnecessaryAxiom));
 
         //Cycle [H ⊑ ∃ r.G, G ⊑ H ⊓ I] + [E ⊑ G]
         cyclicSubset = new HashSet<>(
@@ -95,7 +94,7 @@ public class CycleTest {
 
         assertTrue("Subset is cyclic", verifier.isCyclic());
 
-        cycleCausing = verifier.getCycleCausingAxioms();
+        cycleCausing = verifier.getCycleCausingAxioms(true);
 
         System.out.println(cycleCausing);
 
@@ -119,7 +118,9 @@ public class CycleTest {
         assertTrue("Ontology is cyclic", verifier.isCyclic());
 
         //Remove those causing a cycle
-        axioms.removeAll(verifier.getCycleCausingAxioms());
+        axioms.removeAll(verifier.getCycleCausingAxioms(true));
+
+        System.out.println(axioms);
 
         //Check the result is acyclic
         verifier = new OntologyCycleVerifier(axioms);

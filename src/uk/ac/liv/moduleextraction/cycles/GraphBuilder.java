@@ -3,16 +3,14 @@ package uk.ac.liv.moduleextraction.cycles;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.util.AxiomSplitter;
-import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
-import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
+/* Buids a directed graph from the dependency relationship between symbols in an ontology */
 public class GraphBuilder {
 
 	public Graph buildGraph(Collection<OWLLogicalAxiom> axioms){
@@ -108,21 +106,6 @@ public class GraphBuilder {
 			return value.toString();
 		}
 	}
-	
-	public static void main(String[] args) {
-		
-		OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "examples/top.krss");
-		System.out.println(ont.getLogicalAxioms());
-
-		GraphBuilder b = new GraphBuilder();
-		Graph g = b.buildGraph(ont.getLogicalAxioms());
-		System.out.println(g);
-		
-		TarjanStronglyConnectedComponents scc = new TarjanStronglyConnectedComponents();
-		scc.performTarjan(g);
-		scc.getStronglyConnectComponents();
 
 
-		
-	}
 }
