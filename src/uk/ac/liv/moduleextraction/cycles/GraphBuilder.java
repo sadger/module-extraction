@@ -13,6 +13,12 @@ import java.util.HashSet;
 /* Buids a directed graph from the dependency relationship between symbols in an ontology */
 public class GraphBuilder {
 
+	private HashSet<OWLLogicalAxiom> selfDefined;
+
+	public GraphBuilder(){
+		selfDefined = new HashSet<>();
+	}
+
 	public Graph buildGraph(Collection<OWLLogicalAxiom> axioms){
 		Graph graph = new Graph();
 		for(OWLLogicalAxiom axiom : axioms){
@@ -34,6 +40,7 @@ public class GraphBuilder {
 					}
 					if(lhsClass.equals(rhsClass)){
 						lhsVertex.joinedToSelf = true;
+						selfDefined.add(axiom);
 					}
 					lhsVertex.addConnection(rhsVertex);
 				}
@@ -44,8 +51,11 @@ public class GraphBuilder {
 		
 		return graph;
 	}
-	
-	
+
+	public HashSet<OWLLogicalAxiom> getSelfDefinedAxioms() {
+		return selfDefined;
+	}
+
 	class Graph extends HashMap<OWLClass, Vertex>{
 		
 		public void addVertex(Vertex v){

@@ -98,7 +98,7 @@ public class NDepletingModuleExtractor implements Extractor {
 		//Can only determine if there is a cycle after removing any expressive axioms
 		OntologyCycleVerifier verifier = new OntologyCycleVerifier(allAxioms);
 		if(verifier.isCyclic()){
-			cycleCausing = verifier.getCycleCausingAxioms(true);
+			cycleCausing = verifier.getCycleCausingAxioms();
 			/* All axioms is now the acyclic subset of the ontology 
 			after removing unsupported or cycle causing axioms */
 			allAxioms.removeAll(cycleCausing);

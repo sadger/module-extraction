@@ -1,0 +1,2 @@
+(implies W (some r W))
+(implies W X)

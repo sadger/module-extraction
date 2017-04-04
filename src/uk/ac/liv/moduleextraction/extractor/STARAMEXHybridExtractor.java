@@ -16,14 +16,9 @@ public class STARAMEXHybridExtractor extends AbstractHybridExtractor {
 
     private int starExtractions;
     private int amexExtractions;
-    private boolean useImprovedCycleRemoval = true;
 
     public STARAMEXHybridExtractor(Set<OWLLogicalAxiom> ont) {
         super(ont);
-    }
-
-    public void setUseImprovedCycleRemoval(boolean v){
-        useImprovedCycleRemoval = v;
     }
 
     @Override
@@ -61,7 +56,7 @@ public class STARAMEXHybridExtractor extends AbstractHybridExtractor {
 
     private Set<OWLLogicalAxiom> getCycleCausingAxioms(Set<OWLLogicalAxiom> axioms){
         OntologyCycleVerifier cycleVerifier = new OntologyCycleVerifier(axioms);
-        return cycleVerifier.getCycleCausingAxioms(useImprovedCycleRemoval);
+        return cycleVerifier.getCycleCausingAxioms();
     }
 
     public int getAmexExtractions() {

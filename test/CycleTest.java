@@ -31,6 +31,7 @@ public class CycleTest {
         ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(simple.getLogicalAxioms());
 
 
+
         /*
         0: D ⊑ A
         1: A ⊑ B
@@ -42,7 +43,7 @@ public class CycleTest {
 
         //Ontology is cyclic and all axioms contribute to cycle
         assertTrue(verifier.isCyclic());
-        assertEquals(axioms, new ArrayList<>(verifier.getCycleCausingAxioms(true)));
+        assertEquals(axioms, new ArrayList<>(verifier.getCycleCausingAxioms()));
 
     }
 
@@ -78,7 +79,7 @@ public class CycleTest {
 
         assertTrue("Subset is cyclic", verifier.isCyclic());
 
-        Set<OWLLogicalAxiom> cycleCausing = verifier.getCycleCausingAxioms(true);
+        Set<OWLLogicalAxiom> cycleCausing = verifier.getCycleCausingAxioms();
 
         OWLLogicalAxiom unnecessaryAxiom = axioms.get(3);
         //Does not contain [A ⊑ ∃ r.E] even though uses concept name A
@@ -94,7 +95,7 @@ public class CycleTest {
 
         assertTrue("Subset is cyclic", verifier.isCyclic());
 
-        cycleCausing = verifier.getCycleCausingAxioms(true);
+        cycleCausing = verifier.getCycleCausingAxioms();
 
         System.out.println(cycleCausing);
 
@@ -118,14 +119,41 @@ public class CycleTest {
         assertTrue("Ontology is cyclic", verifier.isCyclic());
 
         //Remove those causing a cycle
-        axioms.removeAll(verifier.getCycleCausingAxioms(true));
-
-        System.out.println(axioms);
+        axioms.removeAll(verifier.getCycleCausingAxioms());
 
         //Check the result is acyclic
         verifier = new OntologyCycleVerifier(axioms);
 
         assertFalse("Ontology should be acyclic",  verifier.isCyclic());
+    }
+
+    @Test
+    public void selfCyclicCaptured(){
+        OWLOntology selfcycle = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/selfcycle.krss");
+        ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(selfcycle.getLogicalAxioms());
+        Collections.sort(axioms);
+
+        /*  0:W ⊑ X
+            1:W ⊑ ∃ r.W */
+        OntologyCycleVerifier verifier = new OntologyCycleVerifier(axioms);
+
+        //Contains self defined axiom so cyclic
+        assertTrue("Ontology is cyclic", verifier.isCyclic());
+
+        //Copy of axioms
+        HashSet<OWLLogicalAxiom> checkSet = new HashSet<>(axioms);
+
+        //Remove cycle causing axioms should be W ⊑ ∃ r.W
+        checkSet.removeAll(verifier.getCycleCausingAxioms());
+
+        //Set still contains W ⊑ X
+        assertTrue(checkSet.contains(axioms.get(0)));
+
+        verifier = new OntologyCycleVerifier(checkSet);
+
+        //Should now be acyclic
+        assertFalse("Ontology is acyclic", verifier.isCyclic());
+
     }
 
 }
