@@ -1,4 +1,0 @@
-(implies A (and B C))
-(implies B (some r D))
-(implies D (or E Top))
-(implies F (all s B))

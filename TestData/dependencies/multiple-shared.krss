@@ -1,6 +1,0 @@
-(implies A B)
-(implies A C)
-(implies B (and C D))
-(implies C E)
-
-

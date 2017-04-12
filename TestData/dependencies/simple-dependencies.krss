@@ -1,4 +1,0 @@
-(implies A B)
-(implies B (some r C))
-(implies C D)
-
