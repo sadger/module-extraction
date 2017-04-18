@@ -7,11 +7,9 @@ import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
 import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -22,8 +20,8 @@ public class HybridModuleExtraction {
 
     @Before
     public void locateFiles(){
-        URL file = getClass().getResource("data");
-        dataDirectory = new File(file.getFile());
+        Path resourceDirectory = Paths.get("test/data/");
+        dataDirectory = resourceDirectory.toFile();
     }
 
     @Test
@@ -31,15 +29,18 @@ public class HybridModuleExtraction {
         OWLOntology food = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/food.owl");
         ModuleUtils.remapIRIs(food, "X");
         ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(food.getLogicalAxioms());
+        Collections.sort(axioms, new AxiomNameComparator());
+
+
 
   /*
         axioms = {
-            0 DessertCourse ≡ MealCourse ⊓ (∀ hasFood.Dessert)
-            1 EdibleThing ⊓ MealCourse ⊑ ⊥
-            2 MealCourse ⊑ ∀ hasFood.EdibleThing
-            3 ∃ hasFood.⊤ ⊑ MealCourse
-            4 Dessert ⊓ SeaFood ⊑ ⊥
-            5 SeafoodCourse ≡ MealCourse ⊓ (∀ hasFood.SeaFood)
+            0:Dessert ⊓ SeaFood ⊑ ⊥
+            1:DessertCourse ≡ MealCourse ⊓ (∀ hasFood.Dessert)
+            2:EdibleThing ⊓ MealCourse ⊑ ⊥
+            3:MealCourse ⊑ ∀ hasFood.EdibleThing
+            4:SeafoodCourse ≡ MealCourse ⊓ (∀ hasFood.SeaFood)
+            5:∃ hasFood.⊤ ⊑ MealCourse
         }
   */
 
@@ -59,7 +60,7 @@ public class HybridModuleExtraction {
         Set<OWLLogicalAxiom> hybridModule = starAmex.extractModule(sig);
 
         // Hybrid Module = [EdibleThing ⊓ MealCourse ⊑ ⊥, MealCourse ⊑ ∀ hasFood.EdibleThing, ∃ hasFood.⊤ ⊑ MealCourse]
-        HashSet<OWLLogicalAxiom> expectedHybridModule = new HashSet<>(Arrays.asList(axioms.get(1), axioms.get(2), axioms.get(3)));
+        HashSet<OWLLogicalAxiom> expectedHybridModule = new HashSet<>(Arrays.asList(axioms.get(2), axioms.get(3), axioms.get(5)));
 
         assertEquals(expectedHybridModule,hybridModule);
 

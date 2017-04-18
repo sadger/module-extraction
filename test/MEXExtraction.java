@@ -6,11 +6,9 @@ import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
 import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,22 +23,23 @@ public class MEXExtraction {
 
     @Before
     public void locateFiles(){
-        URL file = getClass().getResource("data");
-        dataDirectory = new File(file.getFile());
+        Path resourceDirectory = Paths.get("test/data/");
+        dataDirectory = resourceDirectory.toFile();
     }
 
     @Test
     public void simpleIndirectDependencyExtraction(){
         OWLOntology equiv = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/equiv.krss");
         ModuleUtils.remapIRIs(equiv, "X");
+        ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(equiv.getLogicalAxioms());
+        Collections.sort(axioms, new AxiomNameComparator());
 
         /*
-        0:C ⊑ A2
-        1:A ≡ B1 ⊓ B2
-        2:A1 ⊑ B1
-        3:A2 ⊑ B2
+        0:A ≡ B1 ⊓ B2
+        1:A1 ⊑ B1
+        2:A2 ⊑ B2
+        3:C ⊑ A2
         */
-        ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(equiv.getLogicalAxioms());
 
         OWLDataFactory f = equiv.getOWLOntologyManager().getOWLDataFactory();
         OWLClass a = f.getOWLClass(IRI.create("X#A"));
@@ -52,10 +51,10 @@ public class MEXExtraction {
 
         MEX mex = new MEX(equiv.getLogicalAxioms());
 
-        Set<OWLLogicalAxiom> expectedMexModule = new HashSet<>(Arrays.asList(axioms.get(1), axioms.get(2), axioms.get(3)));
+        //Module  {A ≡ B1 ⊓ B2, A1 ⊑ B1, A2 ⊑ B2}
+        Set<OWLLogicalAxiom> expectedMexModule = new HashSet<>(Arrays.asList(axioms.get(0), axioms.get(1), axioms.get(2)));
         Set<OWLLogicalAxiom> mexModule = mex.extractModule(sig);
 
-        //Module  {A ≡ B1 ⊓ B2, A1 ⊑ B1, A2 ⊑ B2}
         assertEquals(expectedMexModule, mexModule);
     }
 }

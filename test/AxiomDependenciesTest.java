@@ -8,11 +8,9 @@ import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
 import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -22,8 +20,8 @@ public class AxiomDependenciesTest {
 
     @Before
     public void locateFiles(){
-        URL file = getClass().getResource("data");
-        dataDirectory = new File(file.getFile());
+        Path resourceDirectory = Paths.get("test/data/");
+        dataDirectory = resourceDirectory.toFile();
     }
 
     @Test
@@ -32,6 +30,7 @@ public class AxiomDependenciesTest {
         OWLOntology depthanimals = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/defdepth.owl");
         ModuleUtils.remapIRIs(depthanimals, "Animals");
         ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(depthanimals.getLogicalAxioms());
+        Collections.sort(axioms,new AxiomNameComparator());
 
         /*
            0:Animal ⊑ ∃ eats.Meat
@@ -58,12 +57,13 @@ public class AxiomDependenciesTest {
         ModuleUtils.remapIRIs(animals, "Animals");
 
         ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(animals.getLogicalAxioms());
+        Collections.sort(axioms,new AxiomNameComparator());
 
         /*
-        0:Dog ⊑ Pet
-        1:Pet ≡ Animal ⊓ ⊤  <- Hack to force Pet on the LHS otherwise dependencies are different
-        2:Cat ⊑ Pet
-        3:Dog ⊑ ∀ eats.Meat
+        0:Cat ⊑ Pet
+        1:Dog ⊑ Pet
+        2:Dog ⊑ ∀ eats.Meat
+        3:Pet ≡ Animal ⊓ ⊤
         */
 
         OWLDataFactory f = animals.getOWLOntologyManager().getOWLDataFactory();
@@ -76,21 +76,21 @@ public class AxiomDependenciesTest {
         //Calculate axiom dependencies
         AxiomDependencies dependencies = new AxiomDependencies(animals);
 
-        System.out.println(dependencies);
-
-        //Dog ⊑ Pet=[Animal, Pet]
+        // Cat ⊑ Pet=[Animal, Pet]
         assertEquals(dependencies.get(axioms.get(0)), new HashSet<>(Arrays.asList(pet,animal)));
 
-        //Pet ≡ Animal ⊓ ⊤=[Animal]
-        assertEquals(dependencies.get(axioms.get(1)), new HashSet<>(Arrays.asList(animal)));
-
-        // Cat ⊑ Pet=[Animal, Pet]
-        assertEquals(dependencies.get(axioms.get(2)), new HashSet<>(Arrays.asList(pet,animal)));
+        //Dog ⊑ Pet=[Animal, Pet]
+        assertEquals(dependencies.get(axioms.get(1)), new HashSet<>(Arrays.asList(pet,animal)));
 
         // Dog ⊑ ∀ eats.Meat=[Meat, eats]}
-        assertEquals(dependencies.get(axioms.get(3)), new HashSet<>(Arrays.asList(eats, meat)));
+        assertEquals(dependencies.get(axioms.get(2)), new HashSet<>(Arrays.asList(eats, meat)));
+
+        //Pet ≡ Animal ⊓ ⊤=[Animal]
+        assertEquals(dependencies.get(axioms.get(3)), new HashSet<>(Arrays.asList(animal)));
+
 
     }
+
 
     @Test
     public void AMEXExtractionWithRCIs(){
@@ -98,13 +98,15 @@ public class AxiomDependenciesTest {
         OWLOntology animals = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/rci-extraction.owl");
         ModuleUtils.remapIRIs(animals, "RCI");
         ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(animals.getLogicalAxioms());
+        Collections.sort(axioms,new AxiomNameComparator());
+
 
         /*
-        0:Lion ⊑ Cat
-        1:Mammal ⊑ ∀ has.WarmBlood
-        2:Mammal ⊑ Animal
-        3:AnimalGroup ⊑ ≥ 2 has.Animal
-        4:Lion ⊑ Mammal
+        0:AnimalGroup ⊑ ≥ 2 has.Animal
+        1:Lion ⊑ Cat
+        2:Lion ⊑ Mammal
+        3:Mammal ⊑ ∀ has.WarmBlood
+        4:Mammal ⊑ Animal
         */
 
         AMEX amexExtractor = new AMEX(animals);
@@ -118,7 +120,7 @@ public class AxiomDependenciesTest {
 
 
         // M = [Mammal ⊑ ∀ has.WarmBlood, Mammal ⊑ Animal, AnimalGroup ⊑ ≥ 2 has.Animal, Lion ⊑ Mammal]
-        Set<OWLLogicalAxiom> expectedModule = new HashSet<>(Arrays.asList(axioms.get(1), axioms.get(2), axioms.get(3), axioms.get(4)));
+        Set<OWLLogicalAxiom> expectedModule = new HashSet<>(Arrays.asList(axioms.get(0), axioms.get(2), axioms.get(3), axioms.get(4)));
         Set<OWLLogicalAxiom> amexModule = amexExtractor.extractModule(sig);
 
         assertEquals(expectedModule,amexModule);

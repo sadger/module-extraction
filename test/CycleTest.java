@@ -6,7 +6,8 @@ import uk.ac.liv.moduleextraction.cycles.OntologyCycleVerifier;
 import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
 import java.io.File;
-import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -20,8 +21,8 @@ public class CycleTest {
 
     @Before
     public void locateFiles(){
-        URL file = getClass().getResource("data");
-        dataDirectory = new File(file.getFile());
+        Path resourceDirectory = Paths.get("test/data/");
+        dataDirectory = resourceDirectory.toFile();
     }
 
 
@@ -29,8 +30,6 @@ public class CycleTest {
     public void simpleCycle(){
         OWLOntology simple = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/simplecycle.krss");
         ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(simple.getLogicalAxioms());
-
-
 
         /*
         0: D ⊑ A
@@ -51,20 +50,21 @@ public class CycleTest {
     public void complexCycle(){
         OWLOntology complex = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/complexcycle.krss");
         ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(complex.getLogicalAxioms());
-        Collections.sort(axioms);
+        //Ensure order is fixed between tests
+        Collections.sort(axioms, new AxiomNameComparator());
 
         /*
-        0: C ≡ D ⊓ F
-        1: W ≡ Z ⊓ (∀ r.W)
-        2: A ⊑ B
-        3: A ⊑ ∃ r.E
-        4: B ⊑ C ⊓ E
-        5: D ⊑ ∀ r.A
-        6: E ⊑ G
-        7: G ⊑ H ⊓ I
-        8: H ⊑ ∃ r.G
-        9: X ⊑ Y ⊔ Z
-        */
+        0:A ⊑ B
+        1:A ⊑ ∃ r.E
+        2:B ⊑ C ⊓ E
+        3:C ≡ D ⊓ F
+        4:D ⊑ ∀ r.A
+        5:E ⊑ G
+        6:G ⊑ H ⊓ I
+        7:H ⊑ ∃ r.G
+        8:W ≡ Z ⊓ (∀ r.W)
+        9:X ⊑ Y ⊔ Z
+         */
 
         OntologyCycleVerifier verifier = new OntologyCycleVerifier(axioms);
         //Whole ontology is cyclic
@@ -72,8 +72,8 @@ public class CycleTest {
 
         //Cycle: [B ⊑ C ⊓ E, C ≡ D ⊓ F, D ⊑ ∀ r.A, A ⊑ B] + [A ⊑ ∃ r.E]
         HashSet<OWLLogicalAxiom> cyclicSubset = new HashSet<>(
-                Arrays.asList(axioms.get(4), axioms.get(0),
-                        axioms.get(5), axioms.get(2), axioms.get(3)));
+                Arrays.asList(axioms.get(2), axioms.get(3),
+                        axioms.get(4), axioms.get(0), axioms.get(1)));
 
         verifier = new OntologyCycleVerifier(cyclicSubset);
 
@@ -81,14 +81,14 @@ public class CycleTest {
 
         Set<OWLLogicalAxiom> cycleCausing = verifier.getCycleCausingAxioms();
 
-        OWLLogicalAxiom unnecessaryAxiom = axioms.get(3);
+        OWLLogicalAxiom unnecessaryAxiom = axioms.get(1);
         //Does not contain [A ⊑ ∃ r.E] even though uses concept name A
         assertTrue("Cycle causing set contains unnecessary axiom: " + unnecessaryAxiom, !cycleCausing.contains(unnecessaryAxiom));
 
         //Cycle [H ⊑ ∃ r.G, G ⊑ H ⊓ I] + [E ⊑ G]
         cyclicSubset = new HashSet<>(
                 Arrays.asList(axioms.get(6), axioms.get(7),
-                        axioms.get(8)));
+                        axioms.get(5)));
 
 
         verifier = new OntologyCycleVerifier(cyclicSubset);
@@ -97,12 +97,11 @@ public class CycleTest {
 
         cycleCausing = verifier.getCycleCausingAxioms();
 
-        System.out.println(cycleCausing);
 
-        assertTrue("Cycle causing set contains unnecessary axiom" + " " + axioms.get(6), !cycleCausing.contains(axioms.get(6)));
+        assertTrue("Cycle causing set contains unnecessary axiom" + " " + axioms.get(5), !cycleCausing.contains(axioms.get(5)));
 
         //Single axiom  W ≡ Z ⊓ (∀ r.W)
-        cyclicSubset = new HashSet<>(Arrays.asList(axioms.get(1)));
+        cyclicSubset = new HashSet<>(Arrays.asList(axioms.get(8)));
 
         verifier = new OntologyCycleVerifier(cyclicSubset);
 
@@ -131,10 +130,15 @@ public class CycleTest {
     public void selfCyclicCaptured(){
         OWLOntology selfcycle = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/selfcycle.krss");
         ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(selfcycle.getLogicalAxioms());
-        Collections.sort(axioms);
 
-        /*  0:W ⊑ X
-            1:W ⊑ ∃ r.W */
+        Collections.sort(axioms, new AxiomNameComparator());
+
+
+        /*
+            0:W ⊑ X
+            1:W ⊑ ∃ r.W
+
+        */
         OntologyCycleVerifier verifier = new OntologyCycleVerifier(axioms);
 
         //Contains self defined axiom so cyclic
@@ -147,7 +151,7 @@ public class CycleTest {
         checkSet.removeAll(verifier.getCycleCausingAxioms());
 
         //Set still contains W ⊑ X
-        assertTrue(checkSet.contains(axioms.get(0)));
+        assertTrue("Should contain " + axioms.get(0), checkSet.contains(axioms.get(0)));
 
         verifier = new OntologyCycleVerifier(checkSet);
 
