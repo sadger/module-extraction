@@ -4,6 +4,7 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 
 import java.util.ArrayList;
@@ -23,6 +24,11 @@ public abstract class AbstractHybridExtractor implements Extractor{
         iterationMetrics = new ArrayList<>();
         this.axioms = ont;
     }
+
+    AbstractHybridExtractor(OWLOntology ont){
+       this(ont.getLogicalAxioms());
+    }
+
 
     @Override
     public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) {

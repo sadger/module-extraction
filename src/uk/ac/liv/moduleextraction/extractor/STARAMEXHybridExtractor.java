@@ -2,6 +2,7 @@ package uk.ac.liv.moduleextraction.extractor;
 
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.cycles.OntologyCycleVerifier;
 import uk.ac.liv.moduleextraction.filters.ALCQIwithAtomicLHSFilter;
 import uk.ac.liv.moduleextraction.filters.OntologyFilters;
@@ -16,16 +17,33 @@ public class STARAMEXHybridExtractor extends AbstractHybridExtractor {
 
     private int starExtractions;
     private int amexExtractions;
+    private Set<OWLLogicalAxiom> starModule;
 
     public STARAMEXHybridExtractor(Set<OWLLogicalAxiom> ont) {
         super(ont);
     }
 
+    public STARAMEXHybridExtractor(OWLOntology ont) {
+        this(ont.getLogicalAxioms());
+    }
+
+    @Override
+    public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature){
+        starExtractions = 0;
+        amexExtractions = 0;
+        return super.extractModule(signature);
+    }
+
     @Override
     Set<OWLLogicalAxiom> extractUsingFirstExtractor(Set<OWLEntity> signature) {
-        starExtractions++;
         STARExtractor starExtractor = new STARExtractor(module);
-        return starExtractor.extractModule(signature);
+        ++starExtractions;
+        Set<OWLLogicalAxiom> module = starExtractor.extractModule(signature);
+        //The STAR module is the same as the first extraction in the hybrid module
+        if (starExtractions == 1) {
+            this.starModule = module;
+        }
+        return module;
     }
 
     @Override
@@ -57,6 +75,10 @@ public class STARAMEXHybridExtractor extends AbstractHybridExtractor {
     private Set<OWLLogicalAxiom> getCycleCausingAxioms(Set<OWLLogicalAxiom> axioms){
         OntologyCycleVerifier cycleVerifier = new OntologyCycleVerifier(axioms);
         return cycleVerifier.getCycleCausingAxioms();
+    }
+
+    public Set<OWLLogicalAxiom> getStarModule() {
+        return starModule;
     }
 
     public int getAmexExtractions() {
