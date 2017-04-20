@@ -32,6 +32,7 @@ public abstract class AbstractHybridExtractor implements Extractor{
 
     @Override
     public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) {
+        resetMetrics();
         this.module = new HashSet<>(axioms);
         //Immutable copy in case extractors modify signature
         ImmutableSet<OWLEntity> immutableSig = ImmutableSet.copyOf(signature);
@@ -67,6 +68,11 @@ public abstract class AbstractHybridExtractor implements Extractor{
 
 
     abstract Set<OWLLogicalAxiom> extractUsingFirstExtractor(Set<OWLEntity> signature);
+
+    /*
+     * Reset any metrics - called before each module is extracted
+     */
+    abstract void resetMetrics();
     abstract Set<OWLLogicalAxiom> extractUsingSecondExtractor(Set<OWLEntity> signature);
 
 }

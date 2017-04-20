@@ -10,7 +10,8 @@ public class ModuleExtractionTests {
 
         /*
                TODO: Example where improved cycle method creates a smaller module
-               TODO: README for boris/examples of generating things
+               TODO: Make sure QBF doesn't accept nominals
+               TODO: Error checking around supported ontologies for extractors
          */
 }
 

@@ -27,12 +27,6 @@ public class STARAMEXHybridExtractor extends AbstractHybridExtractor {
         this(ont.getLogicalAxioms());
     }
 
-    @Override
-    public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature){
-        starExtractions = 0;
-        amexExtractions = 0;
-        return super.extractModule(signature);
-    }
 
     @Override
     Set<OWLLogicalAxiom> extractUsingFirstExtractor(Set<OWLEntity> signature) {
@@ -57,7 +51,14 @@ public class STARAMEXHybridExtractor extends AbstractHybridExtractor {
         module.removeAll(cycleCausing);
         unsupported.addAll(cycleCausing);
 
+
         return new AMEX(module).extractModule(unsupported,signature);
+    }
+
+    @Override
+    void resetMetrics() {
+        starExtractions = 0;
+        amexExtractions = 0;
     }
 
     private Set<OWLLogicalAxiom> getUnsupportedAxioms(Set<OWLLogicalAxiom> axioms){
@@ -80,6 +81,8 @@ public class STARAMEXHybridExtractor extends AbstractHybridExtractor {
     public Set<OWLLogicalAxiom> getStarModule() {
         return starModule;
     }
+
+
 
     public int getAmexExtractions() {
         return amexExtractions;

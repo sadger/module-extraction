@@ -19,7 +19,7 @@ public class MultipleExperiments {
 
     private Experiment experiment;
 
-    public void runExperiments(File signaturesLocation, Experiment experimentType) throws IOException{
+    public void runExperiments(File signaturesLocation, Experiment experimentType, File resultLocation) throws IOException{
         this.experiment = experimentType;
         System.out.println("Running for: " + signaturesLocation);
         Experiment experiment = experimentType;
@@ -29,7 +29,7 @@ public class MultipleExperiments {
 
 		/* Create new folder in result location with same name as signature
 		folder */
-        File newResultFolder = copyDirectoryStructure(signaturesLocation, "Signatures",new File(ModulePaths.getResultLocation()));
+        File newResultFolder = copyDirectoryStructure(signaturesLocation, "Signatures", resultLocation);
         if(experimentType instanceof ExactlyNDepletingComparison){
             ExactlyNDepletingComparison ndep = (ExactlyNDepletingComparison) experimentType;
             newResultFolder = new File(newResultFolder.getAbsolutePath() + "/" + "domain_size-" + ndep.getDomainSize());
@@ -70,7 +70,7 @@ public class MultipleExperiments {
     }
 
     /** Signature location is a list of directories whos subdirectories are all signature files size-100,size-250... etc. */
-    public void runAlternatingExperiments(File signaturesLocation, Experiment experiment) throws IOException{
+    public void runAlternatingExperiments(File signaturesLocation, Experiment experiment, File resultLocation) throws IOException{
         this.experiment  = experiment;
         File[] signaturedirs;
         signaturesLocation.listFiles(new FileFilter() {
@@ -104,7 +104,7 @@ public class MultipleExperiments {
 
                     File signature = files.get(j2);
 
-                    File experimentLocation = copyDirectoryStructure(signature,"Signatures", new File(ModulePaths.getResultLocation()));
+                    File experimentLocation = copyDirectoryStructure(signature,"Signatures", resultLocation);
                     experimentLocation = new File(experimentLocation.getAbsolutePath() + "/" + signature.getName());
 
                     if(new File(experimentLocation.getAbsolutePath() + "/experiment-results").exists()){
@@ -193,7 +193,7 @@ public class MultipleExperiments {
             OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontFile.getAbsolutePath());
             new MultipleExperiments().runExperiments(
                     new File(ModulePaths.getSignatureLocation() + "/Bioportal/at-most-sriq/" + ontFile.getName()),
-                    new NDepletingExperiment(2,ont,ontFile));
+                    new NDepletingExperiment(2,ont,ontFile), new File("/tmp/"));
 
             ont.getOWLOntologyManager().removeOntology(ont);
             ont = null;
