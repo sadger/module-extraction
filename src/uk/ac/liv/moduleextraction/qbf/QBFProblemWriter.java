@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 
-public class DepQBFSolver {
+public class QBFProblemWriter {
 
     private Collection<Integer> universal;
     private Collection<Integer> existential;
@@ -26,7 +26,7 @@ public class DepQBFSolver {
     private File qbfFile;
     private HashMap<Integer, Integer> remapping;
 
-    public DepQBFSolver(Collection<Integer> universal, Collection<Integer> existential, Set<int[]> clauses) {
+    public QBFProblemWriter(Collection<Integer> universal, Collection<Integer> existential, Set<int[]> clauses) {
         this.universal = universal;
         this.existential = existential;
         this.clauses = clauses;

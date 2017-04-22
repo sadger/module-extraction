@@ -1,6 +1,5 @@
 package uk.ac.liv.moduleextraction.qbf;
 
-import com.google.common.cache.LoadingCache;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLEntity;
@@ -25,7 +24,6 @@ public class nElementQBFProblemGenerator {
     private final HashSet<OWLEntity> signature;
     private final HashSet<OWLEntity> classesNotInSignature;
     private final int DOMAIN_SIZE;
-    private static LoadingCache<Integer,nAxiomToClauseStore> convertors;
     private nAxiomToClauseStore mapper;
 
     private HashSet<int[]> clauses;
@@ -95,38 +93,41 @@ public class nElementQBFProblemGenerator {
             if(clauseStore.hasConstantValue()){
                 boolean constantValue = clauseStore.getConstantValue();
                 if(constantValue == false){
+                    //If some clause is false then the whole CNF formula is false
                     isUnsatisfiable = true;
                     break;
                 }
-                //Skip constant "true" clauses
+                //Skip constant "true" clauses they don't affect the satisfiability
             }
             else{
                 clauses.addAll(clauseStore.getClauses());
                 freshVariables.addAll(clauseStore.getFreshVariables());
             }
         }
-
-        /* Additional constraints for nominals in the ontology
-          (not necessary in single element interpretations) */
-        if(DOMAIN_SIZE > 1){
-            ontologyEntities.stream()
-                    .filter(e -> e.isOWLNamedIndividual())
-                    .forEach(e -> clauses.addAll(getNominalConstraint((OWLNamedIndividual) e)));
-        }
     }
 
+    //This isn't included yet - conversion to CNF for the solver is tricky after the rest of the ont is converted
     public HashSet<int[]> getNominalConstraint(OWLNamedIndividual indiv){
         HashSet<int[]> constraintClauses = new HashSet<>();
         ArrayList<PropositionalFormula> underAll = new ArrayList<>(indiv.accept(underAllInterpretations));
         System.out.println(underAll);
+
+        //A nominal must be assigned to some element of the domain
+        int[] chooseOne = new int[underAll.size()];
+        for (int i = 0; i < chooseOne.length; i++) {
+            chooseOne[i] = mapper.lookupMapping(underAll.get(i));
+        }
+        constraintClauses.add(chooseOne);
+
+        //Can't assign the same nominal to the different elements of the domain
         //Pairwise disjointness = n(n-1)/2 clauses
         for(int i = 0; i <= DOMAIN_SIZE - 1 ; i++){
             for (int j = i+1; j <= DOMAIN_SIZE - 1 ; j++) {
                 int[] constraint = {-mapper.lookupMapping(underAll.get(i)), -mapper.lookupMapping(underAll.get(j))};
-                System.out.println(Arrays.toString(constraint));
                 constraintClauses.add(constraint);
             }
         }
+
         return constraintClauses;
     }
 
