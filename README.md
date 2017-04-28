@@ -33,5 +33,8 @@ i.e `./solver problem.qdimacs` and return `10` if the problem is satisfiable, `2
 ## Usage
 
 ### Examples
+A number of examples have been written to show the functionality of the project and are a good place to begin. Assuming you have setup your environment correctly you can find the examples in the package `uk.ac.liv.moduleextraction.examples`
 
 ### Running the tests
+The separate `test/` directory contains a number of JUnit tests. These can be run individually or you can run all the tests from the `ModulExtractionTests` class.
+It is recommended you ensure the tests pass if making any modifications, this  ensure you haven't accidently broken some of the code which is known to be working.
