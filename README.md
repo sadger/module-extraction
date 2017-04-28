@@ -25,7 +25,7 @@ It's probably best to do this at startup in your .profile or .bash_profile file 
 ```export QBF_LOCATION=/path/to/quantor:/path/to/sKizzo:/path/to/depqbf```
 
 The module extractor may need to call on several solvers to extract a module if certain solvers take too long or timeout. The order
-in which they are listed in the enviromental variable is the order in which used when trying to solve a qbf problem w.r.t module extraction.
+in which they are listed in the enviromental variable is the order in which used when trying to solve a qbf problem w.r.t module extraction. Be aware that the solver(s) you select will affect the performance of the module extraction so it's worth seeing which ones work best for your application.
 
 The solvers are assumed to be executable linux binaries that take CNF QBF problem encoded in the a `.qdimacs` format as an argument 
 i.e `./solver problem.qdimacs` and return `10` if the problem is satisfiable, `20` if it is unsatisfiable. Any other return code will be interpreted as an error. 
