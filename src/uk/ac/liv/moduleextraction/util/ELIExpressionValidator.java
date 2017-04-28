@@ -1,56 +1,11 @@
 package uk.ac.liv.moduleextraction.util;
 
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 
-import java.util.Set;
 
+public class ELIExpressionValidator implements OWLClassExpressionVisitorEx<Boolean> {
 
-public class ELValidator implements OWLClassExpressionVisitorEx<Boolean> {
-
-
-	public OWLOntology extractELOntology(OWLOntology ontology){
-		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
-		for(OWLLogicalAxiom axiom : ontology.getLogicalAxioms()){
-			if(!isELAxiom(axiom)){
-				man.removeAxiom(ontology, axiom);
-			}
-		}
-		
-		return ontology;
-	}
-	
-	public boolean isELOntology(OWLOntology ontology){
-		for(OWLLogicalAxiom axiom : ontology.getLogicalAxioms()){
-			if(!isELAxiom(axiom))
-				return false;
-		}
-		
-		return true;
-	}
-	
-	public boolean isELOntology(Set<OWLLogicalAxiom> coreAxioms) {
-		for(OWLLogicalAxiom axiom : coreAxioms){
-			if(!isELAxiom(axiom)){
-				//System.out.println(axiom);
-				return false;
-			}
-		}
-		
-		return true;
-	}
-
-	
-	
-	public boolean isELAxiom(OWLLogicalAxiom axiom){
-		OWLClassExpression lhs = AxiomSplitter.getNameofAxiom(axiom);
-		OWLClassExpression rhs = AxiomSplitter.getDefinitionofAxiom(axiom);
-
-        //Anything that isn't a concept inclusion or equality may have a null lhs/rhs
-        if(rhs == null || lhs == null) { return false; };
-		return lhs.accept(this) && rhs.accept(this);
-	}
 	@Override
 	public Boolean visit(OWLClass ce) {
 		return true;

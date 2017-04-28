@@ -40,9 +40,9 @@ public class AxiomStructureInspector {
 
 		for(OWLLogicalAxiom axiom : axioms){
 			
-			AtomicLHSAxiomVerifier verifier = new AtomicLHSAxiomVerifier();
+			ALCQIAtomicLHSAxiomVerifier verifier = new ALCQIAtomicLHSAxiomVerifier();
 			
-			if(verifier.isSupportedAxiom(axiom)){
+			if(verifier.isALCQIandHasAtomicLHS(axiom)){
 				AxiomType<?> type = axiom.getAxiomType();
 
 				OWLClass name = null;

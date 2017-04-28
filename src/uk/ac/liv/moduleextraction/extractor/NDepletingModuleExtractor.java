@@ -158,7 +158,7 @@ public class NDepletingModuleExtractor implements Extractor {
 			change = false;
 			for (int i = 0; i < acyclicAxioms.size(); i++) {
 				OWLLogicalAxiom chosenAxiom = acyclicAxioms.get(i);
-				if(chainCollector.hasELSyntacticDependency(chosenAxiom, dependT, sigUnionSigM)){
+				if(chainCollector.hasELISyntacticDependency(chosenAxiom, dependT, sigUnionSigM)){
 					change = true;
 					ArrayList<OWLLogicalAxiom> chain =
 							chainCollector.collectELAxiomChain(acyclicAxioms, i, terminology, axiomStore, dependT, sigUnionSigM);

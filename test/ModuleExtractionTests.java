@@ -4,7 +4,8 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({HybridModuleExtraction.class, MEXExtraction.class,
-        AxiomDependenciesTest.class, CycleTest.class})
+        AxiomDependenciesTest.class, CycleTest.class, TerminologyValidationTests.class,
+        ExpressivenessTest.class})
 
 public class ModuleExtractionTests {
 

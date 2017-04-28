@@ -14,25 +14,25 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
  *  Currently this is inclusions and equalities up to ALCQI
  *
  */
-public class AtomicLHSAxiomVerifier {
+public class ALCQIAtomicLHSAxiomVerifier {
 
-	public boolean isSupportedAxiom(OWLLogicalAxiom axiom){
+	public boolean isALCQIandHasAtomicLHS(OWLLogicalAxiom axiom){
 		
 		AxiomType<?> type = axiom.getAxiomType();
-		ALCQIExpressionVerifier expressionVerifier = new ALCQIExpressionVerifier();
+		ALCQIExpressionVerifier alcqiExpressionVerifier = new ALCQIExpressionVerifier();
 	
 		if(type == AxiomType.SUBCLASS_OF || type == AxiomType.EQUIVALENT_CLASSES){
 			
 			OWLClassExpression name = AxiomSplitter.getNameofAxiom(axiom);
 			OWLClassExpression definition = AxiomSplitter.getDefinitionofAxiom(axiom);
 			
-			return (name.getClassExpressionType() == ClassExpressionType.OWL_CLASS)
-					&& definition.accept(expressionVerifier);
+			return (name.getClassExpressionType() == ClassExpressionType.OWL_CLASS) &&
+					definition.accept(alcqiExpressionVerifier);
 		}
 		else{
 			return false;
 		}
-		
 	}
+
 
 }

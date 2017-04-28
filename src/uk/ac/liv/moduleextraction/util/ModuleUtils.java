@@ -179,9 +179,9 @@ public class ModuleUtils {
 	
 	public static Set<OWLLogicalAxiom> getSupportedAxioms(Set<OWLLogicalAxiom> axioms){
 		Set<OWLLogicalAxiom> supported = new HashSet<OWLLogicalAxiom>();
-		AtomicLHSAxiomVerifier verifier = new AtomicLHSAxiomVerifier();
+		ALCQIAtomicLHSAxiomVerifier verifier = new ALCQIAtomicLHSAxiomVerifier();
 		for(OWLLogicalAxiom axiom : axioms){
-			if(verifier.isSupportedAxiom(axiom)){
+			if(verifier.isALCQIandHasAtomicLHS(axiom)){
 				supported.add(axiom);
 			}
 		}

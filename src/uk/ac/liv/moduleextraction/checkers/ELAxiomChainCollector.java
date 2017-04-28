@@ -6,7 +6,7 @@ import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.axiomdependencies.DefinitorialAxiomStore;
 import uk.ac.liv.moduleextraction.util.AxiomSplitter;
-import uk.ac.liv.moduleextraction.util.ELValidator;
+import uk.ac.liv.moduleextraction.util.ELIOntologyValidator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,7 +27,7 @@ public class ELAxiomChainCollector {
 			OWLLogicalAxiom axiom = axiomStore.getAxiom(i);
 
 			if(terminology[i]){
-				if(hasELSyntacticDependency(axiom, dependT, sigUnionSigM)){
+				if(hasELISyntacticDependency(axiom, dependT, sigUnionSigM)){
 
 					chain.add(axiom);
 					//Update signature
@@ -60,7 +60,7 @@ public class ELAxiomChainCollector {
 
 			OWLLogicalAxiom axiom = allAxioms.get(i);
 
-			if(hasELSyntacticDependency(axiom, dependT, sigUnionSigM)){
+			if(hasELISyntacticDependency(axiom, dependT, sigUnionSigM)){
 
 				chain.add(axiom);
 				//Update signature
@@ -76,11 +76,11 @@ public class ELAxiomChainCollector {
 	}
 
 
-	public boolean hasELSyntacticDependency(OWLLogicalAxiom axiom, AxiomDependencies dependT, Set<OWLEntity> sigUnionSigM){
+	public boolean hasELISyntacticDependency(OWLLogicalAxiom axiom, AxiomDependencies dependT, Set<OWLEntity> sigUnionSigM){
 		OWLClass axiomName = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
-		ELValidator validator = new ELValidator();
+		ELIOntologyValidator validator = new ELIOntologyValidator();
 		syntacticChecks++;
-		if(!validator.isELAxiom(axiom) || !sigUnionSigM.contains(axiomName)){
+		if(!validator.isELIAxiom(axiom) || !sigUnionSigM.contains(axiomName)){
 			return false;
 		}
 		else{

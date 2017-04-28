@@ -5,6 +5,9 @@ import org.semanticweb.owlapi.model.*;
 
 public class ALCQIExpressionVerifier implements OWLClassExpressionVisitorEx<Boolean> {
 
+
+
+
     @Override
     public Boolean visit(OWLClass arg0) {
         return true;

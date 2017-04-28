@@ -1,7 +1,6 @@
 import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.owlapi.model.OWLOntology;
-import uk.ac.liv.moduleextraction.qbf.OneElementSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.util.OntologyLoader;
 import uk.ac.liv.moduleextraction.util.TerminologyValidator;
 

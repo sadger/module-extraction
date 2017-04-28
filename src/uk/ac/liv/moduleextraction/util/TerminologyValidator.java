@@ -47,7 +47,7 @@ public class TerminologyValidator {
                 return true;
            }
            OWLClassExpression lhs = AxiomSplitter.getNameofAxiom(ax);
-           if(!(lhs instanceof OWLClass)){
+           if(!(lhs.getClassExpressionType() == ClassExpressionType.OWL_CLASS)){
                return true;
            }
         }

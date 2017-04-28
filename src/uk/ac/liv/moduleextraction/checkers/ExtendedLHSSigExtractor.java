@@ -6,7 +6,7 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.axiomdependencies.DependencySet;
-import uk.ac.liv.moduleextraction.util.AtomicLHSAxiomVerifier;
+import uk.ac.liv.moduleextraction.util.ALCQIAtomicLHSAxiomVerifier;
 import uk.ac.liv.moduleextraction.util.AxiomSplitter;
 import uk.ac.liv.moduleextraction.util.AxiomStructureInspector;
 
@@ -20,7 +20,7 @@ public class ExtendedLHSSigExtractor {
 	private Set<OWLEntity> signatureDependencies = new HashSet<OWLEntity>();
 
 	AxiomDependencies dependencies;
-    AtomicLHSAxiomVerifier verifier = new AtomicLHSAxiomVerifier();
+    ALCQIAtomicLHSAxiomVerifier verifier = new ALCQIAtomicLHSAxiomVerifier();
 
 
 	public HashSet<OWLLogicalAxiom> getLHSSigAxioms(List<OWLLogicalAxiom> sortedOntology, Set<OWLEntity> sigUnionSigM, AxiomDependencies depends){
@@ -32,7 +32,7 @@ public class ExtendedLHSSigExtractor {
 		Set<OWLClass> sharedOrRepeated = getSharedOrRepeatedNames(sortedOntology);
 
 		for(OWLLogicalAxiom axiom : sortedOntology){
-			if(!verifier.isSupportedAxiom(axiom)){
+			if(!verifier.isALCQIandHasAtomicLHS(axiom)){
 				lhsSigT.add(axiom);
 			}
 			else{
