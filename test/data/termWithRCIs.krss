@@ -1,0 +1,4 @@
+(implies A B)
+(implies A C)
+(implies C D)
+(define-concept F G)

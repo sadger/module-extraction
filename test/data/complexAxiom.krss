@@ -1,0 +1,2 @@
+(implies (and B C) A)
+(implies (and C D E) (or F Y Z))
