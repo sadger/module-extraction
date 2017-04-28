@@ -15,6 +15,7 @@ import uk.ac.liv.moduleextraction.propositional.nSeparability.nAxiomToClauseStor
 import uk.ac.liv.moduleextraction.qbf.NElementSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
+import uk.ac.liv.moduleextraction.util.SHIQOntologyVerifier;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,12 +27,12 @@ import java.util.concurrent.TimeUnit;
 
 public class NDepletingModuleExtractor implements Extractor {
 
-	private final DefinitorialAxiomStore axiomStore;
+	private DefinitorialAxiomStore axiomStore = null;
 	private Set<OWLLogicalAxiom> module;
 	private Set<OWLEntity> sigUnionSigM;
-	private final NElementInseparableChecker inseparableChecker;
+	private NElementInseparableChecker inseparableChecker = null;
 
-	private final ELAxiomChainCollector chainCollector;
+	private ELAxiomChainCollector chainCollector = null;
 	private AxiomDependencies dependT;
 	private List<OWLLogicalAxiom> allAxioms;
 	private Set<OWLLogicalAxiom> cycleCausing = new HashSet<OWLLogicalAxiom>();
@@ -48,16 +49,30 @@ public class NDepletingModuleExtractor implements Extractor {
 	//Mapping between axioms and clauses for QBF - each extractor holds its own instance for caching
 	private nAxiomToClauseStore clauseStore;
 
-	private NDepletingModuleExtractor(int domain_size, OWLOntology ontology) {
+	private NDepletingModuleExtractor(int domain_size, OWLOntology ontology) throws ExtractorException {
 		this(domain_size,ontology.getLogicalAxioms());
 	}
 
-	public NDepletingModuleExtractor(int domain_size, Set<OWLLogicalAxiom> ontology){
+	public NDepletingModuleExtractor(int domain_size, Set<OWLLogicalAxiom> ontology) throws ExtractorException {
 		this.DOMAIN_SIZE = domain_size;
-		this.axiomStore = new DefinitorialAxiomStore(ontology);
-		this.chainCollector = new ELAxiomChainCollector();
-		this.clauseStore = new nAxiomToClauseStore(DOMAIN_SIZE);
-		this.inseparableChecker = new NElementInseparableChecker(clauseStore);
+		if (isOntologyValid(ontology)) {
+			this.axiomStore = new DefinitorialAxiomStore(ontology);
+			this.chainCollector = new ELAxiomChainCollector();
+			this.clauseStore = new nAxiomToClauseStore(DOMAIN_SIZE);
+			this.inseparableChecker = new NElementInseparableChecker(clauseStore);
+		}
+
+	}
+
+	private boolean isOntologyValid(Set<OWLLogicalAxiom> ont) throws ExtractorException {
+		SHIQOntologyVerifier shiqOntologyVerifier = new SHIQOntologyVerifier();
+
+		if(shiqOntologyVerifier.isSHIQOntology(ont)){
+			return true;
+		}
+		else{
+			throw new ExtractorException("Input ontology must be at most SHIQ in expressiveness (no nominals)");
+		}
 	}
 
 	public Set<OWLLogicalAxiom> getModule(){

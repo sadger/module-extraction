@@ -4,6 +4,7 @@ package uk.ac.liv.moduleextraction.experiments;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import uk.ac.liv.moduleextraction.extractor.ExtractorException;
 import uk.ac.liv.moduleextraction.extractor.NDepletingModuleExtractor;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 import uk.ac.liv.moduleextraction.signature.SigManager;
@@ -60,14 +61,22 @@ public class TwoDepletingExperiment implements  Experiment {
 
         hybridModule = hybridExperiment.getHybridModule();
 
-        oneDepletingExtractor = new NDepletingModuleExtractor(1, hybridModule);
+        try {
+            oneDepletingExtractor = new NDepletingModuleExtractor(1, hybridModule);
+        } catch (ExtractorException e) {
+            e.printStackTrace();
+        }
         oneDepletingModule = oneDepletingExtractor.extractModule(signature);
 
 
         if(!(oneDepletingModule.size() == hybridModule.size())) {
             twoDepletingExtracted = true;
 
-            twoDepletingExtractor = new NDepletingModuleExtractor(2, hybridModule);
+            try {
+                twoDepletingExtractor = new NDepletingModuleExtractor(2, hybridModule);
+            } catch (ExtractorException e) {
+                e.printStackTrace();
+            }
 
             //Extract EXACTLY 2 module then join with 1-depleting module
             twoDepletingModule = twoDepletingExtractor.extractModule(signature);

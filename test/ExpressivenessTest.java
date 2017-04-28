@@ -31,7 +31,6 @@ public class ExpressivenessTest {
     @Test
     public void SHOIQTest() {
         OWLOntology shoiq = OntologyLoader.loadOntologyAllAxioms(dataDirectory + "/shoiqexample.owl");
-
         assertFalse("Is NOT an ELI ontology", eliOntologyValidator.isELIOntology(shoiq.getLogicalAxioms()));
         assertFalse("Is NOT an ALCQI ontology", alcqiVerifier.isALCQIOntology(shoiq.getLogicalAxioms()));
         assertFalse("Is NOT a SHIQ ontology", shiqVerifier.isSHIQOntology(shoiq.getLogicalAxioms()));
@@ -40,11 +39,11 @@ public class ExpressivenessTest {
     @Test
     public void SHIQTest(){
         OWLOntology shiq = OntologyLoader.loadOntologyAllAxioms(dataDirectory + "/shiqExample.owl");
-        shiq.getLogicalAxioms().forEach(System.out::println);
-//
+
         assertFalse("Is NOT an ELI ontology", eliOntologyValidator.isELIOntology(shiq.getLogicalAxioms()));
         assertFalse("Is NOT an ALCQI ontology", alcqiVerifier.isALCQIOntology(shiq.getLogicalAxioms()));
         assertTrue("Is a SHIQ ontology", shiqVerifier.isSHIQOntology(shiq.getLogicalAxioms()));
+
     }
 
     @Test

@@ -6,6 +6,7 @@ import uk.ac.liv.moduleextraction.experiments.Experiment;
 import uk.ac.liv.moduleextraction.experiments.MultipleExperiments;
 import uk.ac.liv.moduleextraction.experiments.NDepletingExperiment;
 import uk.ac.liv.moduleextraction.extractor.AMEX;
+import uk.ac.liv.moduleextraction.extractor.ExtractorException;
 import uk.ac.liv.moduleextraction.extractor.STARAMEXHybridExtractor;
 import uk.ac.liv.moduleextraction.signature.SigManager;
 import uk.ac.liv.moduleextraction.signature.SignatureGenerator;
@@ -24,10 +25,24 @@ import java.util.Set;
 public class ModuleExtractionExamples {
 
 
-    public static void usingModuleExtractors(){
+
+    public static void main(String[] args) {
+        /* Run the examples */
+        try {
+            ModuleExtractionExamples.usingModuleExtractors();
+        } catch (ExtractorException e) {
+            e.printStackTrace();
+        }
+        //ModuleExtractionExamples.generatingSignatures();
+        //ModuleExtractionExamples.writeSignaturesToFile();
+        //etc...
+
+    }
+
+    public static void usingModuleExtractors() throws ExtractorException {
         //Load the ontology from a file - CHANGE THIS to your own ontology
         //Make sure ontologies are suitable for use with the extractor before using it (no extra checking is done) - i.e don't use more expressive  than ALCQI with AMEX
-        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms("/home/william/PhD/Ontologies/NCI/Profile/NCI-star.owl");
+        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms("/path/to/ontology.owl");
 
         //Create the module extractors - implement the Extractor interface
         AMEX amex = new AMEX(ont);
@@ -57,7 +72,7 @@ public class ModuleExtractionExamples {
 
     public static void generatingSignatures(){
         //Load ontology
-        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms("/home/william/PhD/Ontologies/NCI/Profile/NCI-star.owl");
+        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms("/path/to/ontology.owl");
 
         //Intitalise the signature generator
         SignatureGenerator gen = new SignatureGenerator(ont.getLogicalAxioms());
@@ -80,7 +95,7 @@ public class ModuleExtractionExamples {
         /* Writing signatures to file useful for experiments and reproducing */
 
         //Ontology
-        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms("/home/william/PhD/Ontologies/NCI/Profile/NCI-star.owl");
+        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms("/path/to/ontology.owl");
 
         //Location to save signatures
         File f = new File("/path/to/Signatures");
@@ -121,7 +136,7 @@ public class ModuleExtractionExamples {
 
     public void runningExperiments() {
         //Load the ontology
-        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms("/home/william/PhD/Ontologies/NCI/Profile/NCI-star.owl");
+        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms("/path/to/ontology.owl");
 
         //These are for running things and saving the results
         //All experiments use the Experiment interface
@@ -145,7 +160,7 @@ public class ModuleExtractionExamples {
 
     public void multipleExperiments() throws IOException {
         //Ont file
-        File ontLocation = new File("/home/william/PhD/Ontologies/NCI/Profile/NCI-star.owl");
+        File ontLocation = new File("/path/to/ontology.owl");
 
         //Load the ontology from the file
         OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontLocation.getAbsolutePath());
@@ -172,12 +187,4 @@ public class ModuleExtractionExamples {
     }
 
 
-    public static void main(String[] args) {
-        /* Run the examples */
-        //ModuleExtractionExamples.usingModuleExtractors();
-        //ModuleExtractionExamples.generatingSignatures();
-        //ModuleExtractionExamples.writeSignaturesToFile();
-        //etc...
-
-    }
 }

@@ -6,10 +6,8 @@ import org.slf4j.LoggerFactory;
 import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.axiomdependencies.DefinitorialAxiomStore;
 import uk.ac.liv.moduleextraction.checkers.AxiomDependencyChecker;
-import uk.ac.liv.moduleextraction.util.AxiomSplitter;
-import uk.ac.liv.moduleextraction.util.ModulePaths;
-import uk.ac.liv.moduleextraction.util.ModuleUtils;
-import uk.ac.liv.moduleextraction.util.OntologyLoader;
+import uk.ac.liv.moduleextraction.cycles.OntologyCycleVerifier;
+import uk.ac.liv.moduleextraction.util.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -32,16 +30,33 @@ public class MEX implements Extractor {
     private Logger logger = LoggerFactory.getLogger(MEX.class);
 
 
-    public MEX(OWLOntology ontology) {
+    public MEX(OWLOntology ontology) throws ExtractorException{
         this(ontology.getLogicalAxioms());
     }
 
-    public MEX(Set<OWLLogicalAxiom> axioms){
-        dependencies = new AxiomDependencies(axioms);
-        equivalenceDependencies = new AxiomDependencies(collectEquivalenceAxioms(axioms));
-        axiomStore = new DefinitorialAxiomStore(dependencies.getDefinitorialSortedAxioms());
-        axiomDependencyChecker = new AxiomDependencyChecker();
+    public MEX(Set<OWLLogicalAxiom> axioms) throws ExtractorException{
+        if(isOntologyValid(axioms)){
+            dependencies = new AxiomDependencies(axioms);
+            equivalenceDependencies = new AxiomDependencies(collectEquivalenceAxioms(axioms));
+            axiomStore = new DefinitorialAxiomStore(dependencies.getDefinitorialSortedAxioms());
+            axiomDependencyChecker = new AxiomDependencyChecker();
+        }
+
     }
+
+    private boolean isOntologyValid(Set<OWLLogicalAxiom> ontology) throws ExtractorException{
+        ELIOntologyValidator eliOntologyValidator = new ELIOntologyValidator();
+        TerminologyValidator termValid = new TerminologyValidator(ontology);
+
+        if(eliOntologyValidator.isELIOntology(ontology) && termValid.isTerminology()){
+            OntologyCycleVerifier cycleVerifier = new OntologyCycleVerifier(ontology);
+            return !cycleVerifier.isCyclic();
+        }
+        else{
+            throw new ExtractorException("Input ontology must be a valid acyclic EL terminology");
+        }
+    }
+
 
     @Override
     public Set<OWLLogicalAxiom> extractModule(Set<OWLEntity> signature) {
@@ -142,7 +157,7 @@ public class MEX implements Extractor {
         return equivalenceAxioms;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExtractorException {
         OWLOntology equiv = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/equiv.krss");
         ModuleUtils.remapIRIs(equiv, "X");
 

@@ -51,8 +51,15 @@ public class STARAMEXHybridExtractor extends AbstractHybridExtractor {
         module.removeAll(cycleCausing);
         unsupported.addAll(cycleCausing);
 
+        AMEX amex = null;
+        try{
+          amex = new AMEX(module);
+        }
+        catch (ExtractorException e){
+            e.printStackTrace();
+        }
 
-        return new AMEX(module).extractModule(unsupported,signature);
+        return amex.extractModule(unsupported, signature);
     }
 
     @Override

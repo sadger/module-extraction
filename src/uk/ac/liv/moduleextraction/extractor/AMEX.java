@@ -9,13 +9,12 @@ import uk.ac.liv.moduleextraction.axiomdependencies.DefinitorialAxiomStore;
 import uk.ac.liv.moduleextraction.checkers.AxiomDependencyChecker;
 import uk.ac.liv.moduleextraction.checkers.ExtendedLHSSigExtractor;
 import uk.ac.liv.moduleextraction.checkers.NElementInseparableChecker;
+import uk.ac.liv.moduleextraction.cycles.OntologyCycleVerifier;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 import uk.ac.liv.moduleextraction.propositional.nSeparability.nAxiomToClauseStore;
 import uk.ac.liv.moduleextraction.qbf.OneElementSeparabilityAxiomLocator;
 import uk.ac.liv.moduleextraction.qbf.QBFSolverException;
-import uk.ac.liv.moduleextraction.util.ModulePaths;
-import uk.ac.liv.moduleextraction.util.ModuleUtils;
-import uk.ac.liv.moduleextraction.util.OntologyLoader;
+import uk.ac.liv.moduleextraction.util.*;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -47,20 +46,35 @@ public class AMEX implements Extractor{
 			
 
 	
-	public AMEX(OWLOntology ontology) {
+	public AMEX(OWLOntology ontology) throws   ExtractorException{
 		this(ontology.getLogicalAxioms());
 	}
 	
-	public AMEX(Set<OWLLogicalAxiom> ontology){
+	public AMEX(Set<OWLLogicalAxiom> ontology) throws ExtractorException{
+		if(isOntologyValid(ontology)){
+			dependencies = new AxiomDependencies(ontology);
+			axiomStore = new DefinitorialAxiomStore(dependencies.getDefinitorialSortedAxioms());
 
-		dependencies = new AxiomDependencies(ontology);
-		axiomStore = new DefinitorialAxiomStore(dependencies.getDefinitorialSortedAxioms());
-		
-		axiomDependencyChecker = new AxiomDependencyChecker();
-		
-		lhsExtractor = new ExtendedLHSSigExtractor();
-		clauseStoreMapping = new nAxiomToClauseStore(1);
-		oneElementInseparableChecker = new NElementInseparableChecker(clauseStoreMapping);
+			axiomDependencyChecker = new AxiomDependencyChecker();
+
+			lhsExtractor = new ExtendedLHSSigExtractor();
+			clauseStoreMapping = new nAxiomToClauseStore(1);
+			oneElementInseparableChecker = new NElementInseparableChecker(clauseStoreMapping);
+		}
+	}
+
+	private boolean isOntologyValid(Set<OWLLogicalAxiom> ontology) throws ExtractorException{
+
+		ALCQIOntologyVerifier alcqiVerifier = new ALCQIOntologyVerifier();
+		TerminologyValidator termValid = new TerminologyValidator(ontology);
+
+		if(alcqiVerifier.isALCQIOntology(ontology) && termValid.isTerminologyWithRCIs()) {
+			OntologyCycleVerifier cycleVerifier = new OntologyCycleVerifier(ontology);
+			return !cycleVerifier.isCyclic();
+		}
+		else{
+			throw new ExtractorException("Input ontology must be a valid acyclic ALCQI terminology with (optional) repeated inclusions");
+		}
 	}
 	
 	
@@ -178,7 +192,7 @@ public class AMEX implements Extractor{
 	
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ExtractorException {
 		//Thesis example
 
         OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/shared/vent.krss");

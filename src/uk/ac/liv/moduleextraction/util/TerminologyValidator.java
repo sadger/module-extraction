@@ -83,11 +83,6 @@ public class TerminologyValidator {
             }
 
         }
-
-        System.out.println(inclusionNameCount);
-        System.out.println(equalityNameCount);
-
-
     }
 
     private void inspectAxiomLHS(){

@@ -1,6 +1,7 @@
 import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.owlapi.model.*;
+import uk.ac.liv.moduleextraction.extractor.ExtractorException;
 import uk.ac.liv.moduleextraction.extractor.MEX;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.moduleextraction.util.OntologyLoader;
@@ -28,7 +29,7 @@ public class MEXExtraction {
     }
 
     @Test
-    public void simpleIndirectDependencyExtraction(){
+    public void simpleIndirectDependencyExtraction() throws ExtractorException {
         OWLOntology equiv = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/equiv.krss");
         ModuleUtils.remapIRIs(equiv, "X");
         ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(equiv.getLogicalAxioms());

@@ -4,6 +4,7 @@ import org.semanticweb.owlapi.model.*;
 import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDefinitorialDepth;
 import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.extractor.AMEX;
+import uk.ac.liv.moduleextraction.extractor.ExtractorException;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
@@ -93,7 +94,7 @@ public class AxiomDependenciesTest {
 
 
     @Test
-    public void AMEXExtractionWithRCIs(){
+    public void AMEXExtractionWithRCIs() throws ExtractorException {
         //Thesis AMEX extraction from ontology with RCIs
         OWLOntology animals = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/rci-extraction.owl");
         ModuleUtils.remapIRIs(animals, "RCI");

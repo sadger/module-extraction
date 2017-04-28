@@ -4,6 +4,7 @@ import com.google.common.base.Stopwatch;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import uk.ac.liv.moduleextraction.extractor.ExtractorException;
 import uk.ac.liv.moduleextraction.extractor.NDepletingModuleExtractor;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 import uk.ac.liv.moduleextraction.util.CSVWriter;
@@ -50,7 +51,12 @@ public class ExactlyNDepletingComparison implements Experiment {
 
 		nDepletingStopwatch = Stopwatch.createStarted();
 
-		NDepletingModuleExtractor nDepletingModuleExtractor = new NDepletingModuleExtractor(DOMAIN_SIZE,hybridModule);
+		NDepletingModuleExtractor nDepletingModuleExtractor = null;
+		try {
+			nDepletingModuleExtractor = new NDepletingModuleExtractor(DOMAIN_SIZE,hybridModule);
+		} catch (ExtractorException e) {
+			e.printStackTrace();
+		}
 		this.nDepletingModuleExtractor = nDepletingModuleExtractor;
 		nDepletingModule = nDepletingModuleExtractor.extractModule(signature);
 

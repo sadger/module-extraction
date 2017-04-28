@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import uk.ac.liv.moduleextraction.extractor.ExtractorException;
 import uk.ac.liv.moduleextraction.extractor.NDepletingModuleExtractor;
 import uk.ac.liv.moduleextraction.util.CSVWriter;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
@@ -96,7 +97,12 @@ public class NDepletingExperiment implements  Experiment{
             Stopwatch nModStopWatch = Stopwatch.createStarted();
 
             System.out.print("Extracting " + nModuleExtracted + "-depleting: ");
-            NDepletingModuleExtractor nExtractor = new NDepletingModuleExtractor(nModuleExtracted,hybridModule);
+            NDepletingModuleExtractor nExtractor = null;
+            try {
+                nExtractor = new NDepletingModuleExtractor(nModuleExtracted,hybridModule);
+            } catch (ExtractorException e) {
+                e.printStackTrace();
+            }
             nModule = nExtractor.extractModule(signature);
             System.out.println(nModule.size());
 

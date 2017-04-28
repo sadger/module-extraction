@@ -3,6 +3,7 @@ package uk.ac.liv.moduleextraction.experiments;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import uk.ac.liv.moduleextraction.extractor.AMEX;
+import uk.ac.liv.moduleextraction.extractor.ExtractorException;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
@@ -27,7 +28,12 @@ public class AMEXvsSTAR implements Experiment {
 	public AMEXvsSTAR(OWLOntology ontology) {
 		this.manager = ontology.getOWLOntologyManager();
 		this.syntaxModExtractor = new SyntacticLocalityModuleExtractor(manager, ontology, ModuleType.STAR);
-		this.amex = new AMEX(ontology);
+		try{
+			this.amex = new AMEX(ontology);
+		} catch (ExtractorException e) {
+			e.printStackTrace();
+		}
+
 	}
 	
 	@Override
