@@ -41,7 +41,7 @@ public class ModuleExtractionExamples {
 
     public static void usingModuleExtractors() throws ExtractorException {
         //Load the ontology from a file - CHANGE THIS to your own ontology
-        //Make sure ontologies are suitable for use with the extractor before using it (no extra checking is done) - i.e don't use more expressive  than ALCQI with AMEX
+        //Make sure ontologies are suitable for use with the extractor before using it - i.e don't use more expressive  than ALCQI with AMEX
         OWLOntology ont = OntologyLoader.loadOntologyAllAxioms("/path/to/ontology.owl");
 
         //Create the module extractors - implement the Extractor interface
