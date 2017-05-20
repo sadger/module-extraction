@@ -1,3 +1,5 @@
+package uk.ac.liv.moduleextraction;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
@@ -21,7 +23,7 @@ public class CycleTest {
 
     @Before
     public void locateFiles(){
-        Path resourceDirectory = Paths.get("test/data/");
+        Path resourceDirectory = Paths.get("src/test/data/");
         dataDirectory = resourceDirectory.toFile();
     }
 
@@ -131,12 +133,13 @@ public class CycleTest {
         OWLOntology selfcycle = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/selfcycle.krss");
         ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(selfcycle.getLogicalAxioms());
 
+
         Collections.sort(axioms, new AxiomNameComparator());
 
 
         /*
-            0:W ⊑ X
-            1:W ⊑ ∃ r.W
+            0:W ⊑ ∃ r.W
+            1:W ⊑ X
 
         */
         OntologyCycleVerifier verifier = new OntologyCycleVerifier(axioms);
@@ -151,7 +154,7 @@ public class CycleTest {
         checkSet.removeAll(verifier.getCycleCausingAxioms());
 
         //Set still contains W ⊑ X
-        assertTrue("Should contain " + axioms.get(0), checkSet.contains(axioms.get(0)));
+        assertTrue("Should contain " + axioms.get(1), checkSet.contains(axioms.get(1)));
 
         verifier = new OntologyCycleVerifier(checkSet);
 

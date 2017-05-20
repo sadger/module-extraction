@@ -1,3 +1,5 @@
+package uk.ac.liv.moduleextraction;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.owlapi.model.*;
@@ -17,14 +19,14 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by william on 28/01/17.
  */
-public class MEXExtraction {
+public class MEXExtractionTest {
 
 
     File dataDirectory;
 
     @Before
     public void locateFiles(){
-        Path resourceDirectory = Paths.get("test/data/");
+        Path resourceDirectory = Paths.get("src/test/data/");
         dataDirectory = resourceDirectory.toFile();
     }
 

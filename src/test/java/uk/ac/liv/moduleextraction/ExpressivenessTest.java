@@ -1,3 +1,5 @@
+package uk.ac.liv.moduleextraction;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -24,7 +26,7 @@ public class ExpressivenessTest {
 
     @Before
     public void locateFiles(){
-        Path resourceDirectory = Paths.get("test/data/");
+        Path resourceDirectory = Paths.get("src/test/data/");
         dataDirectory = resourceDirectory.toFile();
     }
 

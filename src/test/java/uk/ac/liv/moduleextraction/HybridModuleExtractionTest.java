@@ -1,3 +1,5 @@
+package uk.ac.liv.moduleextraction;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.owlapi.model.*;
@@ -13,14 +15,14 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
-public class HybridModuleExtraction {
+public class HybridModuleExtractionTest {
 
 
     File dataDirectory;
 
     @Before
     public void locateFiles(){
-        Path resourceDirectory = Paths.get("test/data/");
+        Path resourceDirectory = Paths.get("src/test/data/");
         dataDirectory = resourceDirectory.toFile();
     }
 

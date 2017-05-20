@@ -1,10 +1,11 @@
+package uk.ac.liv.moduleextraction;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
-@SuiteClasses({HybridModuleExtraction.class, MEXExtraction.class,
-        AxiomDependenciesTest.class, CycleTest.class, TerminologyValidationTests.class,
+@SuiteClasses({HybridModuleExtractionTest.class, MEXExtractionTest.class,
+        AxiomDependenciesTest.class, CycleTest.class, TerminologyValidationTest.class,
         ExpressivenessTest.class})
 
 public class ModuleExtractionTests {
