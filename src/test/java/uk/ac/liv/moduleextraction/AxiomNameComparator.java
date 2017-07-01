@@ -1,8 +1,6 @@
 package uk.ac.liv.moduleextraction;
 
-import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import uk.ac.liv.moduleextraction.util.AxiomSplitter;
 
 import java.util.Comparator;
 
@@ -16,11 +14,6 @@ import java.util.Comparator;
 public class AxiomNameComparator implements Comparator<OWLLogicalAxiom>{
     @Override
     public int compare(OWLLogicalAxiom ax1, OWLLogicalAxiom ax2) {
-        OWLClassExpression exp1 = AxiomSplitter.getNameofAxiom(ax1);
-        OWLClassExpression exp2 = AxiomSplitter.getNameofAxiom(ax2);
-        OWLClassExpression exp3 = AxiomSplitter.getDefinitionofAxiom(ax1);
-        OWLClassExpression exp4 = AxiomSplitter.getDefinitionofAxiom(ax2);
-
-        return exp1.toString().compareTo(exp2.toString());
+        return ax1.toString().compareTo(ax2.toString());
     }
 }

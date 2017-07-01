@@ -14,9 +14,6 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by william on 27/02/17.
- */
 public class CycleTest {
 
     File dataDirectory;
@@ -67,6 +64,7 @@ public class CycleTest {
         8:W ≡ Z ⊓ (∀ r.W)
         9:X ⊑ Y ⊔ Z
          */
+
 
         OntologyCycleVerifier verifier = new OntologyCycleVerifier(axioms);
         //Whole ontology is cyclic
@@ -138,9 +136,8 @@ public class CycleTest {
 
 
         /*
-            0:W ⊑ ∃ r.W
-            1:W ⊑ X
-
+            0:W ⊑ X
+            1:W ⊑ ∃ r.W
         */
         OntologyCycleVerifier verifier = new OntologyCycleVerifier(axioms);
 
@@ -154,7 +151,7 @@ public class CycleTest {
         checkSet.removeAll(verifier.getCycleCausingAxioms());
 
         //Set still contains W ⊑ X
-        assertTrue("Should contain " + axioms.get(1), checkSet.contains(axioms.get(1)));
+        assertTrue("Should contain " + axioms.get(0), checkSet.contains(axioms.get(0)));
 
         verifier = new OntologyCycleVerifier(checkSet);
 

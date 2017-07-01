@@ -1,5 +1,6 @@
 package uk.ac.liv.moduleextraction.extractor;
 
+import com.google.common.collect.ImmutableSet;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -35,7 +36,7 @@ public class STARAMEXHybridExtractor extends AbstractHybridExtractor {
         Set<OWLLogicalAxiom> module = starExtractor.extractModule(signature);
         //The STAR module is the same as the first extraction in the hybrid module
         if (starExtractions == 1) {
-            this.starModule = module;
+            this.starModule = ImmutableSet.copyOf(module);
         }
         return module;
     }
