@@ -1,0 +1,48 @@
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'idea'
+
+mainClassName = 'uk.ac.liv.moduleextraction.examples.ModuleExtractionExamples'
+
+//Need to be java 1.8+
+targetCompatibility = '1.8'
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // jar dependencies
+    compile 'net.sourceforge.owlapi:owlapi-distribution:3.5.1'
+    compile 'org.slf4j:slf4j-api:1.7.2'
+    compile 'org.slf4j:slf4j-simple:1.7.2'
+
+
+    // testing
+    testCompile 'junit:junit:4.12'
+}
+
+sourceSets {
+    test {
+        resources {
+            srcDirs = ['src/test/data']
+        }
+    }
+}
+// Require the environment variable to be set
+test {
+    testLogging {
+        // Show that tests are run in the command-line output
+        showStandardStreams = true
+        exceptionFormat = 'full'
+        events 'passed', 'failed'
+    }
+
+    if(null == System.getenv()['QBF_LOCATION']) {
+        throw new GradleException(
+            'Required QBF_LOCATION environment variable not set.')
+    }
+
+    
+}
