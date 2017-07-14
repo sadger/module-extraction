@@ -151,7 +151,7 @@ public class CycleTest {
         checkSet.removeAll(verifier.getCycleCausingAxioms());
 
         //Set still contains W ⊑ X
-        assertTrue("Should contain " + axioms.get(0), checkSet.contains(axioms.get(0)));
+        assertTrue(checkSet + "should contain " + axioms.get(0), checkSet.contains(axioms.get(0)));
 
         verifier = new OntologyCycleVerifier(checkSet);
 

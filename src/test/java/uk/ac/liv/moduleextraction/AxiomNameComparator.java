@@ -1,6 +1,7 @@
 package uk.ac.liv.moduleextraction;
 
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import uk.ac.manchester.cs.owlapi.dlsyntax.DLSyntaxObjectRenderer;
 
 import java.util.Comparator;
 
@@ -14,6 +15,9 @@ import java.util.Comparator;
 public class AxiomNameComparator implements Comparator<OWLLogicalAxiom>{
     @Override
     public int compare(OWLLogicalAxiom ax1, OWLLogicalAxiom ax2) {
-        return ax1.toString().compareTo(ax2.toString());
+        DLSyntaxObjectRenderer renderer = new DLSyntaxObjectRenderer();
+        String ax1String = renderer.render(ax1);
+        String ax2String = renderer.render(ax2);
+        return ax1String.compareTo(ax2String);
     }
 }

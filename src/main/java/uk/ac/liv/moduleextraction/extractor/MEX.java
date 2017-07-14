@@ -35,6 +35,7 @@ public class MEX implements Extractor {
     }
 
     public MEX(Set<OWLLogicalAxiom> axioms) throws ExtractorException{
+        logger.trace("MEX module extraction: input ontology: {}", (axioms.size() < 15) ? axioms : "too large to show");
         if(isOntologyValid(axioms)){
             dependencies = new AxiomDependencies(axioms);
             equivalenceDependencies = new AxiomDependencies(collectEquivalenceAxioms(axioms));
@@ -48,12 +49,12 @@ public class MEX implements Extractor {
         ELIOntologyValidator eliOntologyValidator = new ELIOntologyValidator();
         TerminologyValidator termValid = new TerminologyValidator(ontology);
 
-        if(eliOntologyValidator.isELIOntology(ontology) && termValid.isTerminology()){
+        if(eliOntologyValidator.isELIOntology(ontology) && termValid.isTerminologyWithRCIs()) {
             OntologyCycleVerifier cycleVerifier = new OntologyCycleVerifier(ontology);
             return !cycleVerifier.isCyclic();
         }
         else{
-            throw new ExtractorException("Input ontology must be a valid acyclic EL terminology");
+            throw new ExtractorException("Input ontology must be a valid acyclic EL terminology with (optional) repeated inclusions");
         }
     }
 
