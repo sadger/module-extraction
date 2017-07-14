@@ -15,24 +15,22 @@ public class ALCQIExpressionVerifier implements OWLClassExpressionVisitorEx<Bool
 
     @Override
     public Boolean visit(OWLObjectIntersectionOf arg0) {
-        if(arg0.getOperands().size() == 0) {return false;}
-
-        boolean result = true;
-        for(OWLClassExpression expr : arg0.getOperands()){
-            result = result && expr.accept(this);
+        if(arg0.operands().count() == 0) {
+            return false;
         }
-        return result;
+        else{
+            return arg0.operands().allMatch(expr -> expr.accept(this));
+        }
     }
 
     @Override
     public Boolean visit(OWLObjectUnionOf arg0) {
-        if(arg0.getOperands().size() == 0) {return false;}
-
-        boolean result = true;
-        for(OWLClassExpression expr : arg0.getOperands()){
-            result = result && expr.accept(this);
+        if(arg0.operands().count() == 0) {
+            return false;
         }
-        return result;
+        else{
+            return arg0.operands().allMatch(expr -> expr.accept(this));
+        }
     }
 
     @Override

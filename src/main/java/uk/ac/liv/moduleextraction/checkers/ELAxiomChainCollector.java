@@ -3,6 +3,7 @@ package uk.ac.liv.moduleextraction.checkers;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.util.OWLAPIStreamUtils;
 import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.axiomdependencies.DefinitorialAxiomStore;
 import uk.ac.liv.moduleextraction.util.AxiomSplitter;
@@ -31,7 +32,7 @@ public class ELAxiomChainCollector {
 
 					chain.add(axiom);
 					//Update signature
-					sigUnionSigM.addAll(axiom.getSignature());
+					sigUnionSigM.addAll(OWLAPIStreamUtils.asSet(axiom.signature()));
 					//Remove from ontology
 					terminology[i] = false;
 
@@ -64,7 +65,7 @@ public class ELAxiomChainCollector {
 
 				chain.add(axiom);
 				//Update signature
-				sigUnionSigM.addAll(axiom.getSignature());
+				sigUnionSigM.addAll(OWLAPIStreamUtils.asSet(axiom.signature()));
 				//Remove from ontology
 				axiomStore.removeAxiom(terminology, axiom);
 

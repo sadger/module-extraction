@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.util.OWLAPIStreamUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.liv.moduleextraction.cycles.OntologyCycleVerifier;
@@ -29,7 +30,7 @@ public class STARMEXHybridExtractor extends AbstractHybridExtractor {
     }
 
     public STARMEXHybridExtractor(OWLOntology ont) {
-        this(ont.getLogicalAxioms());
+        this(OWLAPIStreamUtils.asSet(ont.logicalAxioms()));
     }
 
 

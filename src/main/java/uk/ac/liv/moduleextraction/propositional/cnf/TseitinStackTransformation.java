@@ -1,7 +1,6 @@
 package uk.ac.liv.moduleextraction.propositional.cnf;
 
 import com.google.common.base.Stopwatch;
-import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.propositional.formula.*;
 import uk.ac.liv.moduleextraction.propositional.nSeparability.nAxiomConvertor;
@@ -308,14 +307,15 @@ public class TseitinStackTransformation {
             System.out.println(ont.getLogicalAxiomCount());
 
             Set<PropositionalFormula> converted = new HashSet<>();
-            for(OWLLogicalAxiom ax : ont.getLogicalAxioms()){
 
-                PropositionalFormula formula = ax.accept(new nAxiomConvertor(1));
-                formula = formula.accept(implicationEliminator);
-                formula = formula.accept(nnfConvertor);
-                formula = truthIdentitySimplifier.simplifyTruthIdentities(formula);
-                converted.add(formula);
-            }
+            ont.logicalAxioms().forEach(ax -> {
+                    PropositionalFormula formula = ax.accept(new nAxiomConvertor(1));
+                    formula = formula.accept(implicationEliminator);
+                    formula = formula.accept(nnfConvertor);
+                    formula = truthIdentitySimplifier.simplifyTruthIdentities(formula);
+                    converted.add(formula);
+            });
+
 
 
             Stopwatch stacktimer = Stopwatch.createStarted();

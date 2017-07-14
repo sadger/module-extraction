@@ -1,6 +1,7 @@
 package uk.ac.liv.moduleextraction.extractor;
 
 import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.util.OWLAPIStreamUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
@@ -31,7 +32,7 @@ public class MEX implements Extractor {
 
 
     public MEX(OWLOntology ontology) throws ExtractorException{
-        this(ontology.getLogicalAxioms());
+        this(OWLAPIStreamUtils.asSet(ontology.logicalAxioms()));
     }
 
     public MEX(Set<OWLLogicalAxiom> axioms) throws ExtractorException{
@@ -96,7 +97,7 @@ public class MEX implements Extractor {
                         change = true;
                         module.add(chosenAxiom);
                         terminology[i] = false;
-                        sigUnionSigM.addAll(chosenAxiom.getSignature());
+                        sigUnionSigM.addAll(OWLAPIStreamUtils.asSet(chosenAxiom.signature()));
                     }
                 }
             }
@@ -137,7 +138,7 @@ public class MEX implements Extractor {
                         logger.trace("Indirect dependency: {}", chosenAxiom);
                         module.add(chosenAxiom);
                         terminology[i] = false;
-                        sigUnionSigM.addAll(chosenAxiom.getSignature());
+                        sigUnionSigM.addAll(OWLAPIStreamUtils.asSet(chosenAxiom.signature()));
                     }
                 }
 
@@ -162,7 +163,7 @@ public class MEX implements Extractor {
         OWLOntology equiv = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/equiv.krss");
         ModuleUtils.remapIRIs(equiv, "X");
 
-        equiv.getLogicalAxioms().forEach(System.out::println);
+        equiv.logicalAxioms().forEach(System.out::println);
         OWLDataFactory f = equiv.getOWLOntologyManager().getOWLDataFactory();
 
         OWLClass a = f.getOWLClass(IRI.create("X#A"));
@@ -172,7 +173,7 @@ public class MEX implements Extractor {
 
         Set<OWLEntity> sig = new HashSet<>(Arrays.asList(a,a1,a2));
 
-        MEX mex = new MEX(equiv.getLogicalAxioms());
+        MEX mex = new MEX(OWLAPIStreamUtils.asSet(equiv.logicalAxioms()));
         System.out.println("Mod: " + mex.extractModule(sig));
     }
 

@@ -4,6 +4,7 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.util.DLExpressivityChecker;
+import org.semanticweb.owlapi.util.OWLAPIStreamUtils;
 import org.semanticweb.owlapi.util.OWLEntityRenamer;
 import org.semanticweb.owlapi.util.SimpleShortFormProvider;
 
@@ -21,7 +22,7 @@ public class ModuleUtils {
 	public static Set<OWLClass> getClassesInSet(Set<OWLLogicalAxiom> axioms){
 		Set<OWLClass> classes = new HashSet<OWLClass>();
 		for(OWLLogicalAxiom axiom : axioms){
-			classes.addAll(axiom.getClassesInSignature());
+			classes.addAll(OWLAPIStreamUtils.asSet(axiom.classesInSignature()));
 			removeTopAndBottomConcept(classes);
 		}
 		return classes;
@@ -33,7 +34,7 @@ public class ModuleUtils {
 	public static Set<OWLEntity> getClassAndRoleNamesInSet(Collection<OWLLogicalAxiom> axioms){
 		Set<OWLEntity> entities = new HashSet<OWLEntity>();
 		for(OWLLogicalAxiom axiom : axioms){
-			entities.addAll(axiom.getSignature().stream().filter(e -> e.isOWLClass() || e.isOWLObjectProperty()).collect(Collectors.toList()));
+			entities.addAll(axiom.signature().filter(e -> e.isOWLClass() || e.isOWLObjectProperty()).collect(Collectors.toList()));
 		}
 		removeTopAndBottomConcept(entities);
 		return entities;
@@ -42,8 +43,7 @@ public class ModuleUtils {
 	public static Set<OWLEntity> getSignatureOfAxioms(Collection<OWLLogicalAxiom> axioms){
 		Set<OWLEntity> entities = new HashSet<>();
 		axioms.forEach(axiom ->
-				entities.addAll(axiom.getSignature()
-						.stream()
+				entities.addAll(axiom.signature()
 						.filter(e -> e.isOWLClass() || e.isOWLObjectProperty() || e.isOWLNamedIndividual())
 						.collect(Collectors.toSet()))
 		);
@@ -60,14 +60,14 @@ public class ModuleUtils {
 		Set<OWLObjectProperty> result = new HashSet<OWLObjectProperty>();
 
 		for(OWLLogicalAxiom axiom : axioms){
-			result.addAll(axiom.getObjectPropertiesInSignature());
+			result.addAll(OWLAPIStreamUtils.asSet(axiom.objectPropertiesInSignature()));
 		}
 
 		return result;
 	}
 
 	public static Set<OWLClass> getNamedClassesInSignature(OWLClassExpression cls){
-        Set<OWLClass> classes = cls.getClassesInSignature();
+        Set<OWLClass> classes = cls.classesInSignature().collect(Collectors.toSet());
 		removeTopAndBottomConcept(classes);
 		return classes;
 	}
@@ -78,7 +78,7 @@ public class ModuleUtils {
 	}
 
 	public static OWLClass getRandomClass(Set<OWLClass> classes){
-		ArrayList<OWLClass> listOfClasses = new ArrayList<OWLClass>(classes);
+		ArrayList<OWLClass> listOfClasses = new ArrayList<>(classes);
 		Collections.shuffle(listOfClasses);
 		return listOfClasses.get(0);
 	}
@@ -125,7 +125,7 @@ public class ModuleUtils {
 		SimpleShortFormProvider spm = new SimpleShortFormProvider();
 
 		for(OWLOntology ont : ontologies){
-			Set<OWLEntity> sig = ont.getSignature();
+			Set<OWLEntity> sig =  OWLAPIStreamUtils.asSet(ont.signature());
 			String newPrefix = prefix + "#";
 			for(OWLEntity ent : sig){
 				if(!(ent.isTopEntity() || ent.isBottomEntity())){
@@ -143,17 +143,6 @@ public class ModuleUtils {
 		remapIRIs(onts, prefix);
 	}
 
-	public static Set<OWLLogicalAxiom> getAxiomsForSignature(OWLOntology ontology, Set<OWLEntity> signature){
-		Set<OWLLogicalAxiom> axioms = new HashSet<OWLLogicalAxiom>();
-
-		for(OWLLogicalAxiom ax : ontology.getLogicalAxioms()){
-			if(ax.getSignature().equals(signature)){
-				axioms.add(ax);
-			}
-		}
-		return axioms;
-	}
-
 	public static int getCoreSize(Set<OWLLogicalAxiom> axioms){
 		int count = 0;
 
@@ -168,12 +157,12 @@ public class ModuleUtils {
 
 	public static Set<OWLLogicalAxiom> getCoreAxioms(OWLOntology ontology){
 		Set<OWLLogicalAxiom> coreAxioms = new HashSet<OWLLogicalAxiom>();
-		for(OWLLogicalAxiom axiom : ontology.getLogicalAxioms()){
+		ontology.logicalAxioms().forEach(axiom -> {
 			AxiomType<?> type = axiom.getAxiomType();
 			if(type == AxiomType.SUBCLASS_OF || type == AxiomType.EQUIVALENT_CLASSES){
 				coreAxioms.add(axiom);
 			}
-		}
+		});
 		return coreAxioms;
 	}
 	

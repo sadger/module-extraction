@@ -26,7 +26,7 @@ public class AxiomSplitter {
         }
         else if(type ==  AxiomType.DISJOINT_CLASSES) {
             OWLDisjointClassesAxiom ax = (OWLDisjointClassesAxiom) axiom;
-            ArrayList<OWLSubClassOfAxiom> asSubset = new ArrayList(ax.asOWLSubClassOfAxioms());
+            ArrayList<OWLSubClassOfAxiom> asSubset = new ArrayList<>(ax.asOWLSubClassOfAxioms());
             if(asSubset.size() == 1){
                 OWLSubClassOfAxiom disjointSub = asSubset.get(0);
                 return getNameofAxiom(disjointSub);
@@ -52,7 +52,7 @@ public class AxiomSplitter {
 			definition = ((OWLEquivalentClassesAxiom) axiom).getClassExpressionsAsList().get(1);
         else if(type ==  AxiomType.DISJOINT_CLASSES) {
             OWLDisjointClassesAxiom ax = (OWLDisjointClassesAxiom) axiom;
-            ArrayList<OWLSubClassOfAxiom> asSubset = new ArrayList(ax.asOWLSubClassOfAxioms());
+            ArrayList<OWLSubClassOfAxiom> asSubset = new ArrayList<>(ax.asOWLSubClassOfAxioms());
             if(asSubset.size() == 1){
                 OWLSubClassOfAxiom disjointSub = asSubset.get(0);
                 return getDefinitionofAxiom(disjointSub);

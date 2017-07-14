@@ -13,11 +13,7 @@ public class ELIExpressionValidator implements OWLClassExpressionVisitorEx<Boole
 
 	@Override
 	public Boolean visit(OWLObjectIntersectionOf ce) {
-		boolean result = true;
-		for(OWLClassExpression expr : ce.getOperands()){
-			result = result && expr.accept(this);
-		}
-		return result;
+		return ce.operands().allMatch(expr -> expr.accept(this));
 	}
 
 	@Override

@@ -1,11 +1,11 @@
 package uk.ac.liv.moduleextraction.util;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.dlsyntax.renderer.DLSyntaxObjectRenderer;
 import org.semanticweb.owlapi.io.FileDocumentSource;
 import org.semanticweb.owlapi.io.ToStringRenderer;
 import org.semanticweb.owlapi.io.UnparsableOntologyException;
 import org.semanticweb.owlapi.model.*;
-import uk.ac.manchester.cs.owlapi.dlsyntax.DLSyntaxObjectRenderer;
 
 import java.io.File;
 
@@ -13,10 +13,9 @@ public class OntologyLoader {
 
 		
 	public static OWLOntology loadOntologyAllAxioms(String pathName){
-		ToStringRenderer stringRender = ToStringRenderer.getInstance();
-		DLSyntaxObjectRenderer renderer;
-		renderer =  new DLSyntaxObjectRenderer();
-		stringRender.setRenderer(renderer);
+
+		ToStringRenderer stringRenderer= new ToStringRenderer();
+		stringRenderer.setRenderer(() -> new DLSyntaxObjectRenderer());
 
 
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();

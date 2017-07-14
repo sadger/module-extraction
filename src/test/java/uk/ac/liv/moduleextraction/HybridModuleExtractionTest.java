@@ -1,5 +1,6 @@
 package uk.ac.liv.moduleextraction;
 
+import com.google.common.collect.ImmutableSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.owlapi.model.*;
@@ -12,6 +13,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -30,9 +33,10 @@ public class HybridModuleExtractionTest {
     public void thesisFoodExample(){
         OWLOntology food = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/food.owl");
         ModuleUtils.remapIRIs(food, "X");
-        ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(food.getLogicalAxioms());
+        List<OWLLogicalAxiom> axioms = food.logicalAxioms().collect(Collectors.toList());
         Collections.sort(axioms, new AxiomNameComparator());
 
+        Set<OWLLogicalAxiom> logicalAxioms = ImmutableSet.copyOf(axioms);
 
 
   /*
@@ -52,19 +56,19 @@ public class HybridModuleExtractionTest {
         OWLObjectProperty hasFood = f.getOWLObjectProperty(IRI.create("X#hasFood"));
         Set<OWLEntity> sig = new HashSet<>(Arrays.asList(hasFood));
 
-        STARExtractor starExtractor = new STARExtractor(food.getLogicalAxioms());
+        STARExtractor starExtractor = new STARExtractor(logicalAxioms);
         Set<OWLLogicalAxiom> starModule = starExtractor.extractModule(sig);
 
         //STAR contains the whole ontology
-        assertEquals(starModule, food.getLogicalAxioms());
+        assertEquals(starModule, logicalAxioms);
 
-        STARAMEXHybridExtractor starAmex = new STARAMEXHybridExtractor(food.getLogicalAxioms());
+        STARAMEXHybridExtractor starAmex = new STARAMEXHybridExtractor(logicalAxioms);
         Set<OWLLogicalAxiom> hybridModule = starAmex.extractModule(sig);
 
         // Hybrid Module = [EdibleThing ⊓ MealCourse ⊑ ⊥, MealCourse ⊑ ∀ hasFood.EdibleThing, ∃ hasFood.⊤ ⊑ MealCourse]
-        HashSet<OWLLogicalAxiom> expectedHybridModule = new HashSet<>(Arrays.asList(axioms.get(2), axioms.get(3), axioms.get(5)));
+        Set<OWLLogicalAxiom> expectedHybridModule = Stream.of(axioms.get(2), axioms.get(3), axioms.get(5)).collect(Collectors.toSet());
 
-        assertEquals(expectedHybridModule,hybridModule);
+        assertEquals(expectedHybridModule, hybridModule);
 
     }
 

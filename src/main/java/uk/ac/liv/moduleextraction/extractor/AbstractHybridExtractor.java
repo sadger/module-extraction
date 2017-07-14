@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.util.OWLAPIStreamUtils;
 import uk.ac.liv.moduleextraction.metrics.ExtractionMetric;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public abstract class AbstractHybridExtractor implements Extractor{
     }
 
     AbstractHybridExtractor(OWLOntology ont){
-       this(ont.getLogicalAxioms());
+       this(OWLAPIStreamUtils.asSet(ont.logicalAxioms()));
     }
 
 

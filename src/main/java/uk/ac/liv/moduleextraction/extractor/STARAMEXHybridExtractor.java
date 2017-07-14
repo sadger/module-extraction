@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.util.OWLAPIStreamUtils;
 import uk.ac.liv.moduleextraction.cycles.OntologyCycleVerifier;
 import uk.ac.liv.moduleextraction.filters.ALCQIwithAtomicLHSFilter;
 import uk.ac.liv.moduleextraction.filters.OntologyFilters;
@@ -25,7 +26,7 @@ public class STARAMEXHybridExtractor extends AbstractHybridExtractor {
     }
 
     public STARAMEXHybridExtractor(OWLOntology ont) {
-        this(ont.getLogicalAxioms());
+        this(OWLAPIStreamUtils.asSet(ont.logicalAxioms()));
     }
 
 

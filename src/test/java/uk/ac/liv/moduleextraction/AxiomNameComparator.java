@@ -1,7 +1,7 @@
 package uk.ac.liv.moduleextraction;
 
+import org.semanticweb.owlapi.dlsyntax.renderer.DLSyntaxObjectRenderer;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
-import uk.ac.manchester.cs.owlapi.dlsyntax.DLSyntaxObjectRenderer;
 
 import java.util.Comparator;
 

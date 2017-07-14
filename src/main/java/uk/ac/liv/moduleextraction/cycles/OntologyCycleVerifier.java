@@ -5,6 +5,7 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.util.OWLAPIStreamUtils;
 import uk.ac.liv.moduleextraction.util.AxiomSplitter;
 import uk.ac.liv.moduleextraction.util.ModuleUtils;
 
@@ -22,7 +23,7 @@ public class OntologyCycleVerifier {
 	private GraphBuilder builder;
 
 	public OntologyCycleVerifier(OWLOntology ontology) {
-		this(ontology.getLogicalAxioms());
+		this(OWLAPIStreamUtils.asSet(ontology.logicalAxioms()));
 	}
 
 	public OntologyCycleVerifier(Collection<OWLLogicalAxiom> axioms) {

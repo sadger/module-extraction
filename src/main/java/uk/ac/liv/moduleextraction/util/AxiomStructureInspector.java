@@ -4,6 +4,7 @@ import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.util.OWLAPIStreamUtils;
 
 import java.util.*;
 
@@ -17,7 +18,7 @@ public class AxiomStructureInspector {
 	Collection<OWLLogicalAxiom> axioms;
 
 	public AxiomStructureInspector(OWLOntology ont) {
-		this(ont.getLogicalAxioms());
+		this(OWLAPIStreamUtils.asSet(ont.logicalAxioms()));
 
 	}
 

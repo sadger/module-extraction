@@ -2,6 +2,7 @@ package uk.ac.liv.moduleextraction.extractor;
 
 import com.google.common.base.Stopwatch;
 import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.util.OWLAPIStreamUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
@@ -47,7 +48,7 @@ public class AMEX implements Extractor{
 
 	
 	public AMEX(OWLOntology ontology) throws   ExtractorException{
-		this(ontology.getLogicalAxioms());
+		this(OWLAPIStreamUtils.asSet(ontology.logicalAxioms()));
 	}
 	
 	public AMEX(Set<OWLLogicalAxiom> ontology) throws ExtractorException{
@@ -142,7 +143,7 @@ public class AMEX implements Extractor{
 		if(oneElementInseparableChecker.isSeparableFromEmptySet(lhsSigT, sigUnionSigM)){
 			OWLLogicalAxiom insepAxiom = findSeparableAxiom(terminology);
 			module.add(insepAxiom);
-			sigUnionSigM.addAll(insepAxiom.getSignature());
+			sigUnionSigM.addAll(OWLAPIStreamUtils.asSet(insepAxiom.signature()));
 			axiomStore.removeAxiom(terminology, insepAxiom);
 			applyRules(terminology);
 		}
@@ -182,7 +183,7 @@ public class AMEX implements Extractor{
 						module.add(chosenAxiom);
 						terminology[i] = false;
 						logger.trace("Axiom dependency: {}", chosenAxiom);
-						sigUnionSigM.addAll(chosenAxiom.getSignature());
+						sigUnionSigM.addAll(OWLAPIStreamUtils.asSet(chosenAxiom.signature()));
 						
 						
 					}
@@ -197,7 +198,7 @@ public class AMEX implements Extractor{
 
         OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/shared/vent.krss");
 		ModuleUtils.remapIRIs(ont, "X");
-		ont.getLogicalAxioms().forEach(System.out::println);
+		ont.logicalAxioms().forEach(System.out::println);
 
 		Set<OWLEntity> signature = new HashSet<>();
 

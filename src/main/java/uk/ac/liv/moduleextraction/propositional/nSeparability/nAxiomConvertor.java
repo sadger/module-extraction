@@ -38,14 +38,17 @@ public class nAxiomConvertor implements OWLAxiomVisitorEx<PropositionalFormula> 
         nAxiomConvertor convertor3 = new nAxiomConvertor(3);
 
         OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ModulePaths.getOntologyLocation() + "/examples/newprop.owl");
-        for(OWLLogicalAxiom axiom : ont.getLogicalAxioms()){
+
+        ont.logicalAxioms().forEach(axiom -> {
             System.out.println(axiom);
             System.out.println(axiom.getAxiomType());
             System.out.println("[1] " + axiom.accept(convertor1));
             System.out.println("[2] " + axiom.accept(convertor2));
-//            System.out.println("[3] " + axiom.accept(convertor3));
-        }
+
+        });
+
     }
+
 
     /**
      * C \sqsubseteq D = \bigwedge \limits_{d \in \Delta_n} [C]_{d} \rightarrow [D]_{d}$

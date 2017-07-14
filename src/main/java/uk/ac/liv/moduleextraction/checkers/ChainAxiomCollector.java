@@ -2,6 +2,7 @@ package uk.ac.liv.moduleextraction.checkers;
 
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.util.OWLAPIStreamUtils;
 import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.axiomdependencies.DefinitorialAxiomStore;
 
@@ -27,7 +28,7 @@ public class ChainAxiomCollector {
 					chain.add(axiom);
 
 					//Update signature
-					sigUnionSigM.addAll(axiom.getSignature());
+					sigUnionSigM.addAll(OWLAPIStreamUtils.asSet(axiom.signature()));
 					//Remove from ontology
 					terminology[currentIndex] = false;
 

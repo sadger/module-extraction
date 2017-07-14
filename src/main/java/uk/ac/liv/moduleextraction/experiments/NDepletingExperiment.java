@@ -8,8 +8,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import uk.ac.liv.moduleextraction.extractor.ExtractorException;
 import uk.ac.liv.moduleextraction.extractor.NDepletingModuleExtractor;
 import uk.ac.liv.moduleextraction.util.CSVWriter;
-import uk.ac.liv.moduleextraction.util.ModulePaths;
-import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
 import java.io.File;
 import java.io.IOException;
@@ -164,22 +162,6 @@ public class NDepletingExperiment implements  Experiment{
         exactlyWriter.writeCSVFile();
     }
 
-    public static void main(String[] args) throws IOException {
-
-        File ontLocation = new File(ModulePaths.getOntologyLocation() + "OWL-Corpus-All/qbf-only/"
-                + "51120da9-3598-4b41-93ed-1afbc0503afa_estIND.owl-QBF");
-
-        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(ontLocation.getAbsolutePath());
-
-        for(OWLLogicalAxiom axiom : ont.getLogicalAxioms()){
-            Set<OWLEntity> sig = axiom.getSignature();
-            NDepletingExperiment expr = new NDepletingExperiment(2,ont,ontLocation);
-            expr.performExperiment(sig);
-            expr.writeMetrics(new File("/tmp/xxx"));
-        }
-
-
-    }
 
 
 

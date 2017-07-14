@@ -2,6 +2,7 @@ package uk.ac.liv.moduleextraction.signature;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.util.OWLAPIStreamUtils;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
@@ -14,7 +15,7 @@ public class WriteAxiomSignatures {
 	File saveLocation;
 	Set<OWLLogicalAxiom> axioms;
 	public WriteAxiomSignatures(OWLOntology ontology, File saveLocation) {
-		this.axioms = ontology.getLogicalAxioms();
+		this.axioms = OWLAPIStreamUtils.asSet(ontology.logicalAxioms());
 		this.saveLocation = saveLocation;
 	}
 	
@@ -29,7 +30,7 @@ public class WriteAxiomSignatures {
 		int i = 0;
 		for(OWLLogicalAxiom axiom : axioms){
 			i++;
-			Set<OWLEntity> signature = axiom.getSignature();
+			Set<OWLEntity> signature = OWLAPIStreamUtils.asSet(axiom.signature());
 			signature.remove(factory.getOWLThing());
 			signature.remove(factory.getOWLNothing());
 			try {

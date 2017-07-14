@@ -2,9 +2,11 @@ package uk.ac.liv.moduleextraction.axiomdependencies;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
-import uk.ac.liv.moduleextraction.util.*;
+import org.semanticweb.owlapi.util.OWLAPIStreamUtils;
+import uk.ac.liv.moduleextraction.util.AxiomSplitter;
+import uk.ac.liv.moduleextraction.util.FullAxiomComparator;
+import uk.ac.liv.moduleextraction.util.ModuleUtils;
 
-import java.io.File;
 import java.util.*;
 
 /**
@@ -24,7 +26,7 @@ public class AxiomDefinitorialDepth {
     private OWLDataFactory factory;
 
     public AxiomDefinitorialDepth(OWLOntology ontology) {
-        this(ontology.getLogicalAxioms());
+        this(OWLAPIStreamUtils.asSet(ontology.logicalAxioms()));
     }
 
     public int lookup(OWLLogicalAxiom ax) {
@@ -57,7 +59,7 @@ public class AxiomDefinitorialDepth {
                 OWLClass name = (OWLClass) AxiomSplitter.getNameofAxiom(axiom);
                 OWLClassExpression definiton = AxiomSplitter.getDefinitionofAxiom(axiom);
                 Set<OWLClass> currentDepedencies = immediateDependencies.get(name);
-                Set<OWLClass> definitionClasses = definiton.getClassesInSignature();
+                Set<OWLClass> definitionClasses = OWLAPIStreamUtils.asSet(definiton.classesInSignature());
                 //Dependencies don't consider TOP or BOTTOM constructs
 //                definitionClasses.remove(factory.getOWLThing());
 //                definitionClasses.remove(factory.getOWLNothing());
@@ -117,11 +119,4 @@ public class AxiomDefinitorialDepth {
         }
     }
 
-    public static void main(String[] args) {
-        File f = new File(ModulePaths.getOntologyLocation() + "/examples/top.krss");
-        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
-        AxiomDefinitorialDepth dep = new AxiomDefinitorialDepth(ont.getLogicalAxioms());
-        System.out.println(dep.getDefinitorialSortedList());
-
-    }
 }

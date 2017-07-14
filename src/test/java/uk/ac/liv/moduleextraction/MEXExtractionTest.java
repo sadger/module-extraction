@@ -12,6 +12,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -34,7 +36,7 @@ public class MEXExtractionTest {
     public void simpleIndirectDependencyExtraction() throws ExtractorException {
         OWLOntology equiv = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/equiv.krss");
         ModuleUtils.remapIRIs(equiv, "X");
-        ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(equiv.getLogicalAxioms());
+        List<OWLLogicalAxiom> axioms = equiv.logicalAxioms().collect(Collectors.toList());
         Collections.sort(axioms, new AxiomNameComparator());
 
         /*
@@ -52,10 +54,10 @@ public class MEXExtractionTest {
         //  Σ = [A1, A, A2]
         Set<OWLEntity> sig = new HashSet<>(Arrays.asList(a, a1, a2));
 
-        MEX mex = new MEX(equiv.getLogicalAxioms());
+        MEX mex = new MEX(axioms.stream().collect(Collectors.toSet()));
 
         //Module  {A ≡ B1 ⊓ B2, A1 ⊑ B1, A2 ⊑ B2}
-        Set<OWLLogicalAxiom> expectedMexModule = new HashSet<>(Arrays.asList(axioms.get(0), axioms.get(1), axioms.get(2)));
+        Set<OWLLogicalAxiom> expectedMexModule = Stream.of(axioms.get(0), axioms.get(1), axioms.get(2)).collect(Collectors.toSet());
         Set<OWLLogicalAxiom> mexModule = mex.extractModule(sig);
 
         assertEquals(expectedMexModule, mexModule);

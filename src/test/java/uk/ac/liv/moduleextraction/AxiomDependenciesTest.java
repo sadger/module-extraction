@@ -14,6 +14,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -32,7 +33,7 @@ public class AxiomDependenciesTest {
         //Example of definitorial depth with RCIs from thesis
         OWLOntology depthanimals = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/defdepth.owl");
         ModuleUtils.remapIRIs(depthanimals, "Animals");
-        ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(depthanimals.getLogicalAxioms());
+        List<OWLLogicalAxiom> axioms = depthanimals.logicalAxioms().collect(Collectors.toList());
         Collections.sort(axioms,new AxiomNameComparator());
 
         /*
@@ -59,7 +60,7 @@ public class AxiomDependenciesTest {
         OWLOntology animals = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/axiomdeps.owl");
         ModuleUtils.remapIRIs(animals, "Animals");
 
-        ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(animals.getLogicalAxioms());
+        List<OWLLogicalAxiom> axioms = animals.logicalAxioms().collect(Collectors.toList());
         Collections.sort(axioms,new AxiomNameComparator());
 
         /*
@@ -100,7 +101,7 @@ public class AxiomDependenciesTest {
         //Thesis AMEX extraction from ontology with RCIs
         OWLOntology animals = OntologyLoader.loadOntologyAllAxioms(dataDirectory.getAbsolutePath() + "/rci-extraction.owl");
         ModuleUtils.remapIRIs(animals, "RCI");
-        ArrayList<OWLLogicalAxiom> axioms = new ArrayList<>(animals.getLogicalAxioms());
+        List<OWLLogicalAxiom> axioms = animals.logicalAxioms().collect(Collectors.toList());
         Collections.sort(axioms,new AxiomNameComparator());
 
 

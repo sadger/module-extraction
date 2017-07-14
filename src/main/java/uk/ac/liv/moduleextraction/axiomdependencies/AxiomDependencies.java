@@ -1,9 +1,14 @@
 package uk.ac.liv.moduleextraction.axiomdependencies;
 
-import org.semanticweb.owlapi.model.*;
-import uk.ac.liv.moduleextraction.util.*;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLLogicalAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.util.OWLAPIStreamUtils;
+import uk.ac.liv.moduleextraction.util.AxiomSplitter;
+import uk.ac.liv.moduleextraction.util.AxiomStructureInspector;
+import uk.ac.liv.moduleextraction.util.ModuleUtils;
 
-import java.io.File;
 import java.util.*;
 
 /***
@@ -18,7 +23,7 @@ public class AxiomDependencies extends HashMap<OWLLogicalAxiom, DependencySet>{
 	private AxiomStructureInspector inspector;
 
 	public AxiomDependencies(OWLOntology ontology) {
-		this(ontology.getLogicalAxioms());
+		this(OWLAPIStreamUtils.asSet(ontology.logicalAxioms()));
 	}
 
 	public AxiomDependencies(Set<OWLLogicalAxiom> axioms){
@@ -52,10 +57,10 @@ public class AxiomDependencies extends HashMap<OWLLogicalAxiom, DependencySet>{
 	}
 
 	private void addImmediateDependencies(OWLClassExpression definition, DependencySet axiomDeps) {
-		for(OWLEntity e : definition.getSignature()){
+		definition.signature().forEach(e -> {
 			if(!e.isTopEntity() && !e.isBottomEntity())
 				axiomDeps.add(e);
-		}
+		});
 	}
 
 	private void updateFromDefinition(OWLClass axiomName, OWLClassExpression definition, DependencySet axiomDeps) {
@@ -85,11 +90,4 @@ public class AxiomDependencies extends HashMap<OWLLogicalAxiom, DependencySet>{
 		return sortedAxioms;
 	}
 
-	public static void main(String[] args) {
-        File f = new File(ModulePaths.getOntologyLocation() + "/top.krss");
-        OWLOntology ont = OntologyLoader.loadOntologyAllAxioms(f.getAbsolutePath());
-        AxiomDependencies dep = new AxiomDependencies(ont.getLogicalAxioms());
-        System.out.println(dep);
-
-	}
 }

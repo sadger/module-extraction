@@ -4,6 +4,7 @@ import com.google.common.base.Stopwatch;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLogicalAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.util.OWLAPIStreamUtils;
 import uk.ac.liv.moduleextraction.axiomdependencies.AxiomDependencies;
 import uk.ac.liv.moduleextraction.axiomdependencies.DefinitorialAxiomStore;
 import uk.ac.liv.moduleextraction.checkers.ELAxiomChainCollector;
@@ -50,7 +51,7 @@ public class NDepletingModuleExtractor implements Extractor {
 	private nAxiomToClauseStore clauseStore;
 
 	private NDepletingModuleExtractor(int domain_size, OWLOntology ontology) throws ExtractorException {
-		this(domain_size,ontology.getLogicalAxioms());
+		this(domain_size, OWLAPIStreamUtils.asSet(ontology.logicalAxioms()));
 	}
 
 	public NDepletingModuleExtractor(int domain_size, Set<OWLLogicalAxiom> ontology) throws ExtractorException {
@@ -162,7 +163,7 @@ public class NDepletingModuleExtractor implements Extractor {
 			OWLLogicalAxiom axiom = findSeparableAxiom(terminology);
 			module.add(axiom);
 			removeAxiom(terminology, axiom);
-			sigUnionSigM.addAll(axiom.getSignature());
+			sigUnionSigM.addAll(OWLAPIStreamUtils.asSet(axiom.signature()));
 			applyRules(terminology);
 		}
 	}

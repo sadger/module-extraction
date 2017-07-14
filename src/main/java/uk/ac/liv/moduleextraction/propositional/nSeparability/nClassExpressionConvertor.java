@@ -342,7 +342,7 @@ public class nClassExpressionConvertor implements OWLClassExpressionVisitorEx<Pr
     //Nominals - ONE
     @Override
     public PropositionalFormula visit(OWLObjectHasValue owlObjectHasValue) {
-        return owlObjectHasValue.getValue().accept(individualConvertor);
+        return owlObjectHasValue.getFiller().accept(individualConvertor);
     }
 
     //Nominals - MANY

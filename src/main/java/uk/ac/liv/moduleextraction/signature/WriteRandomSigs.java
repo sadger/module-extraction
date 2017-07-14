@@ -2,6 +2,7 @@ package uk.ac.liv.moduleextraction.signature;
 
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.util.OWLAPIStreamUtils;
 import uk.ac.liv.moduleextraction.util.ModulePaths;
 import uk.ac.liv.moduleextraction.util.OntologyLoader;
 
@@ -23,7 +24,7 @@ public class WriteRandomSigs {
 			loc.mkdirs();
 		}
 		this.ontology = ont;
-		this.sigGen = new  SignatureGenerator(ontology.getLogicalAxioms());
+		this.sigGen = new  SignatureGenerator(OWLAPIStreamUtils.asSet(ontology.logicalAxioms()));
 	}
 	
 	
@@ -38,9 +39,8 @@ public class WriteRandomSigs {
 		
 		for(int i=1; i<=numberOfTests; i++){
 			Set<OWLEntity> signature = new HashSet<OWLEntity>();
-			signature.addAll(sigGen.generateRandomClassSignature(sigSize));	
-			
-			int roleCount = ontology.getObjectPropertiesInSignature().size();
+			signature.addAll(sigGen.generateRandomClassSignature(sigSize));
+			int roleCount = (int) ontology.objectPropertiesInSignature().count();
 			int numberOfRoles = (int) Math.floor(((double) roleCount / 100 ) * rolePercentage);
 			
 			signature.addAll(sigGen.generateRandomRoles(numberOfRoles));
