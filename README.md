@@ -3,19 +3,9 @@
 ## Prerequisites
 * Linux operating system (necessary for the QBF solvers)
 * Java 1.8 or above
-* Java library jars
-  * guava-18.0.jar
-  * junit-4.12.jar
-  * owlapi-distribution-3.5.2.jar
-  * slf4j-api-1.7.2.jar **and** slf4j-simple-1.7.2.jar
-  * trove4j-3.0.3.jar
-  * hamcrest-core-1.3.jar
-  
-## Setup
+* Gradle
 
-### Import the source and dependencies
-1. Import the `src/` and `test/` folders into your IDE of choice
-2. Add the prerequisites jar dependencies to your path
+## Setup
 
 
 ### Setup the QBF solvers
@@ -30,11 +20,15 @@ in which they are listed in the enviromental variable is the order in which used
 The solvers are assumed to be executable linux binaries that take CNF QBF problem encoded in the a `.qdimacs` format as an argument 
 i.e `./solver problem.qdimacs` and return `10` if the problem is satisfiable, `20` if it is unsatisfiable. Any other return code will be interpreted as an error. 
 
+### Building the project
+1. Import the project into your IDE of choice
+2. Use the command `gradle build` to pull in the dependencies and build the project
+
 ## Usage
 
 ### Examples
 A number of examples have been written to show the functionality of the project and are a good place to begin. Assuming you have setup your environment correctly you can find the examples in the package `uk.ac.liv.moduleextraction.examples`
 
 ### Running the tests
-The separate `test/` directory contains a number of JUnit tests. These can be run individually or you can run all the tests from the `ModuleExtractionTests` class.
+The separate `test/` directory contains a number of JUnit tests. These can be run using the `gradle test` command.
 It is recommended you ensure the tests pass if making any modifications, this  ensure you haven't accidently broken some of the code which is known to be working.
